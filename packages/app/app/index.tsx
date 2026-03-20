@@ -25,6 +25,17 @@ export default function ServerSelectScreen() {
     setActiveProfile(profile.id);
     try {
       setConnecting(true);
+
+      // Pre-flight: test raw connectivity
+      try {
+        const testRes = await fetch(`${profile.url}/health`, { method: 'GET' });
+        console.log(`[COCKPIT] Health: ${testRes.status}`);
+      } catch (netErr) {
+        const msg = netErr instanceof Error ? netErr.message : String(netErr);
+        Alert.alert('Cannot Reach Server', `${profile.url}/health failed:\n\n${msg}`);
+        return;
+      }
+
       // Try stored credential from SecureStore first
       const storedCred = Platform.OS === 'web'
         ? localStorage.getItem(`cockpit_cred_${profile.id}`)
@@ -55,7 +66,22 @@ export default function ServerSelectScreen() {
 
     try {
       setConnecting(true);
-      await addProfile({ name: name.trim(), url: url.trim(), authMode });
+      const cleanUrl = url.trim().replace(/\/+$/, '');
+
+      // Pre-flight: test raw connectivity before saving profile
+      console.log(`[COCKPIT] Testing connectivity to ${cleanUrl}/health ...`);
+      try {
+        const testRes = await fetch(`${cleanUrl}/health`, { method: 'GET' });
+        const testBody = await testRes.text();
+        console.log(`[COCKPIT] Health check: ${testRes.status} ${testBody.substring(0, 100)}`);
+      } catch (netErr) {
+        const msg = netErr instanceof Error ? netErr.message : String(netErr);
+        console.error(`[COCKPIT] Pre-flight failed:`, netErr);
+        Alert.alert('Cannot Reach Server', `${cleanUrl}/health failed:\n\n${msg}\n\nCheck that the URL is correct and your VPN is connected.`);
+        return;
+      }
+
+      await addProfile({ name: name.trim(), url: cleanUrl, authMode });
       const updated = useServerStore.getState().profiles;
       const newProfile = updated[updated.length - 1];
       setActiveProfile(newProfile.id);
@@ -68,7 +94,7 @@ export default function ServerSelectScreen() {
       router.replace('/(tabs)/overview');
     } catch (err) {
       console.error('[COCKPIT] handleAdd failed:', err);
-      Alert.alert('Failed', err instanceof Error ? err.message : 'Unknown error');
+      Alert.alert('Connection Failed', err instanceof Error ? err.message : 'Unknown error');
     } finally {
       setConnecting(false);
     }
