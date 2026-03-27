@@ -1,4 +1,5 @@
 import { View, Text, TouchableOpacity, Modal, StyleSheet } from 'react-native';
+import { COLORS, RADIUS, SPACING } from '../theme/tokens';
 
 interface ActionSheetProps {
   visible: boolean;
@@ -16,7 +17,7 @@ export default function ActionSheet({
   title,
   message,
   confirmLabel,
-  confirmColor = '#EF4444',
+  confirmColor = COLORS.red,
   onConfirm,
   onCancel,
   loading,
@@ -51,31 +52,31 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgba(0,0,0,0.7)',
     justifyContent: 'center',
     alignItems: 'center',
-    padding: 24,
+    padding: SPACING.xxl,
   },
   sheet: {
-    backgroundColor: '#1F2937',
-    borderRadius: 16,
-    padding: 24,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xxl,
     width: '100%',
     maxWidth: 360,
   },
-  title: { color: '#F9FAFB', fontSize: 18, fontWeight: '700', marginBottom: 8 },
-  message: { color: '#9CA3AF', fontSize: 14, marginBottom: 24, lineHeight: 20 },
-  actions: { flexDirection: 'row', gap: 12 },
+  title: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '700', marginBottom: SPACING.sm },
+  message: { color: COLORS.textSecondary, fontSize: 14, marginBottom: SPACING.xxl, lineHeight: 20 },
+  actions: { flexDirection: 'row', gap: SPACING.md },
   cancelBtn: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
-    backgroundColor: '#374151',
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.border,
     alignItems: 'center',
   },
-  cancelText: { color: '#D1D5DB', fontSize: 15, fontWeight: '600' },
+  cancelText: { color: COLORS.textSecondary, fontSize: 15, fontWeight: '600' },
   confirmBtn: {
     flex: 1,
-    paddingVertical: 12,
-    borderRadius: 8,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
   },
-  confirmText: { color: '#fff', fontSize: 15, fontWeight: '600' },
+  confirmText: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
 });

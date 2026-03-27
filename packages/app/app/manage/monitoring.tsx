@@ -9,6 +9,7 @@ import {
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { WebView } from 'react-native-webview';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- Constants ---------- */
@@ -100,7 +101,7 @@ export default function MonitoringScreen() {
 
         {/* Refresh Button */}
         <TouchableOpacity style={styles.refreshBtn} onPress={handleRefresh}>
-          <Text style={styles.refreshIcon}>{'\u21BB'}</Text>
+          <Ionicons name="refresh" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
 
@@ -108,7 +109,7 @@ export default function MonitoringScreen() {
       <View style={styles.webviewContainer}>
         {error ? (
           <View style={styles.center}>
-            <Text style={styles.errorIcon}>{'\u26A0'}</Text>
+            <Ionicons name="warning" size={48} color={COLORS.yellow} style={{ marginBottom: SPACING.lg }} />
             <Text style={styles.errorTitle}>Grafana Unreachable</Text>
             <Text style={styles.errorText}>
               Could not connect to the monitoring dashboard. Check that Grafana
@@ -224,16 +225,12 @@ const styles = StyleSheet.create({
     color: COLORS.bg,
   },
   refreshBtn: {
-    width: 36,
-    height: 36,
+    minWidth: 44,
+    minHeight: 44,
     borderRadius: RADIUS.sm,
     backgroundColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
-  },
-  refreshIcon: {
-    color: COLORS.textSecondary,
-    fontSize: 18,
   },
 
   /* WebView */
@@ -266,10 +263,6 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     alignItems: 'center',
     paddingHorizontal: SPACING.xxl,
-  },
-  errorIcon: {
-    fontSize: 48,
-    marginBottom: SPACING.lg,
   },
   errorTitle: {
     color: COLORS.textPrimary,

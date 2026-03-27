@@ -7,6 +7,7 @@ import {
   RefreshControl,
 } from 'react-native';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
@@ -26,18 +27,18 @@ interface DaySection {
 }
 
 /* action → color + icon mapping */
-function getActionStyle(action: string): { icon: string; color: string } {
+function getActionStyle(action: string): { icon: keyof typeof Ionicons.glyphMap; color: string } {
   const a = action.toLowerCase();
-  if (a.includes('start')) return { icon: '\u25B6', color: COLORS.green }; // green
-  if (a.includes('stop')) return { icon: '\u23F9', color: '#F87171' }; // red
-  if (a.includes('restart')) return { icon: '\u{1F504}', color: COLORS.blue }; // blue
-  if (a.includes('exec')) return { icon: '\u{1F4BB}', color: COLORS.yellow }; // yellow
-  if (a.includes('prune')) return { icon: '\u{1F9F9}', color: COLORS.orange }; // orange
-  if (a.includes('delete') || a.includes('remove')) return { icon: '\u{1F5D1}', color: '#F87171' };
-  if (a.includes('create') || a.includes('add')) return { icon: '\u2795', color: COLORS.green };
-  if (a.includes('update') || a.includes('edit')) return { icon: '\u270F', color: COLORS.purple };
-  if (a.includes('login') || a.includes('auth')) return { icon: '\u{1F511}', color: COLORS.blue };
-  return { icon: '\u2022', color: COLORS.textSecondary };
+  if (a.includes('start')) return { icon: 'play', color: COLORS.green };
+  if (a.includes('stop')) return { icon: 'stop', color: COLORS.red };
+  if (a.includes('restart')) return { icon: 'refresh', color: COLORS.blue };
+  if (a.includes('exec')) return { icon: 'terminal', color: COLORS.yellow };
+  if (a.includes('prune')) return { icon: 'trash', color: COLORS.orange };
+  if (a.includes('delete') || a.includes('remove')) return { icon: 'trash', color: COLORS.red };
+  if (a.includes('create') || a.includes('add')) return { icon: 'add-circle', color: COLORS.green };
+  if (a.includes('update') || a.includes('edit')) return { icon: 'create', color: COLORS.purple };
+  if (a.includes('login') || a.includes('auth')) return { icon: 'lock-closed', color: COLORS.blue };
+  return { icon: 'ellipse', color: COLORS.textSecondary };
 }
 
 /* group entries by day */
@@ -98,7 +99,7 @@ export default function ActivityScreen() {
         {/* Content */}
         <View style={styles.entryContent}>
           <View style={styles.entryHeader}>
-            <Text style={[styles.actionIcon, { color }]}>{icon}</Text>
+            <Ionicons name={icon} size={14} color={color} />
             <Text style={styles.actionText}>{item.action}</Text>
             <Text style={styles.timeText}>{time}</Text>
           </View>
@@ -137,7 +138,7 @@ export default function ActivityScreen() {
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Text style={styles.emptyIcon}>{'\u{1F4DC}'}</Text>
+              <Ionicons name="list" size={40} color={COLORS.textTertiary} style={{ marginBottom: SPACING.md }} />
               <Text style={styles.emptyText}>No activity yet</Text>
               <Text style={styles.emptySubtext}>
                 Actions performed on this server will appear here
@@ -199,7 +200,6 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   entryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
-  actionIcon: { fontSize: 14 },
   actionText: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', flex: 1 },
   timeText: { color: COLORS.textTertiary, fontSize: 11 },
   targetText: { color: COLORS.blue, fontSize: 13, marginTop: SPACING.xs },
@@ -208,7 +208,6 @@ const styles = StyleSheet.create({
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginTop: 80 },
-  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
   emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
   emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

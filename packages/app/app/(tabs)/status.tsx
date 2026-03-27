@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from '../../src/lib/api';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface Endpoint {
   name: string;
@@ -22,9 +23,9 @@ interface SSLCert {
 }
 
 function getDaysColor(days: number): string {
-  if (days <= 7) return '#EF4444';
-  if (days <= 14) return '#F59E0B';
-  return '#22C55E';
+  if (days <= 7) return COLORS.red;
+  if (days <= 14) return COLORS.yellow;
+  return COLORS.green;
 }
 
 export default function StatusScreen() {
@@ -59,7 +60,7 @@ export default function StatusScreen() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />}
     >
       {/* Endpoints */}
       <Text style={styles.sectionTitle}>HTTP Endpoints</Text>
@@ -70,11 +71,11 @@ export default function StatusScreen() {
           <View key={i} style={styles.card}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardName}>{ep.name}</Text>
-              <View style={[styles.statusDot, { backgroundColor: ep.healthy ? '#22C55E' : '#EF4444' }]} />
+              <View style={[styles.statusDot, { backgroundColor: ep.healthy ? COLORS.green : COLORS.red }]} />
             </View>
             <Text style={styles.cardUrl}>{ep.url}</Text>
             <View style={styles.cardStats}>
-              <Text style={[styles.cardStat, { color: ep.healthy ? '#22C55E' : '#EF4444' }]}>
+              <Text style={[styles.cardStat, { color: ep.healthy ? COLORS.green : COLORS.red }]}>
                 {ep.status || 'ERR'}
               </Text>
               <Text style={styles.cardStat}>{ep.responseTime}ms</Text>
@@ -85,7 +86,7 @@ export default function StatusScreen() {
       )}
 
       {/* SSL Certificates */}
-      <Text style={[styles.sectionTitle, { marginTop: 24 }]}>SSL Certificates</Text>
+      <Text style={[styles.sectionTitle, { marginTop: SPACING.xxl }]}>SSL Certificates</Text>
       {certs.length === 0 ? (
         <Text style={styles.empty}>No SSL domains configured</Text>
       ) : (
@@ -112,36 +113,36 @@ export default function StatusScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
-  content: { padding: 16, paddingBottom: 40 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg, paddingBottom: 40 },
   sectionTitle: {
-    color: '#9CA3AF',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
-  empty: { color: '#6B7280', fontSize: 14, fontStyle: 'italic', marginBottom: 16 },
+  empty: { color: COLORS.textTertiary, fontSize: 14, fontStyle: 'italic', marginBottom: SPACING.lg },
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.md,
     padding: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: COLORS.border,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
-  cardName: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
+  cardName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
   statusDot: { width: 10, height: 10, borderRadius: 5 },
-  cardUrl: { color: '#6B7280', fontSize: 12, marginBottom: 4 },
-  cardStats: { flexDirection: 'row', gap: 16, marginTop: 4 },
-  cardStat: { color: '#9CA3AF', fontSize: 13, fontWeight: '500' },
-  cardError: { color: '#EF4444', fontSize: 12, marginTop: 4 },
+  cardUrl: { color: COLORS.textTertiary, fontSize: 12, marginBottom: SPACING.xs },
+  cardStats: { flexDirection: 'row', gap: SPACING.lg, marginTop: SPACING.xs },
+  cardStat: { color: COLORS.textSecondary, fontSize: 13, fontWeight: '500' },
+  cardError: { color: COLORS.red, fontSize: 12, marginTop: SPACING.xs },
   days: { fontSize: 14, fontWeight: '700' },
 });

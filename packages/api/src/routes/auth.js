@@ -97,12 +97,16 @@ router.post("/auth/users", requireAuth, requireRole("admin"), (req, res) => {
 });
 
 router.delete("/auth/users/:id", requireAuth, requireRole("admin"), (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid user ID" });
-  if (id === req.user.id) return res.status(400).json({ error: "Cannot delete your own account" });
-  deleteUser(id);
-  auditLog(req.user.id, "user.delete", req.params.id);
-  res.json({ ok: true });
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid user ID" });
+    if (id === req.user.id) return res.status(400).json({ error: "Cannot delete your own account" });
+    deleteUser(id);
+    auditLog(req.user.id, "user.delete", req.params.id);
+    res.json({ ok: true });
+  } catch (err) {
+    res.status(500).json({ error: "Failed to delete user" });
+  }
 });
 
 router.put("/auth/users/:id/role", requireAuth, requireRole("admin"), (req, res) => {

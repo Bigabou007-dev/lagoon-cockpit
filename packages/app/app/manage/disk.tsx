@@ -1,6 +1,7 @@
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { Stack, useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
@@ -205,7 +206,7 @@ export default function DiskScreen() {
                 <View style={styles.categoryTitleRow}>
                   <View style={[styles.categoryDot, { backgroundColor: cat.color }]} />
                   <Text style={styles.categoryName}>{cat.label}</Text>
-                  {hasRoute && <Text style={styles.categoryArrow}>{'\u203A'}</Text>}
+                  {hasRoute && <Ionicons name="chevron-forward" size={18} color={COLORS.textSecondary} />}
                 </View>
                 <Text style={styles.categorySize}>{formatBytes(info.size)}</Text>
               </View>

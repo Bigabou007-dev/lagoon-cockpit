@@ -1,29 +1,31 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface MenuItem {
   label: string;
   description: string;
-  icon: string;
+  icon: keyof typeof Ionicons.glyphMap;
+  iconColor: string;
   route: string;
   adminOnly?: boolean;
 }
 
 const MENU_ITEMS: MenuItem[] = [
-  { label: 'System Map', description: 'Visual node-graph of all infrastructure', icon: '\u{1F5FA}', route: '/manage/system-map' },
-  { label: 'Disk Usage', description: 'Storage breakdown + system prune', icon: '\u{1F4BE}', route: '/manage/disk' },
-  { label: 'Images', description: 'Manage Docker images', icon: '\u{1F4E6}', route: '/manage/images' },
-  { label: 'Networks', description: 'Docker network topology', icon: '\u{1F310}', route: '/manage/networks' },
-  { label: 'Metrics History', description: 'CPU/RAM/disk trends over time', icon: '\u{1F4C8}', route: '/manage/metrics' },
-  { label: 'Grafana Monitoring', description: 'Live Grafana dashboards', icon: '\u{1F4CA}', route: '/manage/monitoring' },
-  { label: 'Alert Rules', description: 'Custom threshold-based alerts', icon: '\u{1F514}', route: '/manage/alert-rules', adminOnly: true },
-  { label: 'Webhooks', description: 'Fire events to Slack/Discord/n8n', icon: '\u{1F517}', route: '/manage/webhooks', adminOnly: true },
-  { label: 'Activity Log', description: 'Who did what and when', icon: '\u{1F4CB}', route: '/manage/activity' },
-  { label: 'Scheduled Actions', description: 'Cron-based container automation', icon: '\u{23F0}', route: '/manage/schedules', adminOnly: true },
-  { label: 'Maintenance Mode', description: 'Pause alerts during planned work', icon: '\u{1F6E0}', route: '/manage/maintenance', adminOnly: true },
-  { label: 'Server Settings', description: 'Manage server profiles', icon: '\u{2699}', route: '/settings' },
+  { label: 'System Map', description: 'Visual node-graph of all infrastructure', icon: 'map', iconColor: COLORS.blue, route: '/manage/system-map' },
+  { label: 'Disk Usage', description: 'Storage breakdown + system prune', icon: 'save', iconColor: COLORS.purple, route: '/manage/disk' },
+  { label: 'Images', description: 'Manage Docker images', icon: 'cube', iconColor: COLORS.orange, route: '/manage/images' },
+  { label: 'Networks', description: 'Docker network topology', icon: 'globe', iconColor: COLORS.teal, route: '/manage/networks' },
+  { label: 'Metrics History', description: 'CPU/RAM/disk trends over time', icon: 'stats-chart', iconColor: COLORS.green, route: '/manage/metrics' },
+  { label: 'Grafana Monitoring', description: 'Live Grafana dashboards', icon: 'stats-chart', iconColor: COLORS.blue, route: '/manage/monitoring' },
+  { label: 'Alert Rules', description: 'Custom threshold-based alerts', icon: 'notifications', iconColor: COLORS.yellow, route: '/manage/alert-rules', adminOnly: true },
+  { label: 'Webhooks', description: 'Fire events to Slack/Discord/n8n', icon: 'link', iconColor: COLORS.indigo, route: '/manage/webhooks', adminOnly: true },
+  { label: 'Activity Log', description: 'Who did what and when', icon: 'list', iconColor: COLORS.textSecondary, route: '/manage/activity' },
+  { label: 'Scheduled Actions', description: 'Cron-based container automation', icon: 'calendar', iconColor: COLORS.rose, route: '/manage/schedules', adminOnly: true },
+  { label: 'Maintenance Mode', description: 'Pause alerts during planned work', icon: 'build', iconColor: COLORS.yellow, route: '/manage/maintenance', adminOnly: true },
+  { label: 'Server Settings', description: 'Manage server profiles', icon: 'settings', iconColor: COLORS.textSecondary, route: '/settings' },
 ];
 
 export default function ManageScreen() {
@@ -42,12 +44,14 @@ export default function ManageScreen() {
         <Text style={styles.sectionTitle}>Docker Resources</Text>
         {visibleItems.slice(0, 4).map((item) => (
           <TouchableOpacity key={item.route} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
-            <Text style={styles.menuIcon}>{item.icon}</Text>
+            <View style={[styles.menuIconContainer, { backgroundColor: item.iconColor + '20' }]}>
+              <Ionicons name={item.icon} size={20} color={item.iconColor} />
+            </View>
             <View style={styles.menuContent}>
               <Text style={styles.menuLabel}>{item.label}</Text>
               <Text style={styles.menuDesc}>{item.description}</Text>
             </View>
-            <Text style={styles.menuArrow}>{'\u203A'}</Text>
+            <Ionicons name="chevron-forward" size={16} color={COLORS.border} />
           </TouchableOpacity>
         ))}
       </View>
@@ -56,13 +60,15 @@ export default function ManageScreen() {
         <Text style={styles.sectionTitle}>Monitoring</Text>
         {visibleItems.slice(4, 8).map((item) => (
           <TouchableOpacity key={item.route} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
-            <Text style={styles.menuIcon}>{item.icon}</Text>
+            <View style={[styles.menuIconContainer, { backgroundColor: item.iconColor + '20' }]}>
+              <Ionicons name={item.icon} size={20} color={item.iconColor} />
+            </View>
             <View style={styles.menuContent}>
               <Text style={styles.menuLabel}>{item.label}</Text>
               <Text style={styles.menuDesc}>{item.description}</Text>
             </View>
             {item.adminOnly && <Text style={styles.adminBadge}>Admin</Text>}
-            <Text style={styles.menuArrow}>{'\u203A'}</Text>
+            <Ionicons name="chevron-forward" size={16} color={COLORS.border} />
           </TouchableOpacity>
         ))}
       </View>
@@ -71,13 +77,15 @@ export default function ManageScreen() {
         <Text style={styles.sectionTitle}>Operations</Text>
         {visibleItems.slice(8).map((item) => (
           <TouchableOpacity key={item.route} style={styles.menuItem} onPress={() => router.push(item.route as any)}>
-            <Text style={styles.menuIcon}>{item.icon}</Text>
+            <View style={[styles.menuIconContainer, { backgroundColor: item.iconColor + '20' }]}>
+              <Ionicons name={item.icon} size={20} color={item.iconColor} />
+            </View>
             <View style={styles.menuContent}>
               <Text style={styles.menuLabel}>{item.label}</Text>
               <Text style={styles.menuDesc}>{item.description}</Text>
             </View>
             {item.adminOnly && <Text style={styles.adminBadge}>Admin</Text>}
-            <Text style={styles.menuArrow}>{'\u203A'}</Text>
+            <Ionicons name="chevron-forward" size={16} color={COLORS.border} />
           </TouchableOpacity>
         ))}
       </View>
@@ -97,11 +105,16 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.sm,
     borderWidth: 1, borderColor: COLORS.border,
   },
-  menuIcon: { fontSize: 24 },
+  menuIconContainer: {
+    width: 40,
+    height: 40,
+    borderRadius: RADIUS.md,
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   menuContent: { flex: 1 },
   menuLabel: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
   menuDesc: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
-  menuArrow: { color: COLORS.border, fontSize: 24 },
   adminBadge: {
     color: COLORS.yellow, fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, overflow: 'hidden', marginRight: 4,

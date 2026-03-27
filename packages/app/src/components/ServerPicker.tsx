@@ -1,5 +1,6 @@
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native';
 import { useServerStore } from '../stores/serverStore';
+import { COLORS, SPACING } from '../theme/tokens';
 
 interface ServerPickerProps {
   onAddServer: () => void;
@@ -36,17 +37,17 @@ const styles = StyleSheet.create({
   container: {
     flexDirection: 'row',
     alignItems: 'center',
-    gap: 8,
-    paddingVertical: 4,
+    gap: SPACING.sm,
+    paddingVertical: SPACING.xs,
   },
   dot: {
     width: 8,
     height: 8,
     borderRadius: 4,
-    backgroundColor: '#22C55E',
+    backgroundColor: COLORS.green,
   },
   info: { flex: 1 },
-  name: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
-  url: { color: '#6B7280', fontSize: 11 },
-  noServer: { color: '#9CA3AF', fontSize: 14 },
+  name: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
+  url: { color: COLORS.textTertiary, fontSize: 11 },
+  noServer: { color: COLORS.textSecondary, fontSize: 14 },
 });

@@ -9,7 +9,7 @@ const metricsHistory = require("./system/history");
 const alertEngine = require("./system/alerts");
 const webhooks = require("./system/webhooks");
 const scheduler = require("./system/scheduler");
-const { broadcast, getClientCount } = require("./stream/sse");
+const { broadcast, getClientCount, closeAllClients } = require("./stream/sse");
 const { init: initPush, sendPushNotification } = require("./push/expo");
 const authRoutes = require("./routes/auth");
 const containerRoutes = require("./routes/containers");
@@ -108,8 +108,23 @@ async function broadcastLoop() {
     for (const id of Object.keys(previousContainerStates)) if (!currentIds.has(id)) delete previousContainerStates[id];
   } catch (err) { console.error("[SSE] Broadcast error:", err.message); }
 }
-setInterval(broadcastLoop, 15000);
 
-app.listen(PORT, () => {
+const broadcastInterval = setInterval(broadcastLoop, 15000);
+
+const server = app.listen(PORT, () => {
   console.log(`[COCKPIT] API on :${PORT} | ${SERVER_NAME} | auth=${AUTH_MODE} | SSE=15s`);
 });
+
+// Graceful shutdown — close SSE clients, stop broadcast, checkpoint SQLite WAL
+function shutdown(signal) {
+  console.log(`[COCKPIT] ${signal} received — shutting down gracefully`);
+  clearInterval(broadcastInterval);
+  closeAllClients();
+  server.close(() => {
+    console.log("[COCKPIT] HTTP server closed");
+    process.exit(0);
+  });
+  setTimeout(() => { console.error("[COCKPIT] Forced exit after 5s timeout"); process.exit(1); }, 5000);
+}
+process.on("SIGTERM", () => shutdown("SIGTERM"));
+process.on("SIGINT", () => shutdown("SIGINT"));

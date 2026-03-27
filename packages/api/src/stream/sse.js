@@ -38,7 +38,11 @@ function addClient(res) {
 function broadcast(event, data) {
   const payload = `event: ${event}\ndata: ${JSON.stringify(data)}\n\n`;
   for (const client of clients) {
-    client.write(payload);
+    try {
+      if (!client.destroyed) client.write(payload);
+    } catch {
+      clients.delete(client);
+    }
   }
 }
 

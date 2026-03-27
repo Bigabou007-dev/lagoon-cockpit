@@ -1,6 +1,7 @@
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
@@ -134,7 +135,7 @@ export default function ImagesScreen() {
               <ActivityIndicator size="small" color={COLORS.red} />
             ) : (
               <TouchableOpacity onPress={() => handleDelete(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
-                <Text style={styles.deleteBtn}>{'\u2715'}</Text>
+                <Ionicons name="close" size={16} color={COLORS.red} />
               </TouchableOpacity>
             )
           )}

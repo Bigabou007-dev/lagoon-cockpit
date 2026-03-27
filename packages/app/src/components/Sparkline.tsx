@@ -1,4 +1,5 @@
 import { View, Text, StyleSheet } from 'react-native';
+import { COLORS, RADIUS } from '../theme/tokens';
 
 interface SparklineProps {
   data: number[];
@@ -65,11 +66,11 @@ const styles = StyleSheet.create({
   empty: {
     justifyContent: 'center',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
-    borderRadius: 6,
+    backgroundColor: COLORS.border,
+    borderRadius: RADIUS.sm,
   },
   emptyText: {
-    color: '#6B7280',
+    color: COLORS.textTertiary,
     fontSize: 11,
   },
   chartArea: {
@@ -83,7 +84,7 @@ const styles = StyleSheet.create({
     alignItems: 'flex-end',
   },
   labelText: {
-    color: '#6B7280',
+    color: COLORS.textTertiary,
     fontSize: 10,
   },
 });

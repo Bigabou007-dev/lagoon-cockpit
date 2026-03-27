@@ -35,7 +35,49 @@ Lagoon Cockpit gives you a **native mobile app** + **CLI tool** backed by a **li
 - **Push notifications**: Native mobile alerts when things break
 - **Multi-server**: Connect to multiple VPS instances from one app
 - **Biometric lock**: Face ID / fingerprint with auto-lock
+- **Grafana monitoring**: Embedded Grafana dashboards with panel selector (Overview, CPU, Memory, Containers)
+- **Prometheus metrics**: `/metrics` endpoint exports 37+ metrics in OpenMetrics format for Prometheus scraping
 - **CLI companion**: 20 terminal commands for the same API
+
+---
+
+## Prometheus & Grafana Integration
+
+Cockpit exposes a `/metrics` endpoint that Prometheus can scrape. This feeds into Grafana for rich dashboards, alerting, and historical analysis beyond the built-in 7-day SQLite retention.
+
+### Metrics Exported
+
+- `cockpit_cpu_percent`, `cockpit_memory_*`, `cockpit_disk_*`, `cockpit_load_*`
+- `cockpit_uptime_seconds`, `cockpit_cpu_count`
+- `cockpit_containers_running`, `cockpit_containers_stopped`, `cockpit_containers_total`
+- `cockpit_container_running{name="...",image="..."}` — per-container state
+
+### Configuration
+
+Set `METRICS_TOKEN` in your `.env` to protect the endpoint:
+
+```bash
+METRICS_TOKEN=your-random-token-here
+```
+
+Then configure Prometheus to scrape with the bearer token:
+
+```yaml
+- job_name: 'cockpit'
+  scrape_interval: 30s
+  static_configs:
+    - targets: ['cockpit-api:3000']
+  metrics_path: '/metrics'
+  authorization:
+    type: Bearer
+    credentials: your-random-token-here
+```
+
+If `METRICS_TOKEN` is not set, the endpoint is unauthenticated (suitable for isolated Docker networks).
+
+### Mobile App
+
+The "Grafana Monitoring" screen in the manage hub embeds Grafana dashboards via WebView with kiosk mode. Configure your Grafana URL and dashboard UID in the monitoring page source.
 
 ---
 

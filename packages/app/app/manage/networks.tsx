@@ -1,6 +1,7 @@
 import { View, Text, FlatList, RefreshControl, TouchableOpacity, StyleSheet, ActivityIndicator, Alert, LayoutAnimation, Platform, UIManager } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
@@ -73,7 +74,7 @@ export default function NetworksScreen() {
             <Text style={styles.networkName}>{item.name}</Text>
           </View>
           {hasContainers && (
-            <Text style={styles.chevron}>{isExpanded ? '\u25B2' : '\u25BC'}</Text>
+            <Ionicons name={isExpanded ? 'chevron-up' : 'chevron-down'} size={16} color={COLORS.textSecondary} />
           )}
         </View>
 

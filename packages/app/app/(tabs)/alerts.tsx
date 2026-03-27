@@ -1,6 +1,8 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+import { useRef, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardStore, type Alert } from '../../src/stores/dashboardStore';
+import Skeleton from '../../src/components/Skeleton';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 function getAlertIconProps(alert: Alert): { name: keyof typeof Ionicons.glyphMap; color: string } {
@@ -10,28 +12,83 @@ function getAlertIconProps(alert: Alert): { name: keyof typeof Ionicons.glyphMap
   return { name: 'alert-circle', color: COLORS.yellow };
 }
 
+/* Skeleton loading placeholder for alerts */
+function SkeletonAlerts() {
+  return (
+    <View style={styles.list}>
+      {[0, 1, 2, 3, 4].map((i) => (
+        <View key={i} style={styles.skeletonCard}>
+          <View style={{ flexDirection: 'row', gap: SPACING.md }}>
+            <Skeleton width={18} height={18} borderRadius={9} />
+            <View style={{ flex: 1 }}>
+              <Skeleton width={140} height={14} borderRadius={4} />
+              <Skeleton width={200} height={12} borderRadius={4} style={{ marginTop: 6 }} />
+              <Skeleton width={100} height={10} borderRadius={4} style={{ marginTop: 6 }} />
+            </View>
+          </View>
+        </View>
+      ))}
+    </View>
+  );
+}
+
+/* Animated wrapper for staggered entry */
+function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(16)).current;
+
+  useEffect(() => {
+    const anim = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        delay,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 400,
+        delay,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]);
+    anim.start();
+  }, [opacity, translateY, delay]);
+
+  return (
+    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
+  );
+}
+
 export default function AlertsScreen() {
   const { alerts, clearAlerts } = useDashboardStore();
+  const isLoaded = alerts !== undefined;
 
-  const renderAlert = ({ item }: { item: Alert }) => {
+  const renderAlert = ({ item, index }: { item: Alert; index: number }) => {
     const iconProps = getAlertIconProps(item);
     return (
-      <View style={styles.alertItem}>
-        <Ionicons name={iconProps.name} size={18} color={iconProps.color} style={{ marginTop: 2 }} />
-        <View style={styles.alertContent}>
-          <Text style={styles.alertTitle}>
-            {item.containerName || item.type}
-          </Text>
-          <Text style={styles.alertDetail}>
-            {item.previousState
-              ? `${item.previousState} \u2192 ${item.currentState}`
-              : item.message || item.currentState}
-          </Text>
-          <Text style={styles.alertTime}>
-            {new Date(item.timestamp).toLocaleString()}
-          </Text>
+      <FadeSlideIn delay={index * 60}>
+        <View style={styles.alertItem}>
+          <Ionicons name={iconProps.name} size={18} color={iconProps.color} style={{ marginTop: 2 }} />
+          <View style={styles.alertContent}>
+            <Text style={styles.alertTitle}>
+              {item.containerName || item.type}
+            </Text>
+            <Text style={styles.alertDetail}>
+              {item.previousState
+                ? `${item.previousState} \u2192 ${item.currentState}`
+                : item.message || item.currentState}
+            </Text>
+            <Text style={styles.alertTime}>
+              {new Date(item.timestamp).toLocaleString()}
+            </Text>
+          </View>
         </View>
-      </View>
+      </FadeSlideIn>
     );
   };
 
@@ -43,19 +100,24 @@ export default function AlertsScreen() {
         </TouchableOpacity>
       )}
 
-      <FlatList
-        data={alerts}
-        renderItem={renderAlert}
-        keyExtractor={(_, i) => String(i)}
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons name="checkmark-circle" size={48} color={COLORS.green} style={{ marginBottom: SPACING.lg }} />
-            <Text style={styles.emptyText}>No alerts</Text>
-            <Text style={styles.emptySubtext}>Everything is running smoothly</Text>
-          </View>
-        }
-      />
+      {/* Skeleton loading state — shown when alerts array is empty and potentially still loading */}
+      {!isLoaded && alerts.length === 0 && <SkeletonAlerts />}
+
+      {isLoaded && (
+        <FlatList
+          data={alerts}
+          renderItem={renderAlert}
+          keyExtractor={(_, i) => String(i)}
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons name="checkmark-circle" size={48} color={COLORS.green} style={{ marginBottom: SPACING.lg }} />
+              <Text style={styles.emptyText}>No alerts</Text>
+              <Text style={styles.emptySubtext}>Everything is running smoothly</Text>
+            </View>
+          }
+        />
+      )}
     </View>
   );
 }
@@ -87,6 +149,14 @@ const styles = StyleSheet.create({
   alertTitle: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: 2 },
   alertDetail: { color: COLORS.textSecondary, fontSize: 13, marginBottom: 4 },
   alertTime: { color: COLORS.textTertiary, fontSize: 11 },
+  skeletonCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: 14,
+    marginBottom: SPACING.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+  },
   emptyContainer: { alignItems: 'center', marginTop: 80 },
   emptyText: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '600', marginBottom: 4 },
   emptySubtext: { color: COLORS.textTertiary, fontSize: 14 },

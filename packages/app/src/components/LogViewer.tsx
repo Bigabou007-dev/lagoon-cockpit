@@ -1,5 +1,6 @@
 import { View, Text, ScrollView, StyleSheet } from 'react-native';
 import { useRef, useEffect } from 'react';
+import { COLORS, RADIUS, SPACING } from '../theme/tokens';
 
 interface LogViewerProps {
   lines: string[];
@@ -39,16 +40,16 @@ export default function LogViewer({ lines, autoScroll = true }: LogViewerProps) 
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0A0A0A',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
   },
   content: { minWidth: '100%' },
   line: {
-    color: '#D1D5DB',
+    color: COLORS.textSecondary,
     fontFamily: 'monospace',
     fontSize: 11,
     lineHeight: 18,
   },
-  empty: { color: '#6B7280', fontSize: 13, fontStyle: 'italic' },
+  empty: { color: COLORS.textTertiary, fontSize: 13, fontStyle: 'italic' },
 });

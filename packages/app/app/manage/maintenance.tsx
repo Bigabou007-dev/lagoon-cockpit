@@ -11,6 +11,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 export default function MaintenanceScreen() {
@@ -91,7 +92,12 @@ export default function MaintenanceScreen() {
       >
         {/* Status Banner */}
         <View style={[styles.statusBanner, enabled ? styles.bannerOn : styles.bannerOff]}>
-          <Text style={styles.statusIcon}>{enabled ? '\u{1F6A7}' : '\u2705'}</Text>
+          <Ionicons
+            name={enabled ? 'build' : 'checkmark-circle'}
+            size={48}
+            color={enabled ? '#FCD34D' : '#6EE7B7'}
+            style={{ marginBottom: SPACING.md }}
+          />
           <Text style={[styles.statusLabel, enabled ? styles.labelOn : styles.labelOff]}>
             {loading ? 'Loading...' : enabled ? 'MAINTENANCE ACTIVE' : 'OPERATIONAL'}
           </Text>
@@ -205,7 +211,6 @@ const styles = StyleSheet.create({
     backgroundColor: '#052E16',
     borderColor: '#166534',
   },
-  statusIcon: { fontSize: 48, marginBottom: SPACING.md },
   statusLabel: {
     fontSize: 18,
     fontWeight: '800',
