@@ -37,7 +37,7 @@ const miniBarStyles = StyleSheet.create({
   track: {
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
     flex: 1,
   },
   fill: {

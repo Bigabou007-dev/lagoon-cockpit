@@ -8,6 +8,7 @@ import {
 } from 'react-native';
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- types ---------- */
 interface AuditEntry {
@@ -27,16 +28,16 @@ interface DaySection {
 /* action → color + icon mapping */
 function getActionStyle(action: string): { icon: string; color: string } {
   const a = action.toLowerCase();
-  if (a.includes('start')) return { icon: '\u25B6', color: '#34D399' }; // green
+  if (a.includes('start')) return { icon: '\u25B6', color: COLORS.green }; // green
   if (a.includes('stop')) return { icon: '\u23F9', color: '#F87171' }; // red
-  if (a.includes('restart')) return { icon: '\u{1F504}', color: '#4A90FF' }; // blue
-  if (a.includes('exec')) return { icon: '\u{1F4BB}', color: '#FBBF24' }; // yellow
-  if (a.includes('prune')) return { icon: '\u{1F9F9}', color: '#FB923C' }; // orange
+  if (a.includes('restart')) return { icon: '\u{1F504}', color: COLORS.blue }; // blue
+  if (a.includes('exec')) return { icon: '\u{1F4BB}', color: COLORS.yellow }; // yellow
+  if (a.includes('prune')) return { icon: '\u{1F9F9}', color: COLORS.orange }; // orange
   if (a.includes('delete') || a.includes('remove')) return { icon: '\u{1F5D1}', color: '#F87171' };
-  if (a.includes('create') || a.includes('add')) return { icon: '\u2795', color: '#34D399' };
-  if (a.includes('update') || a.includes('edit')) return { icon: '\u270F', color: '#A78BFA' };
-  if (a.includes('login') || a.includes('auth')) return { icon: '\u{1F511}', color: '#4A90FF' };
-  return { icon: '\u2022', color: '#8E8E93' };
+  if (a.includes('create') || a.includes('add')) return { icon: '\u2795', color: COLORS.green };
+  if (a.includes('update') || a.includes('edit')) return { icon: '\u270F', color: COLORS.purple };
+  if (a.includes('login') || a.includes('auth')) return { icon: '\u{1F511}', color: COLORS.blue };
+  return { icon: '\u2022', color: COLORS.textSecondary };
 }
 
 /* group entries by day */
@@ -132,7 +133,7 @@ export default function ActivityScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -151,19 +152,19 @@ export default function ActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  list: { padding: 16, paddingBottom: 40 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  list: { padding: SPACING.lg, paddingBottom: 40 },
 
   /* day header */
   dayHeader: {
-    marginTop: 20,
-    marginBottom: 12,
+    marginTop: SPACING.xl,
+    marginBottom: SPACING.md,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#3A3A3C',
+    borderBottomColor: COLORS.border,
   },
   dayText: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -171,7 +172,7 @@ const styles = StyleSheet.create({
   },
 
   /* timeline entry */
-  entryRow: { flexDirection: 'row', marginBottom: 4 },
+  entryRow: { flexDirection: 'row', marginBottom: SPACING.xs },
   timeline: { width: 24, alignItems: 'center' },
   dot: {
     width: 10,
@@ -182,32 +183,32 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     width: 1,
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
     marginTop: 2,
   },
 
   /* entry content */
   entryContent: {
     flex: 1,
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 12,
-    marginLeft: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.md,
+    marginLeft: SPACING.sm,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   entryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionIcon: { fontSize: 14 },
-  actionText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', flex: 1 },
-  timeText: { color: '#636366', fontSize: 11 },
-  targetText: { color: '#4A90FF', fontSize: 13, marginTop: 4 },
-  detailText: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
-  userText: { color: '#636366', fontSize: 11, marginTop: 6 },
+  actionText: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', flex: 1 },
+  timeText: { color: COLORS.textTertiary, fontSize: 11 },
+  targetText: { color: COLORS.blue, fontSize: 13, marginTop: SPACING.xs },
+  detailText: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
+  userText: { color: COLORS.textTertiary, fontSize: 11, marginTop: 6 },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginTop: 80 },
-  emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
+  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
+  emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
+  emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

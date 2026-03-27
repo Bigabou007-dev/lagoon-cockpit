@@ -11,6 +11,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import Sparkline from '../../src/components/Sparkline';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- Types ---------- */
 
@@ -146,8 +147,8 @@ export default function MetricsHistoryScreen() {
       <Stack.Screen
         options={{
           title: 'Metrics History',
-          headerStyle: { backgroundColor: '#1C1C1E' },
-          headerTintColor: '#FFFFFF',
+          headerStyle: { backgroundColor: COLORS.bg },
+          headerTintColor: COLORS.textPrimary,
         }}
       />
 
@@ -176,7 +177,7 @@ export default function MetricsHistoryScreen() {
 
       {loading && !refreshing ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#4A90FF" />
+          <ActivityIndicator size="large" color={COLORS.blue} />
         </View>
       ) : error ? (
         <View style={styles.center}>
@@ -193,9 +194,9 @@ export default function MetricsHistoryScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#4A90FF"
-              colors={['#4A90FF']}
-              progressBackgroundColor="#2C2C2E"
+              tintColor={COLORS.blue}
+              colors={[COLORS.blue]}
+              progressBackgroundColor={COLORS.card}
             />
           }
         >
@@ -206,7 +207,7 @@ export default function MetricsHistoryScreen() {
             summary?.cpu_avg,
             summary?.cpu_max,
             '%',
-            '#4A90FF',
+            COLORS.blue,
           )}
           {renderCard(
             'Memory',
@@ -215,7 +216,7 @@ export default function MetricsHistoryScreen() {
             summary?.memory_avg,
             summary?.memory_max,
             '%',
-            '#A78BFA',
+            COLORS.purple,
           )}
           {renderCard(
             'Disk',
@@ -224,7 +225,7 @@ export default function MetricsHistoryScreen() {
             summary?.disk_avg,
             summary?.disk_max,
             '%',
-            '#F59E0B',
+            COLORS.yellow,
           )}
           {renderCard(
             'Load (1m)',
@@ -233,7 +234,7 @@ export default function MetricsHistoryScreen() {
             summary?.load_avg,
             summary?.load_max,
             '',
-            '#34D399',
+            COLORS.green,
           )}
 
           {/* Summary Footer */}
@@ -269,7 +270,7 @@ export default function MetricsHistoryScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
   },
   center: {
     flex: 1,
@@ -277,20 +278,20 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   errorText: {
-    color: '#EF4444',
+    color: COLORS.red,
     fontSize: 14,
-    marginBottom: 12,
+    marginBottom: SPACING.md,
     textAlign: 'center',
-    paddingHorizontal: 24,
+    paddingHorizontal: SPACING.xxl,
   },
   retryBtn: {
-    backgroundColor: '#3A3A3C',
-    paddingHorizontal: 20,
+    backgroundColor: COLORS.border,
+    paddingHorizontal: SPACING.xl,
     paddingVertical: 10,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   retryText: {
-    color: '#4A90FF',
+    color: COLORS.blue,
     fontWeight: '600',
     fontSize: 14,
   },
@@ -298,27 +299,27 @@ const styles = StyleSheet.create({
   /* Range Selector */
   rangeRow: {
     flexDirection: 'row',
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    gap: 8,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    gap: SPACING.sm,
   },
   rangeBtn: {
     flex: 1,
-    paddingVertical: 8,
-    borderRadius: 8,
-    backgroundColor: '#3A3A3C',
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.border,
     alignItems: 'center',
   },
   rangeBtnActive: {
-    backgroundColor: '#4A90FF',
+    backgroundColor: COLORS.blue,
   },
   rangeBtnText: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
   },
   rangeBtnTextActive: {
-    color: '#1C1C1E',
+    color: COLORS.bg,
   },
 
   /* Scroll */
@@ -326,27 +327,27 @@ const styles = StyleSheet.create({
     flex: 1,
   },
   scrollContent: {
-    padding: 16,
+    padding: SPACING.lg,
     paddingBottom: 40,
   },
 
   /* Metric Card */
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   cardHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   cardTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -356,59 +357,59 @@ const styles = StyleSheet.create({
   },
   sparklineWrap: {
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   statsRow: {
     flexDirection: 'row',
-    gap: 16,
+    gap: SPACING.lg,
   },
   statItem: {
     flex: 1,
-    backgroundColor: '#3A3A3C',
-    borderRadius: 8,
+    backgroundColor: COLORS.border,
+    borderRadius: RADIUS.sm,
     padding: 10,
     alignItems: 'center',
   },
   statLabel: {
-    color: '#636366',
+    color: COLORS.textTertiary,
     fontSize: 11,
     fontWeight: '500',
     marginBottom: 2,
   },
   statValue: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 14,
     fontWeight: '600',
   },
 
   /* Summary Card */
   summaryCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginTop: 4,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginTop: SPACING.xs,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   summaryTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 16,
     fontWeight: '600',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
   summaryRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
-    paddingVertical: 8,
+    paddingVertical: SPACING.sm,
     borderBottomWidth: 1,
-    borderBottomColor: '#3A3A3C',
+    borderBottomColor: COLORS.border,
   },
   summaryLabel: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
   },
   summaryValue: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 13,
     fontWeight: '600',
   },

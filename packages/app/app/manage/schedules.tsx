@@ -13,6 +13,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- types ---------- */
 interface Schedule {
@@ -251,7 +252,7 @@ export default function SchedulesScreen() {
       <ScrollView
         style={styles.container}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
         }
       >
         {/* -------- Schedules Section -------- */}
@@ -270,7 +271,7 @@ export default function SchedulesScreen() {
             <TextInput
               style={styles.input}
               placeholder="Schedule name"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={name}
               onChangeText={setName}
             />
@@ -294,7 +295,7 @@ export default function SchedulesScreen() {
               <Text
                 style={[
                   styles.pickerValue,
-                  { color: ACTION_COLORS[action]?.text || '#4A90FF' },
+                  { color: ACTION_COLORS[action]?.text || COLORS.blue },
                 ]}
               >
                 {action.toUpperCase()}
@@ -311,7 +312,7 @@ export default function SchedulesScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Cron expression (e.g. 0 3 * * *)"
-                placeholderTextColor="#636366"
+                placeholderTextColor={COLORS.textTertiary}
                 value={customCron}
                 onChangeText={setCustomCron}
                 autoCapitalize="none"
@@ -368,8 +369,8 @@ export default function SchedulesScreen() {
                   <Switch
                     value={!!schedule.enabled}
                     onValueChange={() => toggleSchedule(schedule)}
-                    trackColor={{ false: '#3A3A3C', true: '#1D4ED8' }}
-                    thumbColor={schedule.enabled ? '#4A90FF' : '#636366'}
+                    trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                    thumbColor={schedule.enabled ? COLORS.blue : COLORS.textTertiary}
                   />
                 </View>
                 {isAdmin && (
@@ -399,7 +400,7 @@ export default function SchedulesScreen() {
                 <View
                   style={[
                     styles.statusDot,
-                    { backgroundColor: entry.success ? '#10B981' : '#EF4444' },
+                    { backgroundColor: entry.success ? '#10B981' : COLORS.red },
                   ]}
                 />
               </View>
@@ -419,118 +420,118 @@ export default function SchedulesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.lg },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    marginTop: 8,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.sm,
   },
   sectionTitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
-  addText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
+  addText: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
 
   /* form */
   formCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   input: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 8,
-    padding: 12,
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
+    color: COLORS.textPrimary,
     fontSize: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   pickerBtn: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
-  pickerLabel: { color: '#8E8E93', fontSize: 13 },
-  pickerValue: { color: '#4A90FF', fontSize: 14, fontWeight: '600', maxWidth: '60%' },
+  pickerLabel: { color: COLORS.textSecondary, fontSize: 13 },
+  pickerValue: { color: COLORS.blue, fontSize: 14, fontWeight: '600', maxWidth: '60%' },
   hintText: {
-    color: '#636366',
+    color: COLORS.textTertiary,
     fontSize: 11,
     marginBottom: 10,
-    marginLeft: 4,
+    marginLeft: SPACING.xs,
   },
   saveBtn: {
     backgroundColor: '#1D4ED8',
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
-  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  saveText: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
 
   /* schedule cards */
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   cardTop: { flexDirection: 'row', alignItems: 'flex-start' },
-  cardName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  cardContainer: { color: '#8E8E93', fontSize: 13, marginTop: 2 },
-  metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
+  cardName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
+  cardContainer: { color: COLORS.textSecondary, fontSize: 13, marginTop: 2 },
+  metaRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm, marginTop: SPACING.sm },
   actionBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: 6,
   },
   actionBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
-  cronText: { color: '#4A90FF', fontSize: 12, fontWeight: '500' },
-  timeText: { color: '#636366', fontSize: 11, marginTop: 3 },
-  deleteBtn: { marginTop: 12, alignSelf: 'flex-start' },
-  deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
+  cronText: { color: COLORS.blue, fontSize: 12, fontWeight: '500' },
+  timeText: { color: COLORS.textTertiary, fontSize: 11, marginTop: 3 },
+  deleteBtn: { marginTop: SPACING.md, alignSelf: 'flex-start' },
+  deleteText: { color: COLORS.red, fontSize: 13, fontWeight: '500' },
 
   /* history cards */
   historyCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
     padding: 14,
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   historyTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  historyName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
+  historyName: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  historyMeta: { color: '#8E8E93', fontSize: 12, marginTop: 4 },
+  historyMeta: { color: COLORS.textSecondary, fontSize: 12, marginTop: SPACING.xs },
   historyError: { color: '#FCA5A5', fontSize: 12, marginTop: 2 },
-  historyTime: { color: '#636366', fontSize: 11, marginTop: 4 },
+  historyTime: { color: COLORS.textTertiary, fontSize: 11, marginTop: SPACING.xs },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 32 },
-  emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
+  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
+  emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
+  emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

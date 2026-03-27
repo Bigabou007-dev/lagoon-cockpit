@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface DockerImage {
   id: string;
@@ -130,7 +131,7 @@ export default function ImagesScreen() {
           <Text style={styles.imageName} numberOfLines={1}>{name}</Text>
           {isAdmin && (
             isDeleting ? (
-              <ActivityIndicator size="small" color="#EF4444" />
+              <ActivityIndicator size="small" color={COLORS.red} />
             ) : (
               <TouchableOpacity onPress={() => handleDelete(item)} hitSlop={{ top: 10, bottom: 10, left: 10, right: 10 }}>
                 <Text style={styles.deleteBtn}>{'\u2715'}</Text>
@@ -163,7 +164,7 @@ export default function ImagesScreen() {
       <>
         <Stack.Screen options={{ title: 'Images', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#4A90FF" />
+          <ActivityIndicator size="large" color={COLORS.blue} />
           <Text style={styles.loadingText}>Loading images...</Text>
         </View>
       </>
@@ -194,7 +195,7 @@ export default function ImagesScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No images found</Text>}
@@ -211,35 +212,35 @@ export default function ImagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  centered: { flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: COLORS.textSecondary, fontSize: 14, marginTop: SPACING.md },
   pruneBtn: {
-    backgroundColor: '#F59E0B', marginHorizontal: 16, marginTop: 16, marginBottom: 8,
-    paddingVertical: 12, borderRadius: 16, alignItems: 'center',
+    backgroundColor: COLORS.yellow, marginHorizontal: SPACING.lg, marginTop: SPACING.lg, marginBottom: SPACING.sm,
+    paddingVertical: SPACING.md, borderRadius: RADIUS.lg, alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },
-  pruneBtnText: { color: '#1C1C1E', fontSize: 15, fontWeight: '700' },
-  list: { paddingHorizontal: 16, paddingBottom: 20, paddingTop: 8 },
+  pruneBtnText: { color: COLORS.bg, fontSize: 15, fontWeight: '700' },
+  list: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl, paddingTop: SPACING.sm },
   card: {
-    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#3A3A3C',
+    backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: 10,
+    borderWidth: 1, borderColor: COLORS.border,
   },
-  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  imageName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
-  deleteBtn: { color: '#EF4444', fontSize: 16, fontWeight: '700' },
-  cardMeta: { flexDirection: 'row', gap: 12 },
+  cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
+  imageName: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', flex: 1, marginRight: SPACING.sm },
+  deleteBtn: { color: COLORS.red, fontSize: 16, fontWeight: '700' },
+  cardMeta: { flexDirection: 'row', gap: SPACING.md },
   metaItem: { flex: 1 },
-  metaLabel: { color: '#8E8E93', fontSize: 11, marginBottom: 2 },
-  metaValue: { color: '#FFFFFF', fontSize: 13, fontWeight: '500' },
-  activeCount: { color: '#4A90FF' },
-  inactiveCount: { color: '#8E8E93' },
+  metaLabel: { color: COLORS.textSecondary, fontSize: 11, marginBottom: 2 },
+  metaValue: { color: COLORS.textPrimary, fontSize: 13, fontWeight: '500' },
+  activeCount: { color: COLORS.blue },
+  inactiveCount: { color: COLORS.textSecondary },
   footer: {
-    backgroundColor: '#2C2C2E', borderTopWidth: 1, borderTopColor: '#3A3A3C',
-    paddingVertical: 14, paddingHorizontal: 20, flexDirection: 'row',
+    backgroundColor: COLORS.card, borderTopWidth: 1, borderTopColor: COLORS.border,
+    paddingVertical: 14, paddingHorizontal: SPACING.xl, flexDirection: 'row',
     justifyContent: 'space-between', alignItems: 'center',
   },
-  footerLabel: { color: '#8E8E93', fontSize: 14 },
-  footerValue: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
-  empty: { color: '#636366', fontSize: 14, textAlign: 'center', marginTop: 40 },
+  footerLabel: { color: COLORS.textSecondary, fontSize: 14 },
+  footerValue: { color: COLORS.textPrimary, fontSize: 18, fontWeight: '700' },
+  empty: { color: COLORS.textTertiary, fontSize: 14, textAlign: 'center', marginTop: 40 },
 });

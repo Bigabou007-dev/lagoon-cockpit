@@ -1,7 +1,7 @@
 FROM node:20-alpine
 WORKDIR /app
 COPY package*.json ./
-RUN npm install --omit=dev
+RUN apk add --no-cache sqlite && npm install --omit=dev
 COPY . .
 ARG DOCKER_GID=988
 RUN addgroup -g ${DOCKER_GID} docker-host && addgroup node docker-host

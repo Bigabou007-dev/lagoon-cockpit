@@ -3,6 +3,7 @@ import { useState, useCallback, useEffect } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface CategoryInfo {
   count: number;
@@ -43,10 +44,10 @@ interface CategoryConfig {
 }
 
 const CATEGORIES: CategoryConfig[] = [
-  { key: 'images', label: 'Images', color: '#4A90FF', route: '/manage/images' },
-  { key: 'containers', label: 'Containers', color: '#22C55E', route: null },
-  { key: 'volumes', label: 'Volumes', color: '#F59E0B', route: null },
-  { key: 'buildCache', label: 'Build Cache', color: '#A78BFA', route: null },
+  { key: 'images', label: 'Images', color: COLORS.blue, route: '/manage/images' },
+  { key: 'containers', label: 'Containers', color: COLORS.green, route: null },
+  { key: 'volumes', label: 'Volumes', color: COLORS.yellow, route: null },
+  { key: 'buildCache', label: 'Build Cache', color: COLORS.purple, route: null },
 ];
 
 export default function DiskScreen() {
@@ -127,7 +128,7 @@ export default function DiskScreen() {
       <>
         <Stack.Screen options={{ title: 'Disk Usage', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#4A90FF" />
+          <ActivityIndicator size="large" color={COLORS.blue} />
           <Text style={styles.loadingText}>Analyzing disk usage...</Text>
         </View>
       </>
@@ -154,7 +155,7 @@ export default function DiskScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />}
       >
         {/* Total size header */}
         <View style={styles.totalCard}>
@@ -250,54 +251,54 @@ export default function DiskScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  content: { padding: 16, paddingBottom: 40 },
-  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
-  errorText: { color: '#EF4444', fontSize: 16, marginBottom: 16 },
-  retryBtn: { backgroundColor: '#3A3A3C', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 },
-  retryBtnText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg, paddingBottom: 40 },
+  centered: { flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: COLORS.textSecondary, fontSize: 14, marginTop: SPACING.md },
+  errorText: { color: COLORS.red, fontSize: 16, marginBottom: SPACING.lg },
+  retryBtn: { backgroundColor: COLORS.border, paddingHorizontal: SPACING.xxl, paddingVertical: 10, borderRadius: RADIUS.sm },
+  retryBtnText: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
 
   // Total card
   totalCard: {
-    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 24, marginBottom: 16,
-    borderWidth: 1, borderColor: '#3A3A3C', alignItems: 'center',
+    backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.xxl, marginBottom: SPACING.lg,
+    borderWidth: 1, borderColor: COLORS.border, alignItems: 'center',
   },
-  totalLabel: { color: '#8E8E93', fontSize: 14, marginBottom: 6 },
-  totalValue: { color: '#FFFFFF', fontSize: 36, fontWeight: '800' },
+  totalLabel: { color: COLORS.textSecondary, fontSize: 14, marginBottom: 6 },
+  totalValue: { color: COLORS.textPrimary, fontSize: 36, fontWeight: '800' },
 
   // Stacked bar
-  stackedBarContainer: { marginBottom: 20 },
+  stackedBarContainer: { marginBottom: SPACING.xl },
   stackedBar: {
     flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden',
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
   },
   stackedSegment: { height: '100%' },
-  legendRow: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 10 },
-  legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
+  legendRow: { flexDirection: 'row', justifyContent: 'center', gap: SPACING.lg, marginTop: 10 },
+  legendItem: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { color: '#8E8E93', fontSize: 11 },
+  legendText: { color: COLORS.textSecondary, fontSize: 11 },
 
   // Category cards
   categoryCard: {
-    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#3A3A3C',
+    backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: 10,
+    borderWidth: 1, borderColor: COLORS.border,
   },
-  categoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  categoryTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
+  categoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: SPACING.md },
+  categoryTitleRow: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   categoryDot: { width: 10, height: 10, borderRadius: 5 },
-  categoryName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  categoryArrow: { color: '#8E8E93', fontSize: 18, marginLeft: 4 },
-  categorySize: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
-  barTrack: { height: 8, backgroundColor: '#3A3A3C', borderRadius: 4, overflow: 'hidden', marginBottom: 10 },
+  categoryName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
+  categoryArrow: { color: COLORS.textSecondary, fontSize: 18, marginLeft: SPACING.xs },
+  categorySize: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '700' },
+  barTrack: { height: 8, backgroundColor: COLORS.border, borderRadius: 4, overflow: 'hidden', marginBottom: 10 },
   barFill: { height: '100%', borderRadius: 4, minWidth: 4 },
   categoryFooter: { flexDirection: 'row', justifyContent: 'space-between' },
-  categoryCount: { color: '#8E8E93', fontSize: 12 },
-  categoryPercent: { color: '#8E8E93', fontSize: 12, fontWeight: '500' },
+  categoryCount: { color: COLORS.textSecondary, fontSize: 12 },
+  categoryPercent: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '500' },
 
   // Prune
   pruneBtn: {
-    backgroundColor: '#EF4444', borderRadius: 16, paddingVertical: 16, marginTop: 10,
+    backgroundColor: COLORS.red, borderRadius: RADIUS.lg, paddingVertical: SPACING.lg, marginTop: 10,
     alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },

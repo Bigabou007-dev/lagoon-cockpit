@@ -1,4 +1,4 @@
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, Easing, ActivityIndicator } from 'react-native';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
@@ -229,10 +229,12 @@ export default function OverviewScreen() {
   const { serverName, disconnect } = useServerStore();
   const { overview, setOverview, containers, setContainers, stacks, setStacks, alerts } = useDashboardStore();
   const [refreshing, setRefreshing] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const intervalRef = useRef<ReturnType<typeof setInterval> | null>(null);
 
   const fetchAll = useCallback(async () => {
     try {
+      setError(null);
       const [overviewData, containerData, stackData] = await Promise.all([
         apiFetch<any>('/api/overview'),
         apiFetch<any>('/api/containers'),
@@ -243,6 +245,7 @@ export default function OverviewScreen() {
       setStacks(stackData.stacks);
     } catch (err) {
       console.error('[COCKPIT] Failed to fetch overview:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
     }
   }, [setOverview, setContainers, setStacks]);
 
@@ -308,11 +311,24 @@ export default function OverviewScreen() {
       </View>
 
       {/* ── Skeleton Loading State ── */}
-      {!overview && (
+      {!overview && !error && (
         <>
           <SkeletonStatGrid />
           <SkeletonGaugeRow />
         </>
+      )}
+
+      {/* ── Error State ── */}
+      {error && !overview && (
+        <View style={styles.errorCard}>
+          <Ionicons name="cloud-offline-outline" size={32} color={T.red} />
+          <Text style={styles.errorTitle}>Connection Error</Text>
+          <Text style={styles.errorText}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={fetchAll}>
+            <Ionicons name="refresh" size={16} color={T.blue} />
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
       )}
 
       {/* ── 2. Quick Stat Cards (2x2) ── */}
@@ -757,6 +773,46 @@ const styles = StyleSheet.create({
   timelineName: { color: T.textPrimary, fontSize: 13, fontWeight: '600' },
   timelineState: { fontSize: 12, fontWeight: '500', marginTop: 1 },
   timelineTime: { color: T.textTertiary, fontSize: 11, marginTop: 2 },
+
+  /* Error */
+  errorCard: {
+    backgroundColor: T.card,
+    borderRadius: T.radius,
+    borderWidth: 1,
+    borderColor: T.red + '30',
+    padding: 32,
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginBottom: 24,
+    gap: 10,
+  },
+  errorTitle: {
+    color: T.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  errorText: {
+    color: T.red,
+    fontSize: 13,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: T.blue + '1A',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
+    marginTop: 8,
+  },
+  retryText: {
+    color: T.blue,
+    fontWeight: '600',
+    fontSize: 14,
+  },
 
   /* Loading */
   loadingContainer: {

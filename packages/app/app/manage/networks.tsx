@@ -2,6 +2,7 @@ import { View, Text, FlatList, RefreshControl, TouchableOpacity, StyleSheet, Act
 import { useState, useCallback, useEffect } from 'react';
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -57,8 +58,8 @@ export default function NetworksScreen() {
   const renderItem = ({ item }: { item: DockerNetwork }) => {
     const hasContainers = item.containers.length > 0;
     const isExpanded = expandedIds.has(item.id);
-    const borderColor = hasContainers ? '#4A90FF' : '#3A3A3C';
-    const indicatorColor = hasContainers ? '#4A90FF' : '#636366';
+    const borderColor = hasContainers ? COLORS.blue : COLORS.border;
+    const indicatorColor = hasContainers ? COLORS.blue : COLORS.textTertiary;
 
     return (
       <TouchableOpacity
@@ -113,7 +114,7 @@ export default function NetworksScreen() {
       <>
         <Stack.Screen options={{ title: 'Networks', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#4A90FF" />
+          <ActivityIndicator size="large" color={COLORS.blue} />
           <Text style={styles.loadingText}>Loading networks...</Text>
         </View>
       </>
@@ -134,12 +135,12 @@ export default function NetworksScreen() {
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryValue, { color: '#4A90FF' }]}>{activeNetworks}</Text>
+            <Text style={[styles.summaryValue, { color: COLORS.blue }]}>{activeNetworks}</Text>
             <Text style={styles.summaryLabel}>Active</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryValue, { color: '#636366' }]}>{networks.length - activeNetworks}</Text>
+            <Text style={[styles.summaryValue, { color: COLORS.textTertiary }]}>{networks.length - activeNetworks}</Text>
             <Text style={styles.summaryLabel}>Empty</Text>
           </View>
         </View>
@@ -149,7 +150,7 @@ export default function NetworksScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No networks found</Text>}
@@ -160,42 +161,42 @@ export default function NetworksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  centered: { flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: COLORS.textSecondary, fontSize: 14, marginTop: SPACING.md },
   summary: {
-    flexDirection: 'row', backgroundColor: '#2C2C2E', marginHorizontal: 16, marginTop: 16,
-    marginBottom: 8, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#3A3A3C',
+    flexDirection: 'row', backgroundColor: COLORS.card, marginHorizontal: SPACING.lg, marginTop: SPACING.lg,
+    marginBottom: SPACING.sm, borderRadius: RADIUS.lg, padding: SPACING.lg, borderWidth: 1, borderColor: COLORS.border,
     justifyContent: 'space-around', alignItems: 'center',
   },
   summaryItem: { alignItems: 'center' },
-  summaryValue: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
-  summaryLabel: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
-  summaryDivider: { width: 1, height: 30, backgroundColor: '#3A3A3C' },
-  list: { paddingHorizontal: 16, paddingBottom: 20, paddingTop: 8 },
+  summaryValue: { color: COLORS.textPrimary, fontSize: 22, fontWeight: '700' },
+  summaryLabel: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
+  summaryDivider: { width: 1, height: 30, backgroundColor: COLORS.border },
+  list: { paddingHorizontal: SPACING.lg, paddingBottom: SPACING.xl, paddingTop: SPACING.sm },
   card: {
-    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#3A3A3C',
+    backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: 10,
+    borderWidth: 1, borderColor: COLORS.border,
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   cardTitleRow: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   indicator: { width: 8, height: 8, borderRadius: 4, marginRight: 10 },
-  networkName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600', flex: 1 },
-  chevron: { color: '#8E8E93', fontSize: 12 },
-  cardMeta: { flexDirection: 'row', gap: 8 },
-  metaBadge: { backgroundColor: '#3A3A3C', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  networkName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600', flex: 1 },
+  chevron: { color: COLORS.textSecondary, fontSize: 12 },
+  cardMeta: { flexDirection: 'row', gap: SPACING.sm },
+  metaBadge: { backgroundColor: COLORS.border, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   metaBadgeActive: { backgroundColor: '#1E3A5F' },
   metaBadgeInactive: {},
-  metaBadgeText: { color: '#8E8E93', fontSize: 11, fontWeight: '500' },
-  metaBadgeTextActive: { color: '#4A90FF' },
-  containerList: { marginTop: 14, borderTopWidth: 1, borderTopColor: '#3A3A3C', paddingTop: 10 },
+  metaBadgeText: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '500' },
+  metaBadgeTextActive: { color: COLORS.blue },
+  containerList: { marginTop: 14, borderTopWidth: 1, borderTopColor: COLORS.border, paddingTop: 10 },
   containerListHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  containerListHeaderText: { color: '#636366', fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
+  containerListHeaderText: { color: COLORS.textTertiary, fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
   containerRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#3A3A3C',
+    paddingVertical: SPACING.sm, borderBottomWidth: 1, borderBottomColor: COLORS.border,
   },
-  containerName: { color: '#FFFFFF', fontSize: 13, flex: 1, marginRight: 12 },
-  containerIp: { color: '#4A90FF', fontSize: 13, fontFamily: 'monospace' },
-  empty: { color: '#636366', fontSize: 14, textAlign: 'center', marginTop: 40 },
+  containerName: { color: COLORS.textPrimary, fontSize: 13, flex: 1, marginRight: SPACING.md },
+  containerIp: { color: COLORS.blue, fontSize: 13, fontFamily: 'monospace' },
+  empty: { color: COLORS.textTertiary, fontSize: 14, textAlign: 'center', marginTop: 40 },
 });

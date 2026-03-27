@@ -295,6 +295,168 @@ def endpoints_stub():
     return jsonify({"endpoints": []})
 
 
+# ── Catch-all stubs for Docker-specific routes (not available on Windows) ──
+
+@app.route('/api/containers/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@require_auth
+def containers_catchall(subpath):
+    return jsonify({"error": "Docker containers not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route('/api/stacks/<path:subpath>', methods=['GET', 'POST', 'PUT', 'DELETE'])
+@require_auth
+def stacks_catchall(subpath):
+    return jsonify({"error": "Docker stacks not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/system/docker")
+@require_auth
+def system_docker_stub():
+    return jsonify({"error": "Docker not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/system/disk")
+@require_auth
+def system_disk():
+    import psutil
+    partitions = []
+    for part in psutil.disk_partitions(all=False):
+        try:
+            usage = psutil.disk_usage(part.mountpoint)
+            partitions.append({
+                "device": part.device,
+                "mountpoint": part.mountpoint,
+                "fstype": part.fstype,
+                "total": usage.total,
+                "used": usage.used,
+                "free": usage.free,
+                "percent": usage.percent,
+            })
+        except PermissionError:
+            continue
+    return jsonify({"partitions": partitions, "platform": "windows"})
+
+
+@app.route("/api/system/prune", methods=["POST"])
+@require_auth
+def system_prune_stub():
+    return jsonify({"error": "Docker prune not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/networks")
+@require_auth
+def networks_stub():
+    return jsonify({"error": "Docker networks not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/volumes")
+@require_auth
+def volumes_stub():
+    return jsonify({"error": "Docker volumes not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/images")
+@require_auth
+def images_list_stub():
+    return jsonify({"error": "Docker images not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route('/api/images/<path:subpath>', methods=['GET', 'DELETE', 'POST'])
+@require_auth
+def images_catchall(subpath):
+    return jsonify({"error": "Docker images not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/audit")
+@require_auth
+def audit_stub():
+    return jsonify({"logs": []})
+
+
+@app.route("/api/metrics/history")
+@require_auth
+def metrics_history_stub():
+    return jsonify({"history": [], "summary": {}})
+
+
+@app.route("/api/alerts/rules")
+@require_auth
+def alerts_rules_list_stub():
+    return jsonify({"rules": []})
+
+
+@app.route("/api/alerts/rules", methods=["POST"])
+@require_auth
+def alerts_rules_create_stub():
+    return jsonify({"error": "Alert rules not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route('/api/alerts/rules/<path:subpath>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def alerts_rules_catchall(subpath):
+    return jsonify({"error": "Alert rules not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/alerts/events")
+@require_auth
+def alerts_events_stub():
+    return jsonify({"events": []})
+
+
+@app.route("/api/webhooks")
+@require_auth
+def webhooks_list_stub():
+    return jsonify({"webhooks": []})
+
+
+@app.route("/api/webhooks", methods=["POST"])
+@require_auth
+def webhooks_create_stub():
+    return jsonify({"error": "Webhooks not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route('/api/webhooks/<path:subpath>', methods=['GET', 'DELETE'])
+@require_auth
+def webhooks_catchall(subpath):
+    return jsonify({"error": "Webhooks not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/schedules")
+@require_auth
+def schedules_list_stub():
+    return jsonify({"schedules": []})
+
+
+@app.route("/api/schedules", methods=["POST"])
+@require_auth
+def schedules_create_stub():
+    return jsonify({"error": "Schedules not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route('/api/schedules/<path:subpath>', methods=['GET', 'PUT', 'DELETE'])
+@require_auth
+def schedules_catchall(subpath):
+    return jsonify({"error": "Schedules not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/maintenance")
+@require_auth
+def maintenance_get_stub():
+    return jsonify({"enabled": False})
+
+
+@app.route("/api/maintenance", methods=["POST"])
+@require_auth
+def maintenance_post_stub():
+    return jsonify({"error": "Maintenance mode not available on Windows server", "platform": "windows"}), 501
+
+
+@app.route("/api/push/register", methods=["POST"])
+@require_auth
+def push_register_stub():
+    return jsonify({"error": "Push registration not available on Windows server", "platform": "windows"}), 501
+
+
 # ── Background: SSE broadcast loop ────────────────────────────────────────
 
 def broadcast_loop():

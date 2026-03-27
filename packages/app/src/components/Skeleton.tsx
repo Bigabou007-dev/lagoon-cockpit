@@ -1,5 +1,6 @@
 import { useEffect, useRef } from 'react';
 import { Animated, type ViewStyle } from 'react-native';
+import { COLORS } from '../theme/tokens';
 
 interface SkeletonProps {
   width: number | string;
@@ -29,7 +30,7 @@ export default function Skeleton({ width, height, borderRadius = 8, style }: Ske
           width: width as number,
           height,
           borderRadius,
-          backgroundColor: '#3A3A3C',
+          backgroundColor: COLORS.border,
           opacity,
         },
         style,

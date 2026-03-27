@@ -14,6 +14,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- types ---------- */
 interface AlertRule {
@@ -163,7 +164,7 @@ export default function AlertRulesScreen() {
       <Stack.Screen options={{ title: 'Alert Rules', headerBackTitle: 'Manage' }} />
       <ScrollView
         style={styles.container}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />}
       >
         {/* -------- Rules Section -------- */}
         <View style={styles.sectionHeader}>
@@ -181,7 +182,7 @@ export default function AlertRulesScreen() {
             <TextInput
               style={styles.input}
               placeholder="Rule name"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={name}
               onChangeText={setName}
             />
@@ -205,7 +206,7 @@ export default function AlertRulesScreen() {
             <TextInput
               style={styles.input}
               placeholder="Threshold"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               keyboardType="numeric"
               value={threshold}
               onChangeText={setThreshold}
@@ -214,7 +215,7 @@ export default function AlertRulesScreen() {
             <TextInput
               style={styles.input}
               placeholder="Duration (seconds)"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               keyboardType="numeric"
               value={duration}
               onChangeText={setDuration}
@@ -253,8 +254,8 @@ export default function AlertRulesScreen() {
                 <Switch
                   value={rule.enabled}
                   onValueChange={() => toggleRule(rule)}
-                  trackColor={{ false: '#3A3A3C', true: '#1D4ED8' }}
-                  thumbColor={rule.enabled ? '#4A90FF' : '#636366'}
+                  trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                  thumbColor={rule.enabled ? COLORS.blue : COLORS.textTertiary}
                 />
               </View>
               {isAdmin && (
@@ -294,98 +295,98 @@ export default function AlertRulesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.lg },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    marginTop: 8,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.sm,
   },
   sectionTitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
-  addText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
+  addText: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
 
   /* form */
   formCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   input: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 8,
-    padding: 12,
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
+    color: COLORS.textPrimary,
     fontSize: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   pickerBtn: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#1C1C1E',
-    borderRadius: 8,
-    padding: 12,
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
-  pickerLabel: { color: '#8E8E93', fontSize: 13 },
-  pickerValue: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
+  pickerLabel: { color: COLORS.textSecondary, fontSize: 13 },
+  pickerValue: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
   saveBtn: {
     backgroundColor: '#1D4ED8',
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
-  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  saveText: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
 
   /* rule cards */
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   cardTop: { flexDirection: 'row', alignItems: 'center' },
-  cardName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  cardMeta: { color: '#4A90FF', fontSize: 13, marginTop: 4 },
-  cardDuration: { color: '#636366', fontSize: 12, marginTop: 2 },
+  cardName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
+  cardMeta: { color: COLORS.blue, fontSize: 13, marginTop: SPACING.xs },
+  cardDuration: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
   deleteBtn: { marginTop: 10, alignSelf: 'flex-start' },
-  deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
+  deleteText: { color: COLORS.red, fontSize: 13, fontWeight: '500' },
 
   /* event cards */
   eventCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
     padding: 14,
-    marginBottom: 8,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
-  eventRule: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', marginBottom: 2 },
-  eventMessage: { color: '#FBBF24', fontSize: 13, marginBottom: 4 },
-  eventMeta: { color: '#8E8E93', fontSize: 12, marginBottom: 2 },
-  eventTime: { color: '#636366', fontSize: 11 },
+  eventRule: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: 2 },
+  eventMessage: { color: COLORS.yellow, fontSize: 13, marginBottom: SPACING.xs },
+  eventMeta: { color: COLORS.textSecondary, fontSize: 12, marginBottom: 2 },
+  eventTime: { color: COLORS.textTertiary, fontSize: 11 },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 32 },
-  emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#636366', fontSize: 13 },
+  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
+  emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
+  emptySubtext: { color: COLORS.textTertiary, fontSize: 13 },
 });

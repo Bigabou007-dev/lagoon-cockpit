@@ -1,0 +1,130 @@
+const express = require("express");
+const router = express.Router();
+
+const alertEngine = require("../system/alerts");
+const webhooks = require("../system/webhooks");
+const scheduler = require("../system/scheduler");
+const { requireAuth, requireRole } = require("../auth/middleware");
+const { auditLog, getDb } = require("../db/sqlite");
+
+// ── Alert Rules ──────────────────────────────────────────
+router.get("/api/alerts/rules", requireAuth, (_req, res) => {
+  res.json({ rules: alertEngine.listRules() });
+});
+
+router.post("/api/alerts/rules", requireAuth, requireRole("admin"), (req, res) => {
+  try {
+    const { name, metric, operator, threshold, durationSeconds } = req.body;
+    if (!name || !metric || !operator || threshold === undefined) {
+      return res.status(400).json({ error: "name, metric, operator, threshold required" });
+    }
+    const rule = alertEngine.createRule(name, metric, operator, threshold, durationSeconds || 0);
+    auditLog(req.user.id, "alert.rule.create", name);
+    res.status(201).json(rule);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete("/api/alerts/rules/:id", requireAuth, requireRole("admin"), (req, res) => {
+  alertEngine.deleteRule(parseInt(req.params.id, 10));
+  res.json({ ok: true });
+});
+
+router.put("/api/alerts/rules/:id/toggle", requireAuth, requireRole("admin"), (req, res) => {
+  alertEngine.toggleRule(parseInt(req.params.id, 10), req.body.enabled !== false);
+  res.json({ ok: true });
+});
+
+router.get("/api/alerts/events", requireAuth, (req, res) => {
+  const limit = Math.min(parseInt(req.query.limit || "50", 10), 500);
+  res.json({ events: alertEngine.getAlertEvents(limit) });
+});
+
+// ── Webhooks ─────────────────────────────────────────────
+router.get("/api/webhooks", requireAuth, requireRole("admin"), (_req, res) => {
+  res.json({ webhooks: webhooks.listWebhooks() });
+});
+
+router.post("/api/webhooks", requireAuth, requireRole("admin"), (req, res) => {
+  try {
+    const { name, url, events, headers } = req.body;
+    if (!name || !url) return res.status(400).json({ error: "name and url required" });
+    const hook = webhooks.createWebhook(name, url, events || "container.down", headers || {});
+    auditLog(req.user.id, "webhook.create", name);
+    res.status(201).json(hook);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete("/api/webhooks/:id", requireAuth, requireRole("admin"), (req, res) => {
+  webhooks.deleteWebhook(parseInt(req.params.id, 10));
+  res.json({ ok: true });
+});
+
+// ── Scheduled Actions ────────────────────────────────────
+router.get("/api/schedules", requireAuth, (_req, res) => {
+  res.json({ schedules: scheduler.listSchedules() });
+});
+
+router.post("/api/schedules", requireAuth, requireRole("admin"), (req, res) => {
+  try {
+    const { name, containerId, containerName, action, cronExpression } = req.body;
+    if (!name || !containerId || !containerName || !action || !cronExpression) {
+      return res.status(400).json({ error: "name, containerId, containerName, action, cronExpression required" });
+    }
+    const schedule = scheduler.createSchedule(name, containerId, containerName, action, cronExpression);
+    auditLog(req.user.id, "schedule.create", name, `${action} ${containerName} @ ${cronExpression}`);
+    res.status(201).json(schedule);
+  } catch (err) {
+    res.status(400).json({ error: err.message });
+  }
+});
+
+router.delete("/api/schedules/:id", requireAuth, requireRole("admin"), (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
+  scheduler.deleteSchedule(id);
+  auditLog(req.user.id, "schedule.delete", req.params.id);
+  res.json({ ok: true });
+});
+
+router.put("/api/schedules/:id/toggle", requireAuth, requireRole("admin"), (req, res) => {
+  const id = parseInt(req.params.id, 10);
+  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
+  const schedule = scheduler.toggleSchedule(id, req.body.enabled !== false);
+  if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+  auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
+  res.json(schedule);
+});
+
+router.get("/api/schedules/history", requireAuth, (req, res) => {
+  const limit = Math.min(Math.max(parseInt(req.query.limit || "50", 10), 1), 500);
+  res.json({ history: scheduler.getScheduleHistory(limit) });
+});
+
+// ── Maintenance Mode ─────────────────────────────────────
+// maintenanceMode state is managed in index.js and passed via app.locals
+router.get("/api/maintenance", requireAuth, (req, res) => {
+  res.json({ enabled: req.app.locals.maintenanceMode });
+});
+
+router.post("/api/maintenance", requireAuth, requireRole("admin"), (req, res) => {
+  req.app.locals.maintenanceMode = req.body.enabled === true;
+  auditLog(req.user.id, "maintenance.toggle", null, req.app.locals.maintenanceMode ? "enabled" : "disabled");
+  res.json({ enabled: req.app.locals.maintenanceMode });
+});
+
+// ── Audit Log ────────────────────────────────────────────
+router.get("/api/audit", requireAuth, requireRole("admin"), (req, res) => {
+  const db = getDb();
+  const limit = Math.min(Math.max(parseInt(req.query.limit || "50", 10), 1), 500);
+  const offset = Math.max(parseInt(req.query.offset || "0", 10), 0);
+  const logs = db
+    .prepare("SELECT * FROM audit_log ORDER BY created_at DESC LIMIT ? OFFSET ?")
+    .all(limit, offset);
+  res.json({ logs });
+});
+
+module.exports = router;

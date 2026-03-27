@@ -11,7 +11,7 @@ def _bridge_get(path):
         resp = requests.get(url, timeout=TIMEOUT)
         return resp.json(), resp.status_code
     except requests.ConnectionError:
-        return {"error": "MT5 Bridge unreachable", "bridge_url": MT5_BRIDGE_URL}, 503
+        return {"error": "MT5 Bridge unreachable"}, 503
     except requests.Timeout:
         return {"error": "MT5 Bridge timed out"}, 504
     except Exception as e:

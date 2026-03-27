@@ -47,4 +47,12 @@ function getClientCount() {
   return clients.size;
 }
 
-module.exports = { addClient, broadcast, getClientCount };
+/** Close all connected SSE clients (used during graceful shutdown) */
+function closeAllClients() {
+  for (const client of clients) {
+    client.end();
+  }
+  clients.clear();
+}
+
+module.exports = { addClient, broadcast, getClientCount, closeAllClients };

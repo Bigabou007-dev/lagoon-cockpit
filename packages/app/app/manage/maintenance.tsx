@@ -11,6 +11,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 export default function MaintenanceScreen() {
   const { userRole } = useServerStore();
@@ -85,7 +86,7 @@ export default function MaintenanceScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
         }
       >
         {/* Status Banner */}
@@ -111,8 +112,8 @@ export default function MaintenanceScreen() {
               value={enabled}
               onValueChange={toggleMaintenance}
               disabled={!isAdmin || toggling || loading}
-              trackColor={{ false: '#3A3A3C', true: '#B45309' }}
-              thumbColor={enabled ? '#F59E0B' : '#636366'}
+              trackColor={{ false: COLORS.border, true: '#B45309' }}
+              thumbColor={enabled ? COLORS.yellow : COLORS.textTertiary}
               style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
             />
           </View>
@@ -184,16 +185,16 @@ export default function MaintenanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  content: { padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg },
 
   /* status banner */
   statusBanner: {
     alignItems: 'center',
     paddingVertical: 32,
-    borderRadius: 16,
-    marginBottom: 20,
-    marginTop: 8,
+    borderRadius: RADIUS.lg,
+    marginBottom: SPACING.xl,
+    marginTop: SPACING.sm,
     borderWidth: 1,
   },
   bannerOn: {
@@ -204,7 +205,7 @@ const styles = StyleSheet.create({
     backgroundColor: '#052E16',
     borderColor: '#166534',
   },
-  statusIcon: { fontSize: 48, marginBottom: 12 },
+  statusIcon: { fontSize: 48, marginBottom: SPACING.md },
   statusLabel: {
     fontSize: 18,
     fontWeight: '800',
@@ -215,45 +216,45 @@ const styles = StyleSheet.create({
 
   /* toggle card */
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 20,
-    marginBottom: 20,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
+    marginBottom: SPACING.xl,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  toggleTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
-  toggleDesc: { color: '#8E8E93', fontSize: 13, marginTop: 4 },
+  toggleTitle: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  toggleDesc: { color: COLORS.textSecondary, fontSize: 13, marginTop: SPACING.xs },
 
   /* info cards */
   infoCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 12,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.md,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   infoTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 10,
   },
-  infoRow: { flexDirection: 'row', marginBottom: 6, paddingRight: 12 },
-  bullet: { color: '#4A90FF', fontSize: 14, marginRight: 8, marginTop: 1 },
-  infoText: { color: '#8E8E93', fontSize: 13, flex: 1, lineHeight: 18 },
+  infoRow: { flexDirection: 'row', marginBottom: 6, paddingRight: SPACING.md },
+  bullet: { color: COLORS.blue, fontSize: 14, marginRight: SPACING.sm, marginTop: 1 },
+  infoText: { color: COLORS.textSecondary, fontSize: 13, flex: 1, lineHeight: 18 },
 
   /* warning */
   warningCard: {
     backgroundColor: '#7F1D1D',
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     padding: 14,
-    marginTop: 8,
+    marginTop: SPACING.sm,
     alignItems: 'center',
   },
   warningText: { color: '#FCA5A5', fontSize: 13, fontWeight: '500' },

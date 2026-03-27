@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, ScrollView, StyleSheet } from 'react-native';
 import { useRouter } from 'expo-router';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface MenuItem {
   label: string;
@@ -84,24 +85,24 @@ export default function ManageScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  content: { padding: 16, paddingBottom: 40 },
-  title: { color: '#FFFFFF', fontSize: 28, fontWeight: '800', marginTop: 8 },
-  subtitle: { color: '#636366', fontSize: 14, marginBottom: 24 },
-  section: { marginBottom: 24 },
-  sectionTitle: { color: '#8E8E93', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg, paddingBottom: 40 },
+  title: { color: COLORS.textPrimary, fontSize: 28, fontWeight: '800', marginTop: SPACING.sm },
+  subtitle: { color: COLORS.textTertiary, fontSize: 14, marginBottom: SPACING.xxl },
+  section: { marginBottom: SPACING.xxl },
+  sectionTitle: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
   menuItem: {
-    flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 8,
-    borderWidth: 1, borderColor: '#3A3A3C',
+    flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
+    backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.sm,
+    borderWidth: 1, borderColor: COLORS.border,
   },
   menuIcon: { fontSize: 24 },
   menuContent: { flex: 1 },
-  menuLabel: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
-  menuDesc: { color: '#636366', fontSize: 12, marginTop: 2 },
-  menuArrow: { color: '#3A3A3C', fontSize: 24 },
+  menuLabel: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  menuDesc: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
+  menuArrow: { color: COLORS.border, fontSize: 24 },
   adminBadge: {
-    color: '#F59E0B', fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
+    color: COLORS.yellow, fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, overflow: 'hidden', marginRight: 4,
   },
 });

@@ -50,7 +50,7 @@ const commands = {
     const [url, apiKey, name] = args;
     if (!url || !apiKey) {
       console.log(`Usage: cockpit connect <url> <api-key> [name]`);
-      console.log(`Example: cockpit connect http://100.69.138.90:3000 my-api-key "Production VPS"`);
+      console.log(`Example: cockpit connect https://cockpit.example.com my-api-key "Production VPS"`);
       return;
     }
 

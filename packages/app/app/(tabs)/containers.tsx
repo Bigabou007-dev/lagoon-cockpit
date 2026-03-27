@@ -29,15 +29,18 @@ export default function ContainersScreen() {
   const [bulkMode, setBulkMode] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
+  const [error, setError] = useState<string | null>(null);
   const fadeAnims = useRef<Animated.Value[]>([]).current;
 
   const fetchContainers = useCallback(async () => {
     try {
+      setError(null);
       const data = await apiFetch<{ containers: ContainerSummary[] }>('/api/containers');
       setContainers(data.containers);
       setIsLoaded(true);
     } catch (err) {
       console.error('Failed to fetch containers:', err);
+      setError(err instanceof Error ? err.message : 'Failed to load containers');
     }
   }, [setContainers]);
 
@@ -191,8 +194,21 @@ export default function ContainersScreen() {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Error state */}
+      {error && !isLoaded && containers.length === 0 && (
+        <View style={styles.errorCard}>
+          <Ionicons name="cloud-offline-outline" size={32} color={COLORS.red} />
+          <Text style={styles.errorTitle}>Connection Error</Text>
+          <Text style={styles.errorMessage}>{error}</Text>
+          <TouchableOpacity style={styles.retryBtn} onPress={fetchContainers}>
+            <Ionicons name="refresh" size={16} color={COLORS.blue} />
+            <Text style={styles.retryText}>Retry</Text>
+          </TouchableOpacity>
+        </View>
+      )}
+
       {/* Skeleton loading state */}
-      {!isLoaded && containers.length === 0 && (
+      {!isLoaded && !error && containers.length === 0 && (
         <View style={styles.list}>
           {[0, 1, 2, 3, 4].map((i) => (
             <View key={i} style={styles.skeletonCard}>
@@ -368,6 +384,45 @@ const styles = StyleSheet.create({
     color: COLORS.textSecondary,
     fontSize: 11,
     fontWeight: '700',
+  },
+
+  errorCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    borderWidth: 1,
+    borderColor: COLORS.red + '30',
+    padding: 32,
+    margin: 16,
+    alignItems: 'center',
+    justifyContent: 'center',
+    gap: 10,
+  },
+  errorTitle: {
+    color: COLORS.textPrimary,
+    fontSize: 16,
+    fontWeight: '700',
+    marginTop: 4,
+  },
+  errorMessage: {
+    color: COLORS.red,
+    fontSize: 13,
+    textAlign: 'center',
+    paddingHorizontal: 16,
+  },
+  retryBtn: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    backgroundColor: COLORS.blue + '1A',
+    paddingHorizontal: 20,
+    paddingVertical: 10,
+    borderRadius: 10,
+    gap: 6,
+    marginTop: 8,
+  },
+  retryText: {
+    color: COLORS.blue,
+    fontWeight: '600',
+    fontSize: 14,
   },
 
   list: { paddingHorizontal: 16, paddingBottom: 100 },

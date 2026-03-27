@@ -12,6 +12,7 @@ import {
 import { Stack } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 /* ---------- types ---------- */
 interface Webhook {
@@ -133,7 +134,7 @@ export default function WebhooksScreen() {
       <Stack.Screen options={{ title: 'Webhooks', headerBackTitle: 'Manage' }} />
       <ScrollView
         style={styles.container}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />}
       >
         {/* Header */}
         <View style={styles.sectionHeader}>
@@ -151,14 +152,14 @@ export default function WebhooksScreen() {
             <TextInput
               style={styles.input}
               placeholder="Webhook name"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={name}
               onChangeText={setName}
             />
             <TextInput
               style={styles.input}
               placeholder="URL (https://...)"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={url}
               onChangeText={setUrl}
               autoCapitalize="none"
@@ -167,7 +168,7 @@ export default function WebhooksScreen() {
             <TextInput
               style={styles.input}
               placeholder="Events (comma-separated: container.down, *)"
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={eventsInput}
               onChangeText={setEventsInput}
               autoCapitalize="none"
@@ -178,7 +179,7 @@ export default function WebhooksScreen() {
             <TextInput
               style={[styles.input, { height: 60 }]}
               placeholder='Headers JSON (optional): {"X-Key":"val"}'
-              placeholderTextColor="#636366"
+              placeholderTextColor={COLORS.textTertiary}
               value={headers}
               onChangeText={setHeaders}
               autoCapitalize="none"
@@ -254,90 +255,90 @@ export default function WebhooksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 16 },
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.lg },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
-    marginTop: 8,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.sm,
   },
   sectionTitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  addText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
+  addText: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
 
   /* form */
   formCard: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   input: {
-    backgroundColor: '#1C1C1E',
-    borderRadius: 8,
-    padding: 12,
-    color: '#FFFFFF',
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.sm,
+    padding: SPACING.md,
+    color: COLORS.textPrimary,
     fontSize: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   hintText: {
-    color: '#636366',
+    color: COLORS.textTertiary,
     fontSize: 11,
     marginBottom: 10,
-    marginLeft: 4,
+    marginLeft: SPACING.xs,
   },
   saveBtn: {
     backgroundColor: '#1D4ED8',
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
-    marginTop: 4,
+    marginTop: SPACING.xs,
   },
-  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  saveText: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
 
   /* cards */
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 8,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  cardName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
-  cardUrl: { color: '#636366', fontSize: 12, marginTop: 2 },
+  cardName: { color: COLORS.textPrimary, fontSize: 15, fontWeight: '600' },
+  cardUrl: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
   statusBadge: {
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
     borderRadius: 6,
-    marginLeft: 8,
+    marginLeft: SPACING.sm,
   },
   statusText: { fontSize: 11, fontWeight: '600' },
   eventsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
   eventTag: {
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
     borderRadius: 6,
-    paddingHorizontal: 8,
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
   },
-  eventTagText: { color: '#4A90FF', fontSize: 11, fontWeight: '500' },
-  deleteBtn: { marginTop: 12, alignSelf: 'flex-start' },
-  deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
+  eventTagText: { color: COLORS.blue, fontSize: 11, fontWeight: '500' },
+  deleteBtn: { marginTop: SPACING.md, alignSelf: 'flex-start' },
+  deleteText: { color: COLORS.red, fontSize: 13, fontWeight: '500' },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 40 },
-  emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
+  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
+  emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
+  emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

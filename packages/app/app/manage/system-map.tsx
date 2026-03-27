@@ -13,6 +13,7 @@ import {
 import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -90,22 +91,22 @@ const STACK_BORDER_COLORS = [
 ];
 
 const STACK_LABEL_COLORS = [
-  '#4A90FF',
-  '#A78BFA',
-  '#F472B6',
-  '#2DD4BF',
-  '#FBBF24',
-  '#818CF8',
-  '#34D399',
-  '#FB7185',
+  COLORS.blue,
+  COLORS.purple,
+  COLORS.pink,
+  COLORS.teal,
+  COLORS.yellow,
+  COLORS.indigo,
+  COLORS.green,
+  COLORS.rose,
 ];
 
 /* ────────────────────────────── Helpers ────────────────────────────── */
 
 function getNodeColor(state: string, health?: string): string {
-  if (health === 'unhealthy') return '#EAB308';  // yellow
-  if (state === 'running') return '#22C55E';       // green
-  return '#EF4444';                                // red
+  if (health === 'unhealthy') return COLORS.yellow;  // yellow
+  if (state === 'running') return COLORS.green;       // green
+  return COLORS.red;                                   // red
 }
 
 function getGlowColor(state: string, health?: string): string {
@@ -354,12 +355,12 @@ export default function SystemMapScreen() {
           options={{
             title: 'System Map',
             headerBackTitle: 'Back',
-            headerStyle: { backgroundColor: '#1C1C1E' },
-            headerTintColor: '#FFFFFF',
+            headerStyle: { backgroundColor: COLORS.bg },
+            headerTintColor: COLORS.textPrimary,
           }}
         />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#4A90FF" />
+          <ActivityIndicator size="large" color={COLORS.blue} />
           <Text style={styles.loadingText}>Mapping infrastructure...</Text>
         </View>
       </>
@@ -372,8 +373,8 @@ export default function SystemMapScreen() {
         options={{
           title: 'System Map',
           headerBackTitle: 'Back',
-          headerStyle: { backgroundColor: '#1C1C1E' },
-          headerTintColor: '#FFFFFF',
+          headerStyle: { backgroundColor: COLORS.bg },
+          headerTintColor: COLORS.textPrimary,
           headerTitleStyle: { fontWeight: '700' },
         }}
       />
@@ -381,16 +382,16 @@ export default function SystemMapScreen() {
         {/* ── Top Stats Bar ── */}
         <View style={styles.statsBar}>
           <View style={styles.statsRow}>
-            <StatPill label="Containers" value={stats.total} color="#4A90FF" />
-            <StatPill label="Running" value={stats.running} color="#22C55E" />
-            <StatPill label="Stopped" value={stats.stopped} color="#EF4444" />
+            <StatPill label="Containers" value={stats.total} color={COLORS.blue} />
+            <StatPill label="Running" value={stats.running} color={COLORS.green} />
+            <StatPill label="Stopped" value={stats.stopped} color={COLORS.red} />
             {stats.unhealthy > 0 && (
-              <StatPill label="Unhealthy" value={stats.unhealthy} color="#EAB308" />
+              <StatPill label="Unhealthy" value={stats.unhealthy} color={COLORS.yellow} />
             )}
           </View>
           <View style={styles.statsRow}>
-            <StatPill label="Stacks" value={stats.stacks} color="#A78BFA" />
-            <StatPill label="Networks" value={networks.length} color="#2DD4BF" />
+            <StatPill label="Stacks" value={stats.stacks} color={COLORS.purple} />
+            <StatPill label="Networks" value={networks.length} color={COLORS.teal} />
           </View>
           {lastRefresh && (
             <Text style={styles.refreshLabel}>
@@ -577,9 +578,9 @@ export default function SystemMapScreen() {
         {/* ── Legend ── */}
         <View style={styles.legend}>
           <View style={styles.legendRow}>
-            <LegendItem color="#22C55E" label="Running" />
-            <LegendItem color="#EF4444" label="Stopped" />
-            <LegendItem color="#EAB308" label="Unhealthy" />
+            <LegendItem color={COLORS.green} label="Running" />
+            <LegendItem color={COLORS.red} label="Stopped" />
+            <LegendItem color={COLORS.yellow} label="Unhealthy" />
           </View>
           <View style={styles.legendRow}>
             <View style={styles.legendItem}>
@@ -622,45 +623,45 @@ function LegendItem({ color, label }: { color: string; label: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
   },
   centered: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 14,
-    marginTop: 12,
+    marginTop: SPACING.md,
   },
 
   /* ── Stats Bar ── */
   statsBar: {
-    backgroundColor: '#2C2C2E',
-    marginHorizontal: 12,
-    marginTop: 12,
-    marginBottom: 8,
+    backgroundColor: COLORS.card,
+    marginHorizontal: SPACING.md,
+    marginTop: SPACING.md,
+    marginBottom: SPACING.sm,
     borderRadius: 14,
-    paddingVertical: 12,
+    paddingVertical: SPACING.md,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   statsRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 8,
+    gap: SPACING.sm,
     marginBottom: 6,
   },
   statPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
     paddingHorizontal: 10,
     paddingVertical: 5,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
     gap: 5,
   },
   statValue: {
@@ -669,7 +670,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontWeight: '500',
   },
   refreshLabel: {
@@ -689,14 +690,14 @@ const styles = StyleSheet.create({
 
   /* ── Group Boxes ── */
   groupBox: {
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     zIndex: 2,
   },
   groupLabel: {
     position: 'absolute',
-    top: 12,
-    left: 16,
+    top: SPACING.md,
+    left: SPACING.lg,
     fontSize: 13,
     fontWeight: '700',
     letterSpacing: 0.5,
@@ -708,7 +709,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   nodeCircle: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: COLORS.card,
     borderWidth: 2.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -718,7 +719,7 @@ const styles = StyleSheet.create({
     opacity: 0.25,
   },
   nodeStateIcon: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 10,
     fontWeight: '800',
   },
@@ -747,24 +748,24 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(96,165,250,0.25)',
   },
   netBadgeText: {
-    color: '#4A90FF',
+    color: COLORS.blue,
     fontSize: 8,
     fontWeight: '500',
   },
 
   /* ── Legend ── */
   legend: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: COLORS.card,
     borderTopWidth: 1,
-    borderTopColor: '#3A3A3C',
+    borderTopColor: COLORS.border,
     paddingVertical: 10,
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.lg,
     gap: 6,
   },
   legendRow: {
     flexDirection: 'row',
     justifyContent: 'center',
-    gap: 16,
+    gap: SPACING.lg,
   },
   legendItem: {
     flexDirection: 'row',
@@ -788,7 +789,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   legendText: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 11,
     fontWeight: '500',
   },

@@ -1,6 +1,7 @@
 import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert } from 'react-native';
 import { useRouter, Stack } from 'expo-router';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
+import { COLORS, RADIUS, SPACING } from '../src/theme/tokens';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -63,47 +64,47 @@ export default function SettingsScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 20 },
+  container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.xl },
   sectionTitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
-    marginBottom: 12,
-    marginTop: 20,
+    marginBottom: SPACING.md,
+    marginTop: SPACING.xl,
   },
-  list: { gap: 8 },
+  list: { gap: SPACING.sm },
   card: {
-    backgroundColor: '#2C2C2E',
-    borderRadius: 16,
-    padding: 16,
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
     flexDirection: 'row',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   cardActive: { borderColor: '#2563EB' },
   cardContent: { flex: 1 },
-  cardName: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
-  cardUrl: { color: '#636366', fontSize: 13, marginTop: 2 },
-  cardAuth: { color: '#4A90FF', fontSize: 12, marginTop: 2 },
-  deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
+  cardName: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  cardUrl: { color: COLORS.textTertiary, fontSize: 13, marginTop: 2 },
+  cardAuth: { color: COLORS.blue, fontSize: 12, marginTop: 2 },
+  deleteText: { color: COLORS.red, fontSize: 13, fontWeight: '500' },
   addBtn: {
-    marginTop: 16,
+    marginTop: SPACING.lg,
     paddingVertical: 14,
-    borderRadius: 16,
-    backgroundColor: '#3A3A3C',
+    borderRadius: RADIUS.lg,
+    backgroundColor: COLORS.border,
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
     borderStyle: 'dashed',
   },
-  addText: { color: '#4A90FF', fontSize: 15, fontWeight: '600' },
+  addText: { color: COLORS.blue, fontSize: 15, fontWeight: '600' },
   disconnectBtn: {
     marginTop: 32,
     paddingVertical: 14,
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     backgroundColor: '#7F1D1D',
     alignItems: 'center',
   },

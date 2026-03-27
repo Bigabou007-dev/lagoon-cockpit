@@ -81,7 +81,43 @@ npm install
 npx expo start
 ```
 
-### 3. Or use the CLI
+### 3. Windows Server Agent
+
+For monitoring Windows servers (services, processes, system metrics):
+
+```bash
+# Copy to Windows server
+scp -r packages/windows-agent/ Administrator@your-server:C:\lagoon\cockpit-agent\
+
+# On Windows: install dependencies
+cd C:\lagoon\cockpit-agent
+pip install -r requirements.txt
+
+# Create .env from template
+copy .env.example .env
+# Edit .env with your API_KEY and JWT_SECRET
+
+# Start the agent
+pythonw.exe agent.py
+
+# Or install as Windows Service for auto-start
+python service_wrapper.py install
+net start LagoonCockpitAgent
+```
+
+The Windows agent provides:
+- System metrics (CPU, RAM, disk via psutil)
+- Windows Services management (list, start, stop, restart)
+- Process monitoring and management
+- MT5 Bridge proxy (for trading setups)
+- Windows Event Log access
+- SSE real-time streaming
+
+Add server in the mobile app:
+- URL: `https://your-windows-cockpit-domain`
+- Auth: API Key
+
+### 4. Or use the CLI
 
 ```bash
 cd lagoon-cockpit/packages/cli
