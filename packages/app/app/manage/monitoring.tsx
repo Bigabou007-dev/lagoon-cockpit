@@ -31,12 +31,27 @@ type Panel = (typeof PANELS)[number];
 
 function buildGrafanaUrl(panel: Panel): string {
   if (panel.panelId == null) {
-    // Full dashboard in kiosk mode
-    return `${GRAFANA_BASE}/d/${DASHBOARD_UID}/${DASHBOARD_SLUG}?kiosk=1&theme=dark`;
+    return `${GRAFANA_BASE}/d/${DASHBOARD_UID}/${DASHBOARD_SLUG}?theme=dark`;
   }
-  // Single panel solo view
-  return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?panelId=${panel.panelId}&kiosk=1&theme=dark`;
+  return `${GRAFANA_BASE}/d-solo/${DASHBOARD_UID}/${DASHBOARD_SLUG}?panelId=${panel.panelId}&theme=dark`;
 }
+
+// Auto-login script: hits Grafana login API to set session cookie, then navigates to dashboard
+const AUTO_LOGIN_JS = `
+  (function() {
+    if (document.querySelector('form[name="loginForm"], input[name="user"]')) {
+      fetch('${GRAFANA_BASE}/api/login', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ user: 'admin', password: 'lagoon-grafana-2026' }),
+        credentials: 'include'
+      }).then(function() {
+        window.location.reload();
+      });
+    }
+  })();
+  true;
+`;
 
 /* ---------- Screen ---------- */
 
@@ -166,18 +181,13 @@ export default function MonitoringScreen() {
                 originWhitelist={['https://*']}
                 allowsInlineMediaPlayback
                 mixedContentMode="compatibility"
-                // Inject CSS to ensure Grafana fits mobile viewport
-                injectedJavaScript={`
+                // Auto-login to Grafana + viewport fix
+                injectedJavaScript={AUTO_LOGIN_JS + `
                   (function() {
                     var meta = document.createElement('meta');
                     meta.name = 'viewport';
                     meta.content = 'width=device-width, initial-scale=1, maximum-scale=1';
                     document.head.appendChild(meta);
-
-                    // Hide Grafana top bar if still visible in kiosk mode
-                    var style = document.createElement('style');
-                    style.textContent = '.navbar, .sidemenu { display: none !important; }';
-                    document.head.appendChild(style);
                   })();
                   true;
                 `}
