@@ -63,7 +63,7 @@ if ($svc.Status -eq "Running") {
     Write-Host "Lagoon Cockpit Agent is running on port 3001" -ForegroundColor Green
     Write-Host ""
     Write-Host "Add this server in the Cockpit mobile app:" -ForegroundColor Cyan
-    Write-Host "  URL: http://100.85.242.40:3001" -ForegroundColor White
+    Write-Host "  URL: http://<your-tailscale-ip>:3001" -ForegroundColor White
     Write-Host "  Auth: API Key" -ForegroundColor White
     Write-Host "  Key: (from $AGENT_DIR\.env)" -ForegroundColor White
 } else {

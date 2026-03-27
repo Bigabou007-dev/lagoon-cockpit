@@ -42,7 +42,6 @@ function request(method, apiPath, body = null) {
         Authorization: `Bearer ${server.token}`,
       },
       timeout: 30000,
-      rejectUnauthorized: false,
     };
 
     const req = client.request(opts, (res) => {
@@ -86,7 +85,6 @@ async function authenticate(url, apiKey) {
       method: "POST",
       headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(body) },
       timeout: 10000,
-      rejectUnauthorized: false,
     };
 
     const req = client.request(opts, (res) => {
@@ -121,7 +119,7 @@ async function refreshAndRetry(method, apiPath, body) {
       hostname: parsed.hostname, port: parsed.port, path: parsed.pathname,
       method: "POST",
       headers: { "Content-Type": "application/json", "Content-Length": Buffer.byteLength(reqBody) },
-      timeout: 10000, rejectUnauthorized: false,
+      timeout: 10000,
     }, (res) => {
       const chunks = [];
       res.on("data", (c) => chunks.push(c));
