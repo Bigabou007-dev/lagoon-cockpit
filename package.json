@@ -9,6 +9,6 @@
     "packages/app"
   ],
   "overrides": {
-    "brace-expansion": ">=5.0.5"
+    "brace-expansion": "^2.0.1"
   }
 }
