@@ -90,7 +90,7 @@ const STACK_BORDER_COLORS = [
 ];
 
 const STACK_LABEL_COLORS = [
-  '#60A5FA',
+  '#4A90FF',
   '#A78BFA',
   '#F472B6',
   '#2DD4BF',
@@ -354,12 +354,12 @@ export default function SystemMapScreen() {
           options={{
             title: 'System Map',
             headerBackTitle: 'Back',
-            headerStyle: { backgroundColor: '#0D0D0D' },
-            headerTintColor: '#F9FAFB',
+            headerStyle: { backgroundColor: '#1C1C1E' },
+            headerTintColor: '#FFFFFF',
           }}
         />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#60A5FA" />
+          <ActivityIndicator size="large" color="#4A90FF" />
           <Text style={styles.loadingText}>Mapping infrastructure...</Text>
         </View>
       </>
@@ -372,8 +372,8 @@ export default function SystemMapScreen() {
         options={{
           title: 'System Map',
           headerBackTitle: 'Back',
-          headerStyle: { backgroundColor: '#0D0D0D' },
-          headerTintColor: '#F9FAFB',
+          headerStyle: { backgroundColor: '#1C1C1E' },
+          headerTintColor: '#FFFFFF',
           headerTitleStyle: { fontWeight: '700' },
         }}
       />
@@ -381,7 +381,7 @@ export default function SystemMapScreen() {
         {/* ── Top Stats Bar ── */}
         <View style={styles.statsBar}>
           <View style={styles.statsRow}>
-            <StatPill label="Containers" value={stats.total} color="#60A5FA" />
+            <StatPill label="Containers" value={stats.total} color="#4A90FF" />
             <StatPill label="Running" value={stats.running} color="#22C55E" />
             <StatPill label="Stopped" value={stats.stopped} color="#EF4444" />
             {stats.unhealthy > 0 && (
@@ -622,23 +622,23 @@ function LegendItem({ color, label }: { color: string; label: string }) {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
   },
   centered: {
     flex: 1,
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
     justifyContent: 'center',
     alignItems: 'center',
   },
   loadingText: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 14,
     marginTop: 12,
   },
 
   /* ── Stats Bar ── */
   statsBar: {
-    backgroundColor: '#111827',
+    backgroundColor: '#2C2C2E',
     marginHorizontal: 12,
     marginTop: 12,
     marginBottom: 8,
@@ -646,7 +646,7 @@ const styles = StyleSheet.create({
     paddingVertical: 12,
     paddingHorizontal: 14,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   statsRow: {
     flexDirection: 'row',
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
   statPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     paddingHorizontal: 10,
     paddingVertical: 5,
     borderRadius: 8,
@@ -669,7 +669,7 @@ const styles = StyleSheet.create({
   },
   statLabel: {
     fontSize: 11,
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontWeight: '500',
   },
   refreshLabel: {
@@ -708,7 +708,7 @@ const styles = StyleSheet.create({
     position: 'absolute',
   },
   nodeCircle: {
-    backgroundColor: '#111827',
+    backgroundColor: '#2C2C2E',
     borderWidth: 2.5,
     alignItems: 'center',
     justifyContent: 'center',
@@ -718,7 +718,7 @@ const styles = StyleSheet.create({
     opacity: 0.25,
   },
   nodeStateIcon: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 10,
     fontWeight: '800',
   },
@@ -747,16 +747,16 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(96,165,250,0.25)',
   },
   netBadgeText: {
-    color: '#60A5FA',
+    color: '#4A90FF',
     fontSize: 8,
     fontWeight: '500',
   },
 
   /* ── Legend ── */
   legend: {
-    backgroundColor: '#111827',
+    backgroundColor: '#2C2C2E',
     borderTopWidth: 1,
-    borderTopColor: '#1F2937',
+    borderTopColor: '#3A3A3C',
     paddingVertical: 10,
     paddingHorizontal: 16,
     gap: 6,
@@ -788,7 +788,7 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   legendText: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 11,
     fontWeight: '500',
   },

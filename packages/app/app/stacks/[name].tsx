@@ -105,7 +105,7 @@ export default function StackDetailScreen() {
           )}
           keyExtractor={(item: ContainerSummary) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
           }
           contentContainerStyle={styles.list}
         />
@@ -127,11 +127,11 @@ export default function StackDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   header: { padding: 20, paddingBottom: 12 },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { color: '#F9FAFB', fontSize: 22, fontWeight: '700' },
-  subtitle: { color: '#6B7280', fontSize: 14, marginTop: 4 },
+  title: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
+  subtitle: { color: '#636366', fontSize: 14, marginTop: 4 },
   actions: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 16 },
   actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
   actionText: { color: '#fff', fontSize: 14, fontWeight: '600' },

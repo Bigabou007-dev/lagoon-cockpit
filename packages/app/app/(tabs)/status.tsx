@@ -59,7 +59,7 @@ export default function StatusScreen() {
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
-      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />}
+      refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
     >
       {/* Endpoints */}
       <Text style={styles.sectionTitle}>HTTP Endpoints</Text>

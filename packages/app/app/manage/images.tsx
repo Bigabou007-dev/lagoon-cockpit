@@ -163,7 +163,7 @@ export default function ImagesScreen() {
       <>
         <Stack.Screen options={{ title: 'Images', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#60A5FA" />
+          <ActivityIndicator size="large" color="#4A90FF" />
           <Text style={styles.loadingText}>Loading images...</Text>
         </View>
       </>
@@ -194,7 +194,7 @@ export default function ImagesScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No images found</Text>}
@@ -211,35 +211,35 @@ export default function ImagesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
-  centered: { flex: 1, backgroundColor: '#0D0D0D', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#9CA3AF', fontSize: 14, marginTop: 12 },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
+  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
   pruneBtn: {
     backgroundColor: '#F59E0B', marginHorizontal: 16, marginTop: 16, marginBottom: 8,
-    paddingVertical: 12, borderRadius: 10, alignItems: 'center',
+    paddingVertical: 12, borderRadius: 16, alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },
-  pruneBtnText: { color: '#0D0D0D', fontSize: 15, fontWeight: '700' },
+  pruneBtnText: { color: '#1C1C1E', fontSize: 15, fontWeight: '700' },
   list: { paddingHorizontal: 16, paddingBottom: 20, paddingTop: 8 },
   card: {
-    backgroundColor: '#111827', borderRadius: 12, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#1F2937',
+    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
+    borderWidth: 1, borderColor: '#3A3A3C',
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
-  imageName: { color: '#F9FAFB', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
+  imageName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', flex: 1, marginRight: 8 },
   deleteBtn: { color: '#EF4444', fontSize: 16, fontWeight: '700' },
   cardMeta: { flexDirection: 'row', gap: 12 },
   metaItem: { flex: 1 },
-  metaLabel: { color: '#9CA3AF', fontSize: 11, marginBottom: 2 },
-  metaValue: { color: '#F9FAFB', fontSize: 13, fontWeight: '500' },
-  activeCount: { color: '#60A5FA' },
-  inactiveCount: { color: '#9CA3AF' },
+  metaLabel: { color: '#8E8E93', fontSize: 11, marginBottom: 2 },
+  metaValue: { color: '#FFFFFF', fontSize: 13, fontWeight: '500' },
+  activeCount: { color: '#4A90FF' },
+  inactiveCount: { color: '#8E8E93' },
   footer: {
-    backgroundColor: '#111827', borderTopWidth: 1, borderTopColor: '#1F2937',
+    backgroundColor: '#2C2C2E', borderTopWidth: 1, borderTopColor: '#3A3A3C',
     paddingVertical: 14, paddingHorizontal: 20, flexDirection: 'row',
     justifyContent: 'space-between', alignItems: 'center',
   },
-  footerLabel: { color: '#9CA3AF', fontSize: 14 },
-  footerValue: { color: '#F9FAFB', fontSize: 18, fontWeight: '700' },
-  empty: { color: '#6B7280', fontSize: 14, textAlign: 'center', marginTop: 40 },
+  footerLabel: { color: '#8E8E93', fontSize: 14 },
+  footerValue: { color: '#FFFFFF', fontSize: 18, fontWeight: '700' },
+  empty: { color: '#636366', fontSize: 14, textAlign: 'center', marginTop: 40 },
 });

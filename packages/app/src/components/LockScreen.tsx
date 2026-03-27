@@ -2,6 +2,8 @@ import { View, Text, TouchableOpacity, StyleSheet, Animated } from 'react-native
 import { useAuthStore } from '../stores/authStore';
 import { useEffect, useState, useRef } from 'react';
 import { LinearGradient } from 'expo-linear-gradient';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../theme/tokens';
 
 export default function LockScreen() {
   const { unlock, isLoading, checkBiometricSupport, bypassUnlock } = useAuthStore();
@@ -51,7 +53,7 @@ export default function LockScreen() {
       <View style={styles.content}>
         <Animated.View style={[styles.iconContainer, { transform: [{ scale: pulseAnim }] }]}>
           <View style={styles.iconCircle}>
-            <Text style={styles.icon}>{'\u{1F512}'}</Text>
+            <Ionicons name="shield-checkmark-outline" size={48} color={COLORS.blue} />
           </View>
         </Animated.View>
 
@@ -93,7 +95,7 @@ export default function LockScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
     justifyContent: 'center',
     alignItems: 'center',
     padding: 24,
@@ -110,23 +112,20 @@ const styles = StyleSheet.create({
     width: 100,
     height: 100,
     borderRadius: 50,
-    backgroundColor: '#2C2C2E',
+    backgroundColor: COLORS.card,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
-  icon: {
-    fontSize: 48,
-  },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 28,
     fontWeight: '700',
     marginBottom: 8,
   },
   subtitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 16,
     marginBottom: 32,
   },
@@ -140,7 +139,7 @@ const styles = StyleSheet.create({
     borderColor: 'rgba(255, 107, 107, 0.25)',
   },
   error: {
-    color: '#FF6B6B',
+    color: COLORS.red,
     fontSize: 14,
     textAlign: 'center',
   },
@@ -156,7 +155,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   buttonText: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 17,
     fontWeight: '600',
   },

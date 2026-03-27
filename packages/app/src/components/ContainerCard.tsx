@@ -1,5 +1,8 @@
 import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import type { ContainerSummary } from '../stores/dashboardStore';
+import { COLORS } from '../theme/tokens';
 
 interface ContainerCardProps {
   container: ContainerSummary;
@@ -9,21 +12,6 @@ interface ContainerCardProps {
   showQuickActions?: boolean;
   onQuickAction?: (id: string, action: 'start' | 'stop' | 'restart') => void;
 }
-
-const COLORS = {
-  bg: '#1C1C1E',
-  card: '#2C2C2E',
-  border: '#3A3A3C',
-  blue: '#4A90FF',
-  green: '#34D399',
-  red: '#FF6B6B',
-  purple: '#A78BFA',
-  orange: '#FB923C',
-  yellow: '#FBBF24',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textTertiary: '#636366',
-};
 
 function getStatusColor(state: string, health?: string) {
   if (health === 'unhealthy') return COLORS.yellow;
@@ -66,6 +54,7 @@ export default function ContainerCard({
   const statusLabel = getStatusLabel(container.state, container.health ?? undefined);
 
   const confirmAction = (action: 'start' | 'stop' | 'restart') => {
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
       `${action.charAt(0).toUpperCase() + action.slice(1)} "${container.name}"?`,
       undefined,
@@ -148,16 +137,16 @@ export default function ContainerCard({
         <View style={styles.quickActions}>
           {!isRunning && (
             <TouchableOpacity style={[styles.qBtn, { backgroundColor: COLORS.green + '1A' }]} onPress={() => confirmAction('start')} accessibilityRole="button" accessibilityLabel="Start container">
-              <Text style={[styles.qBtnIcon, { color: COLORS.green }]}>{'\u25B6'}</Text>
+              <Ionicons name="play" size={16} color={COLORS.green} />
             </TouchableOpacity>
           )}
           {isRunning && (
             <TouchableOpacity style={[styles.qBtn, { backgroundColor: COLORS.red + '1A' }]} onPress={() => confirmAction('stop')} accessibilityRole="button" accessibilityLabel="Stop container">
-              <Text style={[styles.qBtnIcon, { color: COLORS.red }]}>{'\u25A0'}</Text>
+              <Ionicons name="stop" size={16} color={COLORS.red} />
             </TouchableOpacity>
           )}
           <TouchableOpacity style={[styles.qBtn, { backgroundColor: COLORS.blue + '1A' }]} onPress={() => confirmAction('restart')} accessibilityRole="button" accessibilityLabel="Restart container">
-            <Text style={[styles.qBtnIcon, { color: COLORS.blue }]}>{'\u21BB'}</Text>
+            <Ionicons name="refresh-circle" size={16} color={COLORS.blue} />
           </TouchableOpacity>
         </View>
       )}

@@ -29,14 +29,14 @@ function getActionStyle(action: string): { icon: string; color: string } {
   const a = action.toLowerCase();
   if (a.includes('start')) return { icon: '\u25B6', color: '#34D399' }; // green
   if (a.includes('stop')) return { icon: '\u23F9', color: '#F87171' }; // red
-  if (a.includes('restart')) return { icon: '\u{1F504}', color: '#60A5FA' }; // blue
+  if (a.includes('restart')) return { icon: '\u{1F504}', color: '#4A90FF' }; // blue
   if (a.includes('exec')) return { icon: '\u{1F4BB}', color: '#FBBF24' }; // yellow
   if (a.includes('prune')) return { icon: '\u{1F9F9}', color: '#FB923C' }; // orange
   if (a.includes('delete') || a.includes('remove')) return { icon: '\u{1F5D1}', color: '#F87171' };
   if (a.includes('create') || a.includes('add')) return { icon: '\u2795', color: '#34D399' };
   if (a.includes('update') || a.includes('edit')) return { icon: '\u270F', color: '#A78BFA' };
-  if (a.includes('login') || a.includes('auth')) return { icon: '\u{1F511}', color: '#60A5FA' };
-  return { icon: '\u2022', color: '#9CA3AF' };
+  if (a.includes('login') || a.includes('auth')) return { icon: '\u{1F511}', color: '#4A90FF' };
+  return { icon: '\u2022', color: '#8E8E93' };
 }
 
 /* group entries by day */
@@ -132,7 +132,7 @@ export default function ActivityScreen() {
           keyExtractor={(item) => item.id}
           contentContainerStyle={styles.list}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
           }
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -151,7 +151,7 @@ export default function ActivityScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   list: { padding: 16, paddingBottom: 40 },
 
   /* day header */
@@ -160,10 +160,10 @@ const styles = StyleSheet.create({
     marginBottom: 12,
     paddingBottom: 6,
     borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
+    borderBottomColor: '#3A3A3C',
   },
   dayText: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
@@ -182,32 +182,32 @@ const styles = StyleSheet.create({
   line: {
     flex: 1,
     width: 1,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     marginTop: 2,
   },
 
   /* entry content */
   entryContent: {
     flex: 1,
-    backgroundColor: '#111827',
-    borderRadius: 10,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 12,
     marginLeft: 8,
     marginBottom: 6,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   entryHeader: { flexDirection: 'row', alignItems: 'center', gap: 6 },
   actionIcon: { fontSize: 14 },
-  actionText: { color: '#F9FAFB', fontSize: 14, fontWeight: '600', flex: 1 },
-  timeText: { color: '#6B7280', fontSize: 11 },
-  targetText: { color: '#60A5FA', fontSize: 13, marginTop: 4 },
-  detailText: { color: '#9CA3AF', fontSize: 12, marginTop: 2 },
-  userText: { color: '#6B7280', fontSize: 11, marginTop: 6 },
+  actionText: { color: '#FFFFFF', fontSize: 14, fontWeight: '600', flex: 1 },
+  timeText: { color: '#636366', fontSize: 11 },
+  targetText: { color: '#4A90FF', fontSize: 13, marginTop: 4 },
+  detailText: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
+  userText: { color: '#636366', fontSize: 11, marginTop: 6 },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginTop: 80 },
   emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#F9FAFB', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
+  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
 });

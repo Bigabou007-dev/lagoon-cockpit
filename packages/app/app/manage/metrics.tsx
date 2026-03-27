@@ -146,8 +146,8 @@ export default function MetricsHistoryScreen() {
       <Stack.Screen
         options={{
           title: 'Metrics History',
-          headerStyle: { backgroundColor: '#0D0D0D' },
-          headerTintColor: '#F9FAFB',
+          headerStyle: { backgroundColor: '#1C1C1E' },
+          headerTintColor: '#FFFFFF',
         }}
       />
 
@@ -176,7 +176,7 @@ export default function MetricsHistoryScreen() {
 
       {loading && !refreshing ? (
         <View style={styles.center}>
-          <ActivityIndicator size="large" color="#60A5FA" />
+          <ActivityIndicator size="large" color="#4A90FF" />
         </View>
       ) : error ? (
         <View style={styles.center}>
@@ -193,7 +193,9 @@ export default function MetricsHistoryScreen() {
             <RefreshControl
               refreshing={refreshing}
               onRefresh={onRefresh}
-              tintColor="#60A5FA"
+              tintColor="#4A90FF"
+              colors={['#4A90FF']}
+              progressBackgroundColor="#2C2C2E"
             />
           }
         >
@@ -204,7 +206,7 @@ export default function MetricsHistoryScreen() {
             summary?.cpu_avg,
             summary?.cpu_max,
             '%',
-            '#60A5FA',
+            '#4A90FF',
           )}
           {renderCard(
             'Memory',
@@ -267,7 +269,7 @@ export default function MetricsHistoryScreen() {
 const styles = StyleSheet.create({
   screen: {
     flex: 1,
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
   },
   center: {
     flex: 1,
@@ -282,13 +284,13 @@ const styles = StyleSheet.create({
     paddingHorizontal: 24,
   },
   retryBtn: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     paddingHorizontal: 20,
     paddingVertical: 10,
     borderRadius: 8,
   },
   retryText: {
-    color: '#60A5FA',
+    color: '#4A90FF',
     fontWeight: '600',
     fontSize: 14,
   },
@@ -304,19 +306,19 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 8,
     borderRadius: 8,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     alignItems: 'center',
   },
   rangeBtnActive: {
-    backgroundColor: '#60A5FA',
+    backgroundColor: '#4A90FF',
   },
   rangeBtnText: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 13,
     fontWeight: '600',
   },
   rangeBtnTextActive: {
-    color: '#0D0D0D',
+    color: '#1C1C1E',
   },
 
   /* Scroll */
@@ -330,12 +332,12 @@ const styles = StyleSheet.create({
 
   /* Metric Card */
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   cardHeader: {
     flexDirection: 'row',
@@ -344,7 +346,7 @@ const styles = StyleSheet.create({
     marginBottom: 12,
   },
   cardTitle: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
   },
@@ -362,34 +364,34 @@ const styles = StyleSheet.create({
   },
   statItem: {
     flex: 1,
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     borderRadius: 8,
     padding: 10,
     alignItems: 'center',
   },
   statLabel: {
-    color: '#6B7280',
+    color: '#636366',
     fontSize: 11,
     fontWeight: '500',
     marginBottom: 2,
   },
   statValue: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
   },
 
   /* Summary Card */
   summaryCard: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginTop: 4,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   summaryTitle: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 16,
     fontWeight: '600',
     marginBottom: 12,
@@ -399,14 +401,14 @@ const styles = StyleSheet.create({
     justifyContent: 'space-between',
     paddingVertical: 8,
     borderBottomWidth: 1,
-    borderBottomColor: '#1F2937',
+    borderBottomColor: '#3A3A3C',
   },
   summaryLabel: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 13,
   },
   summaryValue: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 13,
     fontWeight: '600',
   },

@@ -1,25 +1,17 @@
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import { useState, useCallback, useEffect, useRef } from 'react';
+import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
-import { useDashboardStore, type ContainerSummary } from '../../src/stores/dashboardStore';
+import { useDashboardStore } from '../../src/stores/dashboardStore';
 import { apiFetch } from '../../src/lib/api';
 import { useRouter } from 'expo-router';
+import { COLORS, RADIUS } from '../../src/theme/tokens';
+import Skeleton from '../../src/components/Skeleton';
 
 /* ─── Design tokens ─── */
 const T = {
-  bg: '#1C1C1E',
-  card: '#2C2C2E',
-  border: '#3A3A3C',
-  blue: '#4A90FF',
-  green: '#34D399',
-  red: '#FF6B6B',
-  purple: '#A78BFA',
-  orange: '#FB923C',
-  yellow: '#FBBF24',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textTertiary: '#636366',
-  radius: 16,
+  ...COLORS,
+  radius: RADIUS.lg,
 };
 
 /* ─── Helpers ─── */
@@ -42,13 +34,13 @@ function formatUptime(seconds: number): string {
 
 /* ─── Circular Progress Ring ─── */
 function ProgressRing({
-  size,
-  strokeWidth,
+  size = 70,
+  strokeWidth = 5,
   percent,
   color,
 }: {
-  size: number;
-  strokeWidth: number;
+  size?: number;
+  strokeWidth?: number;
   percent: number;
   color: string;
 }) {
@@ -63,7 +55,7 @@ function ProgressRing({
     height: size,
     borderRadius: radius,
     borderWidth: strokeWidth,
-    borderColor: T.border,
+    borderColor: COLORS.border,
     position: 'absolute' as const,
   };
 
@@ -82,7 +74,7 @@ function ProgressRing({
   const leftDeg = Math.max(degrees - 180, 0);
 
   return (
-    <View style={{ width: size, height: size, alignItems: 'center', justifyContent: 'center' }}>
+    <View style={{ width: size, height: size }}>
       {/* Track ring */}
       <View style={baseCircle} />
 
@@ -135,9 +127,11 @@ function ProgressRing({
       )}
 
       {/* Center label */}
-      <Text style={{ color: T.textPrimary, fontSize: 14, fontWeight: '700' }}>
-        {clampedPercent.toFixed(0)}%
-      </Text>
+      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
+        <Text style={{ color: T.textPrimary, fontSize: 16, fontWeight: '700' }}>
+          {clampedPercent.toFixed(0)}%
+        </Text>
+      </View>
     </View>
   );
 }
@@ -162,6 +156,70 @@ function LiveIndicator() {
       <Animated.View style={[styles.liveDot, { opacity }]} />
       <Text style={styles.liveText}>Live</Text>
     </View>
+  );
+}
+
+/* ─── Skeleton Placeholders ─── */
+function SkeletonStatGrid() {
+  return (
+    <View style={styles.statGrid}>
+      {[0, 1, 2, 3].map((i) => (
+        <View key={i} style={styles.statCard}>
+          <Skeleton width={32} height={32} borderRadius={10} />
+          <Skeleton width={60} height={32} borderRadius={8} style={{ marginTop: 10 }} />
+          <Skeleton width={80} height={12} borderRadius={4} style={{ marginTop: 8 }} />
+        </View>
+      ))}
+    </View>
+  );
+}
+
+function SkeletonGaugeRow() {
+  return (
+    <View style={styles.section}>
+      <Skeleton width={140} height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+      <View style={styles.gaugeRow}>
+        {[0, 1, 2].map((i) => (
+          <View key={i} style={styles.gaugeCard}>
+            <Skeleton width={64} height={64} borderRadius={32} />
+            <Skeleton width={30} height={12} borderRadius={4} style={{ marginTop: 8 }} />
+            <Skeleton width={50} height={10} borderRadius={4} style={{ marginTop: 4 }} />
+          </View>
+        ))}
+      </View>
+    </View>
+  );
+}
+
+/* ─── Animated Section Wrapper ─── */
+function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
+  const opacity = useRef(new Animated.Value(0)).current;
+  const translateY = useRef(new Animated.Value(20)).current;
+
+  useEffect(() => {
+    const anim = Animated.parallel([
+      Animated.timing(opacity, {
+        toValue: 1,
+        duration: 400,
+        delay,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+      Animated.timing(translateY, {
+        toValue: 0,
+        duration: 400,
+        delay,
+        easing: Easing.out(Easing.ease),
+        useNativeDriver: true,
+      }),
+    ]);
+    anim.start();
+  }, [opacity, translateY, delay]);
+
+  return (
+    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+      {children}
+    </Animated.View>
   );
 }
 
@@ -215,7 +273,7 @@ export default function OverviewScreen() {
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={T.blue} />
+        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={T.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
       }
     >
       {/* ── 1. Server Header ── */}
@@ -249,99 +307,106 @@ export default function OverviewScreen() {
         </View>
       </View>
 
-      {/* ── Loading State ── */}
+      {/* ── Skeleton Loading State ── */}
       {!overview && (
-        <View style={styles.loadingContainer}>
-          <ActivityIndicator size="large" color={T.blue} />
-          <Text style={styles.loadingText}>Loading dashboard...</Text>
-        </View>
+        <>
+          <SkeletonStatGrid />
+          <SkeletonGaugeRow />
+        </>
       )}
 
       {/* ── 2. Quick Stat Cards (2x2) ── */}
       {overview && (
-        <View style={styles.statGrid}>
-          <TouchableOpacity
-            style={styles.statCard}
-            onPress={() => router.push('/(tabs)/containers')}
-          >
-            <View style={[styles.statIcon, { backgroundColor: T.blue + '20' }]}>
-              <Text style={[styles.statIconText, { color: T.blue }]}>C</Text>
-            </View>
-            <Text style={styles.statNumber}>
-              {overview.containers.running + overview.containers.stopped}
-            </Text>
-            <Text style={styles.statLabel}>CONTAINERS</Text>
-          </TouchableOpacity>
+        <FadeSlideIn delay={0}>
+          <View style={styles.statGrid}>
+            <TouchableOpacity
+              style={styles.statCard}
+              onPress={() => router.push('/(tabs)/containers')}
+            >
+              <View style={[styles.statIcon, { backgroundColor: T.blue + '20' }]}>
+                <Ionicons name="cube-outline" size={16} color={T.blue} />
+              </View>
+              <Text style={styles.statNumber}>
+                {overview.containers.running + overview.containers.stopped}
+              </Text>
+              <Text style={styles.statLabel}>CONTAINERS</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.statCard}
-            onPress={() => router.push('/(tabs)/containers')}
-          >
-            <View style={[styles.statIcon, { backgroundColor: T.green + '20' }]}>
-              <Text style={[styles.statIconText, { color: T.green }]}>R</Text>
-            </View>
-            <Text style={styles.statNumber}>{overview.containers.running}</Text>
-            <Text style={styles.statLabel}>RUNNING</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.statCard}
+              onPress={() => router.push('/(tabs)/containers')}
+            >
+              <View style={[styles.statIcon, { backgroundColor: T.green + '20' }]}>
+                <Ionicons name="checkmark-circle-outline" size={16} color={T.green} />
+              </View>
+              <Text style={styles.statNumber}>{overview.containers.running}</Text>
+              <Text style={styles.statLabel}>RUNNING</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.statCard}
-            onPress={() => router.push('/(tabs)/containers')}
-          >
-            <View style={[styles.statIcon, { backgroundColor: T.red + '20' }]}>
-              <Text style={[styles.statIconText, { color: T.red }]}>S</Text>
-            </View>
-            <Text style={[styles.statNumber, overview.containers.stopped > 0 && { color: T.red }]}>
-              {overview.containers.stopped}
-            </Text>
-            <Text style={styles.statLabel}>STOPPED</Text>
-          </TouchableOpacity>
+            <TouchableOpacity
+              style={styles.statCard}
+              onPress={() => router.push('/(tabs)/containers')}
+            >
+              <View style={[styles.statIcon, { backgroundColor: T.red + '20' }]}>
+                <Ionicons name="stop-circle-outline" size={16} color={T.red} />
+              </View>
+              <Text style={[styles.statNumber, overview.containers.stopped > 0 && { color: T.red }]}>
+                {overview.containers.stopped}
+              </Text>
+              <Text style={styles.statLabel}>STOPPED</Text>
+            </TouchableOpacity>
 
-          <TouchableOpacity
-            style={styles.statCard}
-            onPress={() => router.push('/(tabs)/stacks')}
-          >
-            <View style={[styles.statIcon, { backgroundColor: T.purple + '20' }]}>
-              <Text style={[styles.statIconText, { color: T.purple }]}>K</Text>
-            </View>
-            <Text style={styles.statNumber}>{overview.stacks.total}</Text>
-            <Text style={styles.statLabel}>STACKS</Text>
-          </TouchableOpacity>
-        </View>
+            <TouchableOpacity
+              style={styles.statCard}
+              onPress={() => router.push('/(tabs)/stacks')}
+            >
+              <View style={[styles.statIcon, { backgroundColor: T.purple + '20' }]}>
+                <Ionicons name="layers-outline" size={16} color={T.purple} />
+              </View>
+              <Text style={styles.statNumber}>{overview.stacks.total}</Text>
+              <Text style={styles.statLabel}>STACKS</Text>
+            </TouchableOpacity>
+          </View>
+        </FadeSlideIn>
       )}
 
       {/* ── 3. System Gauges ── */}
       {sys && (
-        <View style={styles.section}>
-          <Text style={styles.sectionHeader}>SYSTEM RESOURCES</Text>
-          <View style={styles.gaugeRow}>
-            <View style={styles.gaugeCard}>
-              <ProgressRing size={64} strokeWidth={5} percent={sys.cpuPercent} color={T.blue} />
-              <Text style={styles.gaugeLabel}>CPU</Text>
-              <Text style={styles.gaugeDetail}>{sys.cpuCount} cores</Text>
-            </View>
-            <View style={styles.gaugeCard}>
-              <ProgressRing
-                size={64}
-                strokeWidth={5}
-                percent={sys.memory.percent}
-                color={T.purple}
-              />
-              <Text style={styles.gaugeLabel}>RAM</Text>
-              <Text style={styles.gaugeDetail}>{formatBytes(sys.memory.used)}</Text>
-            </View>
-            <View style={styles.gaugeCard}>
-              <ProgressRing
-                size={64}
-                strokeWidth={5}
-                percent={sys.disk.percent}
-                color={T.orange}
-              />
-              <Text style={styles.gaugeLabel}>Disk</Text>
-              <Text style={styles.gaugeDetail}>{formatBytes(sys.disk.used)}</Text>
+        <FadeSlideIn delay={100}>
+          <View style={styles.section}>
+            <Text style={styles.sectionHeader}>SYSTEM RESOURCES</Text>
+            <View style={styles.gaugeRow}>
+              <View style={styles.gaugeCard}>
+                <MaterialCommunityIcons name="cpu-64-bit" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
+                <ProgressRing size={70} strokeWidth={6} percent={sys.cpuPercent} color={T.blue} />
+                <Text style={styles.gaugeLabel}>CPU</Text>
+                <Text style={styles.gaugeDetail}>{sys.cpuCount} cores</Text>
+              </View>
+              <View style={styles.gaugeCard}>
+                <MaterialCommunityIcons name="memory" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
+                <ProgressRing
+                  size={70}
+                  strokeWidth={6}
+                  percent={sys.memory.percent}
+                  color={T.purple}
+                />
+                <Text style={styles.gaugeLabel}>RAM</Text>
+                <Text style={styles.gaugeDetail}>{formatBytes(sys.memory.used)}</Text>
+              </View>
+              <View style={styles.gaugeCard}>
+                <MaterialCommunityIcons name="harddisk" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
+                <ProgressRing
+                  size={70}
+                  strokeWidth={6}
+                  percent={sys.disk.percent}
+                  color={T.orange}
+                />
+                <Text style={styles.gaugeLabel}>Disk</Text>
+                <Text style={styles.gaugeDetail}>{formatBytes(sys.disk.used)}</Text>
+              </View>
             </View>
           </View>
-        </View>
+        </FadeSlideIn>
       )}
 
       {/* ── 4. Load Average ── */}
@@ -360,29 +425,32 @@ export default function OverviewScreen() {
 
       {/* ── 5. Problem Containers ── */}
       {problemContainers.length > 0 && (
-        <View style={styles.section}>
-          <Text style={[styles.sectionHeader, { color: T.red }]}>ATTENTION REQUIRED</Text>
-          <View style={styles.problemSection}>
-            {problemContainers.map((c) => (
-              <TouchableOpacity
-                key={c.id}
-                style={styles.problemRow}
-                onPress={() => router.push(`/containers/${c.id}`)}
-              >
-                <View style={styles.problemDot} />
-                <Text style={styles.problemName} numberOfLines={1}>
-                  {c.name}
-                </Text>
-                <Text style={styles.problemState}>
-                  {c.health === 'unhealthy' ? 'unhealthy' : c.state}
-                </Text>
-              </TouchableOpacity>
-            ))}
+        <FadeSlideIn delay={200}>
+          <View style={styles.section}>
+            <Text style={[styles.sectionHeader, { color: T.red }]}>ATTENTION REQUIRED</Text>
+            <View style={styles.problemSection}>
+              {problemContainers.map((c) => (
+                <TouchableOpacity
+                  key={c.id}
+                  style={styles.problemRow}
+                  onPress={() => router.push(`/containers/${c.id}`)}
+                >
+                  <View style={styles.problemDot} />
+                  <Text style={styles.problemName} numberOfLines={1}>
+                    {c.name}
+                  </Text>
+                  <Text style={styles.problemState}>
+                    {c.health === 'unhealthy' ? 'unhealthy' : c.state}
+                  </Text>
+                </TouchableOpacity>
+              ))}
+            </View>
           </View>
-        </View>
+        </FadeSlideIn>
       )}
 
       {/* ── 6. Recent Alerts (timeline) ── */}
+      <FadeSlideIn delay={300}>
       <View style={styles.section}>
         <TouchableOpacity
           style={styles.sectionHeaderRow}
@@ -396,7 +464,7 @@ export default function OverviewScreen() {
 
         {alerts.length === 0 ? (
           <View style={styles.allGood}>
-            <View style={[styles.allGoodDot, { backgroundColor: T.green }]} />
+            <Ionicons name="checkmark-circle" size={20} color={T.green} />
             <Text style={styles.allGoodText}>All systems operational</Text>
           </View>
         ) : (
@@ -429,6 +497,7 @@ export default function OverviewScreen() {
           </View>
         )}
       </View>
+      </FadeSlideIn>
 
       {/* Bottom spacer */}
       {overview && (
@@ -515,9 +584,8 @@ const styles = StyleSheet.create({
     marginBottom: 24,
   },
   statCard: {
-    width: '48%' as any,
-    flexGrow: 1,
-    flexBasis: '46%' as any,
+    flex: 1,
+    minWidth: 150,
     backgroundColor: T.card,
     borderRadius: T.radius,
     borderWidth: 1,
@@ -577,7 +645,7 @@ const styles = StyleSheet.create({
   },
   gaugeLabel: {
     color: T.textSecondary,
-    fontSize: 12,
+    fontSize: 11,
     fontWeight: '600',
     marginTop: 8,
   },

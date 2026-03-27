@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@expo/metro-runtime": "~55.0.6",
+    "@expo/vector-icons": "^15.0.2",
     "expo": "~55.0.4",
     "expo-build-properties": "~55.0.10",
     "expo-constants": "^55.0.7",
@@ -23,6 +24,7 @@
     "react-dom": "19.2.0",
     "react-native": "0.83.2",
     "react-native-gesture-handler": "^2.30.0",
+    "react-native-reanimated": "4.2.1",
     "react-native-safe-area-context": "^5.7.0",
     "react-native-screens": "^4.24.0",
     "react-native-web": "^0.21.0",

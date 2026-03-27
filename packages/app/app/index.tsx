@@ -15,6 +15,7 @@ import { Platform } from 'react-native';
 import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
+import { COLORS } from '../src/theme/tokens';
 
 export default function ServerSelectScreen() {
   const router = useRouter();
@@ -314,7 +315,7 @@ export default function ServerSelectScreen() {
 const styles = StyleSheet.create({
   container: {
     flex: 1,
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
   },
   containerContent: {
     padding: 24,
@@ -322,13 +323,13 @@ const styles = StyleSheet.create({
     paddingBottom: 40,
   },
   title: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 36,
     fontWeight: '800',
     marginBottom: 4,
   },
   subtitle: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 17,
     marginBottom: 28,
   },
@@ -350,7 +351,7 @@ const styles = StyleSheet.create({
     marginTop: 1,
   },
   errorText: {
-    color: '#FF6B6B',
+    color: COLORS.red,
     fontSize: 14,
     flex: 1,
     lineHeight: 20,
@@ -364,7 +365,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   errorDismissText: {
-    color: '#FF6B6B',
+    color: COLORS.red,
     fontSize: 16,
     fontWeight: '600',
   },
@@ -377,12 +378,12 @@ const styles = StyleSheet.create({
 
   // Server card
   profileCard: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: COLORS.card,
     borderRadius: 16,
     padding: 16,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
   },
@@ -399,12 +400,12 @@ const styles = StyleSheet.create({
     marginRight: 8,
   },
   profileName: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 17,
     fontWeight: '600',
   },
   profileUrl: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 13,
     fontFamily: Platform.OS === 'ios' ? 'Menlo' : 'monospace',
     marginBottom: 8,
@@ -419,7 +420,7 @@ const styles = StyleSheet.create({
     marginLeft: 16,
   },
   authBadgeText: {
-    color: '#4A90FF',
+    color: COLORS.blue,
     fontSize: 12,
     fontWeight: '600',
   },
@@ -430,7 +431,7 @@ const styles = StyleSheet.create({
     width: 24,
   },
   chevron: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 28,
     fontWeight: '300',
   },
@@ -443,56 +444,56 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
     borderStyle: 'dashed',
     flexDirection: 'row',
     gap: 8,
   },
   addIcon: {
-    color: '#4A90FF',
+    color: COLORS.blue,
     fontSize: 22,
     fontWeight: '500',
   },
   addText: {
-    color: '#4A90FF',
+    color: COLORS.blue,
     fontSize: 16,
     fontWeight: '600',
   },
 
   // Form
   form: {
-    backgroundColor: '#2C2C2E',
+    backgroundColor: COLORS.card,
     borderRadius: 16,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
     padding: 20,
     gap: 14,
   },
   formTitle: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 18,
     fontWeight: '700',
     marginBottom: 4,
   },
   inputGroup: {},
   input: {
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
     borderRadius: 12,
     padding: 16,
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 15,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
 
   // Segmented control
   segmentedControl: {
     flexDirection: 'row',
-    backgroundColor: '#1C1C1E',
+    backgroundColor: COLORS.bg,
     borderRadius: 12,
     padding: 3,
     borderWidth: 1,
-    borderColor: '#3A3A3C',
+    borderColor: COLORS.border,
   },
   segment: {
     flex: 1,
@@ -501,15 +502,15 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   segmentActive: {
-    backgroundColor: '#4A90FF',
+    backgroundColor: COLORS.blue,
   },
   segmentText: {
-    color: '#8E8E93',
+    color: COLORS.textSecondary,
     fontSize: 14,
     fontWeight: '600',
   },
   segmentTextActive: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
   },
 
   // Form actions
@@ -522,12 +523,12 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: 16,
     borderRadius: 12,
-    backgroundColor: '#3A3A3C',
+    backgroundColor: COLORS.border,
     alignItems: 'center',
     justifyContent: 'center',
   },
   cancelBtnText: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 15,
     fontWeight: '600',
   },
@@ -543,7 +544,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   connectBtnText: {
-    color: '#FFFFFF',
+    color: COLORS.textPrimary,
     fontSize: 15,
     fontWeight: '600',
   },

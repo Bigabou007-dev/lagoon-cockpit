@@ -84,22 +84,22 @@ export default function ManageScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   content: { padding: 16, paddingBottom: 40 },
-  title: { color: '#F9FAFB', fontSize: 28, fontWeight: '800', marginTop: 8 },
-  subtitle: { color: '#6B7280', fontSize: 14, marginBottom: 24 },
+  title: { color: '#FFFFFF', fontSize: 28, fontWeight: '800', marginTop: 8 },
+  subtitle: { color: '#636366', fontSize: 14, marginBottom: 24 },
   section: { marginBottom: 24 },
-  sectionTitle: { color: '#9CA3AF', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
+  sectionTitle: { color: '#8E8E93', fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: 12,
-    backgroundColor: '#111827', borderRadius: 12, padding: 16, marginBottom: 8,
-    borderWidth: 1, borderColor: '#1F2937',
+    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 8,
+    borderWidth: 1, borderColor: '#3A3A3C',
   },
   menuIcon: { fontSize: 24 },
   menuContent: { flex: 1 },
-  menuLabel: { color: '#F9FAFB', fontSize: 16, fontWeight: '600' },
-  menuDesc: { color: '#6B7280', fontSize: 12, marginTop: 2 },
-  menuArrow: { color: '#374151', fontSize: 24 },
+  menuLabel: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  menuDesc: { color: '#636366', fontSize: 12, marginTop: 2 },
+  menuArrow: { color: '#3A3A3C', fontSize: 24 },
   adminBadge: {
     color: '#F59E0B', fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, overflow: 'hidden', marginRight: 4,

@@ -251,7 +251,7 @@ export default function SchedulesScreen() {
       <ScrollView
         style={styles.container}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
         }
       >
         {/* -------- Schedules Section -------- */}
@@ -270,7 +270,7 @@ export default function SchedulesScreen() {
             <TextInput
               style={styles.input}
               placeholder="Schedule name"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#636366"
               value={name}
               onChangeText={setName}
             />
@@ -294,7 +294,7 @@ export default function SchedulesScreen() {
               <Text
                 style={[
                   styles.pickerValue,
-                  { color: ACTION_COLORS[action]?.text || '#60A5FA' },
+                  { color: ACTION_COLORS[action]?.text || '#4A90FF' },
                 ]}
               >
                 {action.toUpperCase()}
@@ -311,7 +311,7 @@ export default function SchedulesScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Cron expression (e.g. 0 3 * * *)"
-                placeholderTextColor="#6B7280"
+                placeholderTextColor="#636366"
                 value={customCron}
                 onChangeText={setCustomCron}
                 autoCapitalize="none"
@@ -368,8 +368,8 @@ export default function SchedulesScreen() {
                   <Switch
                     value={!!schedule.enabled}
                     onValueChange={() => toggleSchedule(schedule)}
-                    trackColor={{ false: '#374151', true: '#1D4ED8' }}
-                    thumbColor={schedule.enabled ? '#60A5FA' : '#6B7280'}
+                    trackColor={{ false: '#3A3A3C', true: '#1D4ED8' }}
+                    thumbColor={schedule.enabled ? '#4A90FF' : '#636366'}
                   />
                 </View>
                 {isAdmin && (
@@ -419,7 +419,7 @@ export default function SchedulesScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D', padding: 16 },
+  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 16 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -428,74 +428,74 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
     marginBottom: 12,
   },
-  addText: { color: '#60A5FA', fontSize: 14, fontWeight: '600' },
+  addText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
 
   /* form */
   formCard: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   input: {
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
     borderRadius: 8,
     padding: 12,
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   pickerBtn: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
     borderRadius: 8,
     padding: 12,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
-  pickerLabel: { color: '#9CA3AF', fontSize: 13 },
-  pickerValue: { color: '#60A5FA', fontSize: 14, fontWeight: '600', maxWidth: '60%' },
+  pickerLabel: { color: '#8E8E93', fontSize: 13 },
+  pickerValue: { color: '#4A90FF', fontSize: 14, fontWeight: '600', maxWidth: '60%' },
   hintText: {
-    color: '#6B7280',
+    color: '#636366',
     fontSize: 11,
     marginBottom: 10,
     marginLeft: 4,
   },
   saveBtn: {
     backgroundColor: '#1D4ED8',
-    borderRadius: 10,
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 4,
   },
-  saveText: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
+  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
 
   /* schedule cards */
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   cardTop: { flexDirection: 'row', alignItems: 'flex-start' },
-  cardName: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
-  cardContainer: { color: '#9CA3AF', fontSize: 13, marginTop: 2 },
+  cardName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  cardContainer: { color: '#8E8E93', fontSize: 13, marginTop: 2 },
   metaRow: { flexDirection: 'row', alignItems: 'center', gap: 8, marginTop: 8 },
   actionBadge: {
     paddingHorizontal: 8,
@@ -503,34 +503,34 @@ const styles = StyleSheet.create({
     borderRadius: 6,
   },
   actionBadgeText: { fontSize: 11, fontWeight: '700', letterSpacing: 0.5 },
-  cronText: { color: '#60A5FA', fontSize: 12, fontWeight: '500' },
-  timeText: { color: '#6B7280', fontSize: 11, marginTop: 3 },
+  cronText: { color: '#4A90FF', fontSize: 12, fontWeight: '500' },
+  timeText: { color: '#636366', fontSize: 11, marginTop: 3 },
   deleteBtn: { marginTop: 12, alignSelf: 'flex-start' },
   deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
 
   /* history cards */
   historyCard: {
-    backgroundColor: '#111827',
-    borderRadius: 10,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 14,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   historyTop: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
   },
-  historyName: { color: '#F9FAFB', fontSize: 14, fontWeight: '600' },
+  historyName: { color: '#FFFFFF', fontSize: 14, fontWeight: '600' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
-  historyMeta: { color: '#9CA3AF', fontSize: 12, marginTop: 4 },
+  historyMeta: { color: '#8E8E93', fontSize: 12, marginTop: 4 },
   historyError: { color: '#FCA5A5', fontSize: 12, marginTop: 2 },
-  historyTime: { color: '#6B7280', fontSize: 11, marginTop: 4 },
+  historyTime: { color: '#636366', fontSize: 11, marginTop: 4 },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 32 },
   emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#F9FAFB', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
+  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
 });

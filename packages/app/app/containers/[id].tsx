@@ -1,24 +1,16 @@
 import { View, Text, ScrollView, RefreshControl, TouchableOpacity, TextInput, StyleSheet, Alert, ActivityIndicator } from 'react-native';
 import { useLocalSearchParams, Stack } from 'expo-router';
 import { useState, useCallback, useEffect } from 'react';
+import { Ionicons } from '@expo/vector-icons';
+import * as Haptics from 'expo-haptics';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import LogViewer from '../../src/components/LogViewer';
 import ActionSheet from '../../src/components/ActionSheet';
+import { COLORS as BASE_COLORS } from '../../src/theme/tokens';
 
 const COLORS = {
-  bg: '#1C1C1E',
-  card: '#2C2C2E',
-  border: '#3A3A3C',
-  blue: '#4A90FF',
-  green: '#34D399',
-  red: '#FF6B6B',
-  purple: '#A78BFA',
-  orange: '#FB923C',
-  yellow: '#FBBF24',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textTertiary: '#636366',
+  ...BASE_COLORS,
   terminal: '#0A0A0A',
   terminalText: '#86EFAC',
 };
@@ -143,6 +135,7 @@ export default function ContainerDetailScreen() {
 
   const handleAction = async () => {
     if (!showAction) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     setActionLoading(true);
     try {
       const endpoint = showAction === 'rebuild'
@@ -215,7 +208,7 @@ export default function ContainerDetailScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
       >
         {/* Loading State */}
         {!detail && !fetchError && (
@@ -261,7 +254,7 @@ export default function ContainerDetailScreen() {
               accessibilityRole="button"
               accessibilityLabel="Start container"
             >
-              <Text style={[styles.actionIcon, { color: COLORS.green }]}>{'\u25B6'}</Text>
+              <Ionicons name="play" size={14} color={COLORS.green} style={{ opacity: state === 'running' ? 0.4 : 1 }} />
               <Text style={[styles.actionLabel, { color: COLORS.green, opacity: state === 'running' ? 0.4 : 1 }]}>Start</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -271,7 +264,7 @@ export default function ContainerDetailScreen() {
               accessibilityRole="button"
               accessibilityLabel="Stop container"
             >
-              <Text style={[styles.actionIcon, { color: COLORS.red }]}>{'\u25A0'}</Text>
+              <Ionicons name="stop" size={14} color={COLORS.red} style={{ opacity: state !== 'running' ? 0.4 : 1 }} />
               <Text style={[styles.actionLabel, { color: COLORS.red, opacity: state !== 'running' ? 0.4 : 1 }]}>Stop</Text>
             </TouchableOpacity>
             <TouchableOpacity
@@ -280,7 +273,7 @@ export default function ContainerDetailScreen() {
               accessibilityRole="button"
               accessibilityLabel="Restart container"
             >
-              <Text style={[styles.actionIcon, { color: COLORS.blue }]}>{'\u21BB'}</Text>
+              <Ionicons name="refresh" size={14} color={COLORS.blue} />
               <Text style={[styles.actionLabel, { color: COLORS.blue }]}>Restart</Text>
             </TouchableOpacity>
             {isAdmin && (
@@ -290,7 +283,7 @@ export default function ContainerDetailScreen() {
                 accessibilityRole="button"
                 accessibilityLabel="Rebuild container"
               >
-                <Text style={[styles.actionIcon, { color: COLORS.orange }]}>{'\u{1F4A3}'}</Text>
+                <Ionicons name="trash" size={14} color={COLORS.orange} />
                 <Text style={[styles.actionLabel, { color: COLORS.orange }]}>Rebuild</Text>
               </TouchableOpacity>
             )}
@@ -646,7 +639,8 @@ const styles = StyleSheet.create({
     gap: 10,
   },
   statCard: {
-    width: '48%',
+    flex: 1,
+    minWidth: 150,
     backgroundColor: COLORS.card,
     borderRadius: 16,
     padding: 16,

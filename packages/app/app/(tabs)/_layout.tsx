@@ -1,26 +1,27 @@
 import { Tabs } from 'expo-router';
-import { View, Text, StyleSheet } from 'react-native';
+import { View, StyleSheet } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
 import { useSSE } from '../../src/hooks/useSSE';
+import { COLORS } from '../../src/theme/tokens';
 
-const TAB_ICONS: Record<string, string> = {
-  Overview: '\u{1F4CA}',
-  Containers: '\u{1F4E6}',
-  Stacks: '\u{1F5C2}',
-  Alerts: '\u{1F514}',
-  Manage: '\u{2699}',
+const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
+  Overview: 'bar-chart-outline',
+  Containers: 'cube-outline',
+  Stacks: 'layers-outline',
+  Alerts: 'notifications-outline',
+  Manage: 'settings-outline',
 };
 
 function TabIcon({ label, focused }: { label: string; focused: boolean }) {
+  const iconName = TAB_ICONS[label] || 'settings-outline';
   return (
     <View style={tabIconStyles.wrapper}>
-      <Text
-        style={[
-          tabIconStyles.icon,
-          { opacity: focused ? 1 : 0.6 },
-        ]}
-      >
-        {TAB_ICONS[label] || '\u{2699}'}
-      </Text>
+      <Ionicons
+        name={iconName}
+        size={24}
+        color={focused ? COLORS.blue : COLORS.textTertiary}
+        style={{ opacity: focused ? 1 : 0.6 }}
+      />
       {focused && <View style={tabIconStyles.activeDot} />}
     </View>
   );
@@ -33,14 +34,11 @@ const tabIconStyles = StyleSheet.create({
     minWidth: 44,
     minHeight: 44,
   },
-  icon: {
-    fontSize: 24,
-  },
   activeDot: {
     width: 4,
     height: 4,
     borderRadius: 2,
-    backgroundColor: '#4A90FF',
+    backgroundColor: COLORS.blue,
     marginTop: 4,
   },
 });
@@ -52,24 +50,24 @@ export default function TabLayout() {
     <Tabs
       screenOptions={{
         tabBarStyle: {
-          backgroundColor: '#1C1C1E',
-          borderTopColor: '#3A3A3C',
+          backgroundColor: COLORS.bg,
+          borderTopColor: COLORS.border,
           borderTopWidth: 1,
           height: 85,
           paddingBottom: 25,
           paddingTop: 8,
         },
-        tabBarActiveTintColor: '#4A90FF',
-        tabBarInactiveTintColor: '#636366',
+        tabBarActiveTintColor: COLORS.blue,
+        tabBarInactiveTintColor: COLORS.textTertiary,
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
           marginTop: -2,
         },
         headerStyle: {
-          backgroundColor: '#1C1C1E',
+          backgroundColor: COLORS.bg,
         },
-        headerTintColor: '#FFFFFF',
+        headerTintColor: COLORS.textPrimary,
         headerShadowVisible: false,
         headerTitleStyle: {
           fontWeight: '700',

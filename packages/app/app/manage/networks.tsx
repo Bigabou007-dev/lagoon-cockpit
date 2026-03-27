@@ -57,8 +57,8 @@ export default function NetworksScreen() {
   const renderItem = ({ item }: { item: DockerNetwork }) => {
     const hasContainers = item.containers.length > 0;
     const isExpanded = expandedIds.has(item.id);
-    const borderColor = hasContainers ? '#60A5FA' : '#374151';
-    const indicatorColor = hasContainers ? '#60A5FA' : '#6B7280';
+    const borderColor = hasContainers ? '#4A90FF' : '#3A3A3C';
+    const indicatorColor = hasContainers ? '#4A90FF' : '#636366';
 
     return (
       <TouchableOpacity
@@ -113,7 +113,7 @@ export default function NetworksScreen() {
       <>
         <Stack.Screen options={{ title: 'Networks', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#60A5FA" />
+          <ActivityIndicator size="large" color="#4A90FF" />
           <Text style={styles.loadingText}>Loading networks...</Text>
         </View>
       </>
@@ -134,12 +134,12 @@ export default function NetworksScreen() {
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryValue, { color: '#60A5FA' }]}>{activeNetworks}</Text>
+            <Text style={[styles.summaryValue, { color: '#4A90FF' }]}>{activeNetworks}</Text>
             <Text style={styles.summaryLabel}>Active</Text>
           </View>
           <View style={styles.summaryDivider} />
           <View style={styles.summaryItem}>
-            <Text style={[styles.summaryValue, { color: '#6B7280' }]}>{networks.length - activeNetworks}</Text>
+            <Text style={[styles.summaryValue, { color: '#636366' }]}>{networks.length - activeNetworks}</Text>
             <Text style={styles.summaryLabel}>Empty</Text>
           </View>
         </View>
@@ -149,7 +149,7 @@ export default function NetworksScreen() {
           renderItem={renderItem}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No networks found</Text>}
@@ -160,42 +160,42 @@ export default function NetworksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
-  centered: { flex: 1, backgroundColor: '#0D0D0D', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#9CA3AF', fontSize: 14, marginTop: 12 },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
+  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
   summary: {
-    flexDirection: 'row', backgroundColor: '#111827', marginHorizontal: 16, marginTop: 16,
-    marginBottom: 8, borderRadius: 12, padding: 16, borderWidth: 1, borderColor: '#1F2937',
+    flexDirection: 'row', backgroundColor: '#2C2C2E', marginHorizontal: 16, marginTop: 16,
+    marginBottom: 8, borderRadius: 16, padding: 16, borderWidth: 1, borderColor: '#3A3A3C',
     justifyContent: 'space-around', alignItems: 'center',
   },
   summaryItem: { alignItems: 'center' },
-  summaryValue: { color: '#F9FAFB', fontSize: 22, fontWeight: '700' },
-  summaryLabel: { color: '#9CA3AF', fontSize: 12, marginTop: 2 },
-  summaryDivider: { width: 1, height: 30, backgroundColor: '#1F2937' },
+  summaryValue: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
+  summaryLabel: { color: '#8E8E93', fontSize: 12, marginTop: 2 },
+  summaryDivider: { width: 1, height: 30, backgroundColor: '#3A3A3C' },
   list: { paddingHorizontal: 16, paddingBottom: 20, paddingTop: 8 },
   card: {
-    backgroundColor: '#111827', borderRadius: 12, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#1F2937',
+    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
+    borderWidth: 1, borderColor: '#3A3A3C',
   },
   cardHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 10 },
   cardTitleRow: { flexDirection: 'row', alignItems: 'center', flex: 1 },
   indicator: { width: 8, height: 8, borderRadius: 4, marginRight: 10 },
-  networkName: { color: '#F9FAFB', fontSize: 15, fontWeight: '600', flex: 1 },
-  chevron: { color: '#9CA3AF', fontSize: 12 },
+  networkName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600', flex: 1 },
+  chevron: { color: '#8E8E93', fontSize: 12 },
   cardMeta: { flexDirection: 'row', gap: 8 },
-  metaBadge: { backgroundColor: '#1F2937', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
+  metaBadge: { backgroundColor: '#3A3A3C', paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
   metaBadgeActive: { backgroundColor: '#1E3A5F' },
   metaBadgeInactive: {},
-  metaBadgeText: { color: '#9CA3AF', fontSize: 11, fontWeight: '500' },
-  metaBadgeTextActive: { color: '#60A5FA' },
-  containerList: { marginTop: 14, borderTopWidth: 1, borderTopColor: '#1F2937', paddingTop: 10 },
+  metaBadgeText: { color: '#8E8E93', fontSize: 11, fontWeight: '500' },
+  metaBadgeTextActive: { color: '#4A90FF' },
+  containerList: { marginTop: 14, borderTopWidth: 1, borderTopColor: '#3A3A3C', paddingTop: 10 },
   containerListHeader: { flexDirection: 'row', justifyContent: 'space-between', marginBottom: 6 },
-  containerListHeaderText: { color: '#6B7280', fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
+  containerListHeaderText: { color: '#636366', fontSize: 11, fontWeight: '600', textTransform: 'uppercase' },
   containerRow: {
     flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center',
-    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#1F2937',
+    paddingVertical: 8, borderBottomWidth: 1, borderBottomColor: '#3A3A3C',
   },
-  containerName: { color: '#F9FAFB', fontSize: 13, flex: 1, marginRight: 12 },
-  containerIp: { color: '#60A5FA', fontSize: 13, fontFamily: 'monospace' },
-  empty: { color: '#6B7280', fontSize: 14, textAlign: 'center', marginTop: 40 },
+  containerName: { color: '#FFFFFF', fontSize: 13, flex: 1, marginRight: 12 },
+  containerIp: { color: '#4A90FF', fontSize: 13, fontFamily: 'monospace' },
+  empty: { color: '#636366', fontSize: 14, textAlign: 'center', marginTop: 40 },
 });

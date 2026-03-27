@@ -85,7 +85,7 @@ export default function MaintenanceScreen() {
         style={styles.container}
         contentContainerStyle={styles.content}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
         }
       >
         {/* Status Banner */}
@@ -111,8 +111,8 @@ export default function MaintenanceScreen() {
               value={enabled}
               onValueChange={toggleMaintenance}
               disabled={!isAdmin || toggling || loading}
-              trackColor={{ false: '#374151', true: '#B45309' }}
-              thumbColor={enabled ? '#F59E0B' : '#6B7280'}
+              trackColor={{ false: '#3A3A3C', true: '#B45309' }}
+              thumbColor={enabled ? '#F59E0B' : '#636366'}
               style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
             />
           </View>
@@ -184,7 +184,7 @@ export default function MaintenanceScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   content: { padding: 16 },
 
   /* status banner */
@@ -215,43 +215,43 @@ const styles = StyleSheet.create({
 
   /* toggle card */
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 20,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   toggleRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
-  toggleTitle: { color: '#F9FAFB', fontSize: 16, fontWeight: '600' },
-  toggleDesc: { color: '#9CA3AF', fontSize: 13, marginTop: 4 },
+  toggleTitle: { color: '#FFFFFF', fontSize: 16, fontWeight: '600' },
+  toggleDesc: { color: '#8E8E93', fontSize: 13, marginTop: 4 },
 
   /* info cards */
   infoCard: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 12,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   infoTitle: {
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 14,
     fontWeight: '600',
     marginBottom: 10,
   },
   infoRow: { flexDirection: 'row', marginBottom: 6, paddingRight: 12 },
-  bullet: { color: '#60A5FA', fontSize: 14, marginRight: 8, marginTop: 1 },
-  infoText: { color: '#9CA3AF', fontSize: 13, flex: 1, lineHeight: 18 },
+  bullet: { color: '#4A90FF', fontSize: 14, marginRight: 8, marginTop: 1 },
+  infoText: { color: '#8E8E93', fontSize: 13, flex: 1, lineHeight: 18 },
 
   /* warning */
   warningCard: {
     backgroundColor: '#7F1D1D',
-    borderRadius: 10,
+    borderRadius: 16,
     padding: 14,
     marginTop: 8,
     alignItems: 'center',

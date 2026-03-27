@@ -43,7 +43,7 @@ interface CategoryConfig {
 }
 
 const CATEGORIES: CategoryConfig[] = [
-  { key: 'images', label: 'Images', color: '#60A5FA', route: '/manage/images' },
+  { key: 'images', label: 'Images', color: '#4A90FF', route: '/manage/images' },
   { key: 'containers', label: 'Containers', color: '#22C55E', route: null },
   { key: 'volumes', label: 'Volumes', color: '#F59E0B', route: null },
   { key: 'buildCache', label: 'Build Cache', color: '#A78BFA', route: null },
@@ -127,7 +127,7 @@ export default function DiskScreen() {
       <>
         <Stack.Screen options={{ title: 'Disk Usage', headerBackTitle: 'Back' }} />
         <View style={styles.centered}>
-          <ActivityIndicator size="large" color="#60A5FA" />
+          <ActivityIndicator size="large" color="#4A90FF" />
           <Text style={styles.loadingText}>Analyzing disk usage...</Text>
         </View>
       </>
@@ -154,7 +154,7 @@ export default function DiskScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
       >
         {/* Total size header */}
         <View style={styles.totalCard}>
@@ -250,54 +250,54 @@ export default function DiskScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   content: { padding: 16, paddingBottom: 40 },
-  centered: { flex: 1, backgroundColor: '#0D0D0D', justifyContent: 'center', alignItems: 'center' },
-  loadingText: { color: '#9CA3AF', fontSize: 14, marginTop: 12 },
+  centered: { flex: 1, backgroundColor: '#1C1C1E', justifyContent: 'center', alignItems: 'center' },
+  loadingText: { color: '#8E8E93', fontSize: 14, marginTop: 12 },
   errorText: { color: '#EF4444', fontSize: 16, marginBottom: 16 },
-  retryBtn: { backgroundColor: '#1F2937', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 },
-  retryBtnText: { color: '#60A5FA', fontSize: 14, fontWeight: '600' },
+  retryBtn: { backgroundColor: '#3A3A3C', paddingHorizontal: 24, paddingVertical: 10, borderRadius: 8 },
+  retryBtnText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
 
   // Total card
   totalCard: {
-    backgroundColor: '#111827', borderRadius: 16, padding: 24, marginBottom: 16,
-    borderWidth: 1, borderColor: '#1F2937', alignItems: 'center',
+    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 24, marginBottom: 16,
+    borderWidth: 1, borderColor: '#3A3A3C', alignItems: 'center',
   },
-  totalLabel: { color: '#9CA3AF', fontSize: 14, marginBottom: 6 },
-  totalValue: { color: '#F9FAFB', fontSize: 36, fontWeight: '800' },
+  totalLabel: { color: '#8E8E93', fontSize: 14, marginBottom: 6 },
+  totalValue: { color: '#FFFFFF', fontSize: 36, fontWeight: '800' },
 
   // Stacked bar
   stackedBarContainer: { marginBottom: 20 },
   stackedBar: {
     flexDirection: 'row', height: 12, borderRadius: 6, overflow: 'hidden',
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
   },
   stackedSegment: { height: '100%' },
   legendRow: { flexDirection: 'row', justifyContent: 'center', gap: 16, marginTop: 10 },
   legendItem: { flexDirection: 'row', alignItems: 'center', gap: 4 },
   legendDot: { width: 8, height: 8, borderRadius: 4 },
-  legendText: { color: '#9CA3AF', fontSize: 11 },
+  legendText: { color: '#8E8E93', fontSize: 11 },
 
   // Category cards
   categoryCard: {
-    backgroundColor: '#111827', borderRadius: 12, padding: 16, marginBottom: 10,
-    borderWidth: 1, borderColor: '#1F2937',
+    backgroundColor: '#2C2C2E', borderRadius: 16, padding: 16, marginBottom: 10,
+    borderWidth: 1, borderColor: '#3A3A3C',
   },
   categoryHeader: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center', marginBottom: 12 },
   categoryTitleRow: { flexDirection: 'row', alignItems: 'center', gap: 8 },
   categoryDot: { width: 10, height: 10, borderRadius: 5 },
-  categoryName: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
-  categoryArrow: { color: '#9CA3AF', fontSize: 18, marginLeft: 4 },
-  categorySize: { color: '#F9FAFB', fontSize: 16, fontWeight: '700' },
-  barTrack: { height: 8, backgroundColor: '#1F2937', borderRadius: 4, overflow: 'hidden', marginBottom: 10 },
+  categoryName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  categoryArrow: { color: '#8E8E93', fontSize: 18, marginLeft: 4 },
+  categorySize: { color: '#FFFFFF', fontSize: 16, fontWeight: '700' },
+  barTrack: { height: 8, backgroundColor: '#3A3A3C', borderRadius: 4, overflow: 'hidden', marginBottom: 10 },
   barFill: { height: '100%', borderRadius: 4, minWidth: 4 },
   categoryFooter: { flexDirection: 'row', justifyContent: 'space-between' },
-  categoryCount: { color: '#9CA3AF', fontSize: 12 },
-  categoryPercent: { color: '#9CA3AF', fontSize: 12, fontWeight: '500' },
+  categoryCount: { color: '#8E8E93', fontSize: 12 },
+  categoryPercent: { color: '#8E8E93', fontSize: 12, fontWeight: '500' },
 
   // Prune
   pruneBtn: {
-    backgroundColor: '#EF4444', borderRadius: 12, paddingVertical: 16, marginTop: 10,
+    backgroundColor: '#EF4444', borderRadius: 16, paddingVertical: 16, marginTop: 10,
     alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },

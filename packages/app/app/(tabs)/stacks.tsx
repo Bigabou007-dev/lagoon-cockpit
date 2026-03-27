@@ -38,7 +38,7 @@ export default function StacksScreen() {
         )}
         keyExtractor={(item) => item.name}
         refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />
+          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
         }
         contentContainerStyle={styles.list}
         ListEmptyComponent={<Text style={styles.empty}>No compose stacks found</Text>}
@@ -48,7 +48,7 @@ export default function StacksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D' },
+  container: { flex: 1, backgroundColor: '#1C1C1E' },
   list: { padding: 16, paddingBottom: 20 },
-  empty: { color: '#6B7280', fontSize: 14, textAlign: 'center', marginTop: 40 },
+  empty: { color: '#636366', fontSize: 14, textAlign: 'center', marginTop: 40 },
 });

@@ -133,7 +133,7 @@ export default function WebhooksScreen() {
       <Stack.Screen options={{ title: 'Webhooks', headerBackTitle: 'Manage' }} />
       <ScrollView
         style={styles.container}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#60A5FA" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
       >
         {/* Header */}
         <View style={styles.sectionHeader}>
@@ -151,14 +151,14 @@ export default function WebhooksScreen() {
             <TextInput
               style={styles.input}
               placeholder="Webhook name"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#636366"
               value={name}
               onChangeText={setName}
             />
             <TextInput
               style={styles.input}
               placeholder="URL (https://...)"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#636366"
               value={url}
               onChangeText={setUrl}
               autoCapitalize="none"
@@ -167,7 +167,7 @@ export default function WebhooksScreen() {
             <TextInput
               style={styles.input}
               placeholder="Events (comma-separated: container.down, *)"
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#636366"
               value={eventsInput}
               onChangeText={setEventsInput}
               autoCapitalize="none"
@@ -178,7 +178,7 @@ export default function WebhooksScreen() {
             <TextInput
               style={[styles.input, { height: 60 }]}
               placeholder='Headers JSON (optional): {"X-Key":"val"}'
-              placeholderTextColor="#6B7280"
+              placeholderTextColor="#636366"
               value={headers}
               onChangeText={setHeaders}
               autoCapitalize="none"
@@ -254,7 +254,7 @@ export default function WebhooksScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#0D0D0D', padding: 16 },
+  container: { flex: 1, backgroundColor: '#1C1C1E', padding: 16 },
   sectionHeader: {
     flexDirection: 'row',
     justifyContent: 'space-between',
@@ -263,60 +263,60 @@ const styles = StyleSheet.create({
     marginTop: 8,
   },
   sectionTitle: {
-    color: '#9CA3AF',
+    color: '#8E8E93',
     fontSize: 13,
     fontWeight: '600',
     textTransform: 'uppercase',
     letterSpacing: 1,
   },
-  addText: { color: '#60A5FA', fontSize: 14, fontWeight: '600' },
+  addText: { color: '#4A90FF', fontSize: 14, fontWeight: '600' },
 
   /* form */
   formCard: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 16,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   input: {
-    backgroundColor: '#0D0D0D',
+    backgroundColor: '#1C1C1E',
     borderRadius: 8,
     padding: 12,
-    color: '#F9FAFB',
+    color: '#FFFFFF',
     fontSize: 14,
     marginBottom: 10,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   hintText: {
-    color: '#6B7280',
+    color: '#636366',
     fontSize: 11,
     marginBottom: 10,
     marginLeft: 4,
   },
   saveBtn: {
     backgroundColor: '#1D4ED8',
-    borderRadius: 10,
+    borderRadius: 16,
     paddingVertical: 14,
     alignItems: 'center',
     marginTop: 4,
   },
-  saveText: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
+  saveText: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
 
   /* cards */
   card: {
-    backgroundColor: '#111827',
-    borderRadius: 12,
+    backgroundColor: '#2C2C2E',
+    borderRadius: 16,
     padding: 16,
     marginBottom: 8,
     borderWidth: 1,
-    borderColor: '#1F2937',
+    borderColor: '#3A3A3C',
   },
   cardHeader: { flexDirection: 'row', alignItems: 'flex-start' },
-  cardName: { color: '#F9FAFB', fontSize: 15, fontWeight: '600' },
-  cardUrl: { color: '#6B7280', fontSize: 12, marginTop: 2 },
+  cardName: { color: '#FFFFFF', fontSize: 15, fontWeight: '600' },
+  cardUrl: { color: '#636366', fontSize: 12, marginTop: 2 },
   statusBadge: {
     paddingHorizontal: 8,
     paddingVertical: 3,
@@ -326,18 +326,18 @@ const styles = StyleSheet.create({
   statusText: { fontSize: 11, fontWeight: '600' },
   eventsRow: { flexDirection: 'row', flexWrap: 'wrap', gap: 6, marginTop: 10 },
   eventTag: {
-    backgroundColor: '#1F2937',
+    backgroundColor: '#3A3A3C',
     borderRadius: 6,
     paddingHorizontal: 8,
     paddingVertical: 3,
   },
-  eventTagText: { color: '#60A5FA', fontSize: 11, fontWeight: '500' },
+  eventTagText: { color: '#4A90FF', fontSize: 11, fontWeight: '500' },
   deleteBtn: { marginTop: 12, alignSelf: 'flex-start' },
   deleteText: { color: '#EF4444', fontSize: 13, fontWeight: '500' },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 40 },
   emptyIcon: { fontSize: 40, marginBottom: 12 },
-  emptyText: { color: '#F9FAFB', fontSize: 16, fontWeight: '600', marginBottom: 4 },
-  emptySubtext: { color: '#6B7280', fontSize: 13, textAlign: 'center' },
+  emptyText: { color: '#FFFFFF', fontSize: 16, fontWeight: '600', marginBottom: 4 },
+  emptySubtext: { color: '#636366', fontSize: 13, textAlign: 'center' },
 });

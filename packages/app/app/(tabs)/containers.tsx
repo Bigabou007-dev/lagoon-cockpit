@@ -1,27 +1,16 @@
-import { View, TextInput, FlatList, RefreshControl, StyleSheet, Alert, ScrollView } from 'react-native';
-import { useState, useCallback, useEffect } from 'react';
+import { View, TextInput, FlatList, RefreshControl, StyleSheet, Alert, ScrollView, Animated, Easing } from 'react-native';
+import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { useDashboardStore, type ContainerSummary } from '../../src/stores/dashboardStore';
 import { apiFetch } from '../../src/lib/api';
 import ContainerCard from '../../src/components/ContainerCard';
+import Skeleton from '../../src/components/Skeleton';
 import { Text, TouchableOpacity } from 'react-native';
+import { Ionicons } from '@expo/vector-icons';
+import { COLORS } from '../../src/theme/tokens';
+import * as Haptics from 'expo-haptics';
 
 type Filter = 'all' | 'running' | 'stopped' | 'unhealthy';
-
-const COLORS = {
-  bg: '#1C1C1E',
-  card: '#2C2C2E',
-  border: '#3A3A3C',
-  blue: '#4A90FF',
-  green: '#34D399',
-  red: '#FF6B6B',
-  purple: '#A78BFA',
-  orange: '#FB923C',
-  yellow: '#FBBF24',
-  textPrimary: '#FFFFFF',
-  textSecondary: '#8E8E93',
-  textTertiary: '#636366',
-};
 
 const FILTER_COLORS: Record<Filter, string> = {
   all: COLORS.blue,
@@ -39,11 +28,14 @@ export default function ContainersScreen() {
   const [selectedIds, setSelectedIds] = useState<Set<string>>(new Set());
   const [bulkMode, setBulkMode] = useState(false);
   const [bulkLoading, setBulkLoading] = useState(false);
+  const [isLoaded, setIsLoaded] = useState(false);
+  const fadeAnims = useRef<Animated.Value[]>([]).current;
 
   const fetchContainers = useCallback(async () => {
     try {
       const data = await apiFetch<{ containers: ContainerSummary[] }>('/api/containers');
       setContainers(data.containers);
+      setIsLoaded(true);
     } catch (err) {
       console.error('Failed to fetch containers:', err);
     }
@@ -73,6 +65,7 @@ export default function ContainersScreen() {
 
   const handleBulkAction = async (action: 'start' | 'stop' | 'restart') => {
     if (selectedIds.size === 0) return;
+    Haptics.impactAsync(Haptics.ImpactFeedbackStyle.Medium);
     Alert.alert(
       `${action.charAt(0).toUpperCase() + action.slice(1)} ${selectedIds.size} containers?`,
       'This action will affect all selected containers.',
@@ -136,7 +129,7 @@ export default function ContainersScreen() {
 
       {/* Search bar */}
       <View style={styles.searchContainer}>
-        <Text style={styles.searchIcon}>{'\u{1F50D}'}</Text>
+        <Ionicons name="search" size={16} color={COLORS.textTertiary} style={{ marginRight: 8 }} />
         <TextInput
           style={styles.search}
           placeholder="Search containers..."
@@ -198,26 +191,69 @@ export default function ContainersScreen() {
         </TouchableOpacity>
       </ScrollView>
 
+      {/* Skeleton loading state */}
+      {!isLoaded && containers.length === 0 && (
+        <View style={styles.list}>
+          {[0, 1, 2, 3, 4].map((i) => (
+            <View key={i} style={styles.skeletonCard}>
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginBottom: 12 }}>
+                <View>
+                  <Skeleton width={140} height={16} borderRadius={4} />
+                  <Skeleton width={200} height={12} borderRadius={4} style={{ marginTop: 6 }} />
+                </View>
+                <Skeleton width={70} height={24} borderRadius={12} />
+              </View>
+              <Skeleton width={'100%'} height={4} borderRadius={2} />
+              <View style={{ flexDirection: 'row', justifyContent: 'space-between', marginTop: 10 }}>
+                <Skeleton width={60} height={12} borderRadius={4} />
+                <Skeleton width={80} height={12} borderRadius={4} />
+              </View>
+            </View>
+          ))}
+        </View>
+      )}
+
       {/* Container list */}
-      <FlatList
-        data={filtered}
-        renderItem={({ item }) => (
-          <ContainerCard
-            container={item}
-            onPress={() => bulkMode ? toggleSelect(item.id) : router.push(`/containers/${item.id}`)}
-            onLongPress={() => { setBulkMode(true); toggleSelect(item.id); }}
-            selected={bulkMode ? selectedIds.has(item.id) : undefined}
-            showQuickActions={!bulkMode}
-            onQuickAction={handleQuickAction}
-          />
-        )}
-        keyExtractor={(item) => item.id}
-        refreshControl={
-          <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} />
-        }
-        contentContainerStyle={styles.list}
-        ListEmptyComponent={<Text style={styles.empty}>No containers found</Text>}
-      />
+      {(isLoaded || containers.length > 0) && (
+        <FlatList
+          data={filtered}
+          renderItem={({ item, index }) => {
+            // Ensure we have an animated value for this index
+            while (fadeAnims.length <= index) {
+              fadeAnims.push(new Animated.Value(0));
+            }
+            const fadeAnim = fadeAnims[index];
+            // Trigger staggered fade-in on first load
+            if ((fadeAnim as any).__getValue() === 0) {
+              Animated.timing(fadeAnim, {
+                toValue: 1,
+                duration: 400,
+                delay: index * 60,
+                easing: Easing.out(Easing.ease),
+                useNativeDriver: true,
+              }).start();
+            }
+            return (
+              <Animated.View style={{ opacity: fadeAnim }}>
+                <ContainerCard
+                  container={item}
+                  onPress={() => bulkMode ? toggleSelect(item.id) : router.push(`/containers/${item.id}`)}
+                  onLongPress={() => { setBulkMode(true); toggleSelect(item.id); }}
+                  selected={bulkMode ? selectedIds.has(item.id) : undefined}
+                  showQuickActions={!bulkMode}
+                  onQuickAction={handleQuickAction}
+                />
+              </Animated.View>
+            );
+          }}
+          keyExtractor={(item) => item.id}
+          refreshControl={
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+          }
+          contentContainerStyle={styles.list}
+          ListEmptyComponent={<Text style={styles.empty}>No containers found</Text>}
+        />
+      )}
 
       {/* Floating bulk action bar */}
       {bulkMode && selectedIds.size > 0 && (
@@ -230,7 +266,7 @@ export default function ContainersScreen() {
                 onPress={() => handleBulkAction('start')}
                 disabled={bulkLoading}
               >
-                <Text style={[styles.bulkBtnIcon, { color: COLORS.green }]}>{'\u25B6'}</Text>
+                <Ionicons name="play" size={14} color={COLORS.green} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.green }]}>Start</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -238,7 +274,7 @@ export default function ContainersScreen() {
                 onPress={() => handleBulkAction('stop')}
                 disabled={bulkLoading}
               >
-                <Text style={[styles.bulkBtnIcon, { color: COLORS.red }]}>{'\u25A0'}</Text>
+                <Ionicons name="stop" size={14} color={COLORS.red} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.red }]}>Stop</Text>
               </TouchableOpacity>
               <TouchableOpacity
@@ -246,7 +282,7 @@ export default function ContainersScreen() {
                 onPress={() => handleBulkAction('restart')}
                 disabled={bulkLoading}
               >
-                <Text style={[styles.bulkBtnIcon, { color: COLORS.blue }]}>{'\u21BB'}</Text>
+                <Ionicons name="refresh-circle" size={14} color={COLORS.blue} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.blue }]}>Restart</Text>
               </TouchableOpacity>
             </View>
@@ -335,6 +371,16 @@ const styles = StyleSheet.create({
   },
 
   list: { paddingHorizontal: 16, paddingBottom: 100 },
+  skeletonCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: 16,
+    padding: 16,
+    marginBottom: 10,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    borderLeftWidth: 4,
+    borderLeftColor: COLORS.border,
+  },
   empty: { color: COLORS.textTertiary, fontSize: 14, textAlign: 'center', marginTop: 60 },
 
   bulkBar: {
