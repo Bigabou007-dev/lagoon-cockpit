@@ -2,51 +2,89 @@ name: CI
 
 on:
   push:
-    branches: [main]
+    branches: [main, develop]
   pull_request:
-    branches: [main]
+    branches: [main, develop]
 
 permissions:
   contents: read
 
 jobs:
-  dependency-audit:
-    name: Dependency Audit
+  lint-js:
+    name: Lint JavaScript/TypeScript
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
     steps:
       - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
       - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: npx eslint packages/api/src packages/cli/src
+      - run: npx prettier --check "packages/api/src/**/*.js" "packages/cli/src/**/*.js"
+
+  typecheck:
+    name: TypeScript Check
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: 20
+          cache: npm
+      - run: npm ci --ignore-scripts
+      - run: cd packages/app && npx tsc --noEmit
+
+  secret-scan:
+    name: Secret Scan
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        with:
+          fetch-depth: 0
+      - uses: trufflesecurity/trufflehog@586f66d7886cd0b037c7c245d4a6e34ef357ab10 # v3.94.1
+        with:
+          extra_args: --only-verified
+
+  dependency-audit:
+    name: Dependency Audit
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
         with:
           node-version: 20
           cache: npm
       - run: npm ci --ignore-scripts
       - run: npm audit --audit-level=high --workspaces
 
-  lint-and-test:
-    name: Lint & Test
+  test-api:
+    name: Test API
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    needs: [lint-js]
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8 # v4.0.2
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
         with:
           node-version: 20
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npm test --if-present --workspaces
+      - run: cd packages/api && npm test
 
-  secret-scan:
-    name: Secret Scan
+  build-docker:
+    name: Docker Build Check
     runs-on: ubuntu-latest
-    permissions:
-      contents: read
+    needs: [test-api]
     steps:
-      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11 # v4.1.1
-        with:
-          fetch-depth: 0
-      - uses: trufflesecurity/trufflehog@586f66d7886cd0b037c7c245d4a6e34ef357ab10 # v3.94.1
-        with:
-          extra_args: --only-verified
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - run: docker build --no-cache -t cockpit-api-test packages/api
+      - name: Verify image runs
+        run: |
+          docker run -d --name cockpit-test \
+            -e JWT_SECRET=ci-test-secret-$(date +%s) \
+            -e API_KEY=ci-test-key \
+            -e AUTH_MODE=key \
+            cockpit-api-test
+          sleep 3
+          docker exec cockpit-test wget -qO- http://localhost:3000/health | grep -q '"status":"ok"'
+          docker stop cockpit-test

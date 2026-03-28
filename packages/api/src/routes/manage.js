@@ -5,6 +5,7 @@ const alertEngine = require("../system/alerts");
 const webhooks = require("../system/webhooks");
 const scheduler = require("../system/scheduler");
 const { requireAuth, requireRole } = require("../auth/middleware");
+const { checkLimit } = require("../edition/middleware");
 const { auditLog, getDb } = require("../db/sqlite");
 
 // ── Alert Rules ──────────────────────────────────────────
@@ -14,6 +15,17 @@ router.get("/api/alerts/rules", requireAuth, (_req, res) => {
 
 router.post("/api/alerts/rules", requireAuth, requireRole("admin"), (req, res) => {
   try {
+    // Edition limit check
+    const ruleCount = alertEngine.listRules().length;
+    const limit = checkLimit(req, "alertRules", ruleCount);
+    if (!limit.allowed) {
+      return res.status(402).json({
+        error: `Alert rule limit reached (${limit.max})`,
+        current: limit.current, max: limit.max,
+        upgradeUrl: "https://lagoontechsystems.com/upgrade",
+      });
+    }
+
     const { name, metric, operator, threshold, durationSeconds } = req.body;
     if (!name || !metric || !operator || threshold === undefined) {
       return res.status(400).json({ error: "name, metric, operator, threshold required" });
@@ -60,6 +72,17 @@ router.get("/api/webhooks", requireAuth, requireRole("admin"), (_req, res) => {
 
 router.post("/api/webhooks", requireAuth, requireRole("admin"), (req, res) => {
   try {
+    // Edition limit check
+    const hookCount = webhooks.listWebhooks().length;
+    const limit = checkLimit(req, "webhooks", hookCount);
+    if (!limit.allowed) {
+      return res.status(402).json({
+        error: `Webhook limit reached (${limit.max})`,
+        current: limit.current, max: limit.max,
+        upgradeUrl: "https://lagoontechsystems.com/upgrade",
+      });
+    }
+
     const { name, url, events, headers } = req.body;
     if (!name || !url) return res.status(400).json({ error: "name and url required" });
     const hook = webhooks.createWebhook(name, url, events || "container.down", headers || {});
@@ -88,6 +111,17 @@ router.get("/api/schedules", requireAuth, (_req, res) => {
 
 router.post("/api/schedules", requireAuth, requireRole("admin"), (req, res) => {
   try {
+    // Edition limit check
+    const schedCount = scheduler.listSchedules().length;
+    const limit = checkLimit(req, "schedules", schedCount);
+    if (!limit.allowed) {
+      return res.status(402).json({
+        error: `Schedule limit reached (${limit.max})`,
+        current: limit.current, max: limit.max,
+        upgradeUrl: "https://lagoontechsystems.com/upgrade",
+      });
+    }
+
     const { name, containerId, containerName, action, cronExpression } = req.body;
     if (!name || !containerId || !containerName || !action || !cronExpression) {
       return res.status(400).json({ error: "name, containerId, containerName, action, cronExpression required" });

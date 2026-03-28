@@ -1,0 +1,132 @@
+name: Release
+
+on:
+  push:
+    tags: ["v*"]
+
+permissions:
+  contents: write
+  packages: write
+
+jobs:
+  extract-version:
+    name: Extract Version
+    runs-on: ubuntu-latest
+    outputs:
+      version: ${{ steps.version.outputs.version }}
+      tag: ${{ steps.version.outputs.tag }}
+    steps:
+      - id: version
+        run: |
+          TAG="${GITHUB_REF#refs/tags/}"
+          VERSION="${TAG#v}"
+          echo "tag=$TAG" >> "$GITHUB_OUTPUT"
+          echo "version=$VERSION" >> "$GITHUB_OUTPUT"
+
+  build-docker:
+    name: Build & Push Docker Image
+    runs-on: ubuntu-latest
+    needs: [extract-version]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+
+      - uses: docker/setup-qemu-action@68827325e0b33c7199eb31dd4e31fbe9023e06e3 # v3.0.0
+      - uses: docker/setup-buildx-action@f95db51fddba0c2d1ec667646a06c2ce06100226 # v3.0.0
+
+      - uses: docker/login-action@343f7c4344506bcbf9b4de18042ae17996df046d # v3.0.0
+        with:
+          username: ${{ secrets.DOCKERHUB_USERNAME }}
+          password: ${{ secrets.DOCKERHUB_TOKEN }}
+
+      - uses: docker/build-push-action@0565240e2d4ab88bba5387d719585280857ece09 # v5.0.0
+        with:
+          context: packages/api
+          push: true
+          platforms: linux/amd64,linux/arm64
+          build-args: |
+            COCKPIT_VERSION=${{ needs.extract-version.outputs.version }}
+            COCKPIT_EDITION=ce
+          tags: |
+            lagoontechsystems/cockpit:latest
+            lagoontechsystems/cockpit:${{ needs.extract-version.outputs.version }}
+
+  publish-npm-cli:
+    name: Publish CLI to npm
+    runs-on: ubuntu-latest
+    needs: [extract-version]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: 20
+          registry-url: https://registry.npmjs.org
+      - run: |
+          cd packages/cli
+          npm version ${{ needs.extract-version.outputs.version }} --no-git-tag-version --allow-same-version
+          npm publish --access public
+        env:
+          NODE_AUTH_TOKEN: ${{ secrets.NPM_TOKEN }}
+
+  trigger-eas-build:
+    name: Trigger EAS Build
+    runs-on: ubuntu-latest
+    needs: [extract-version]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+      - uses: actions/setup-node@60edb5dd545a775178f52524783378180af0d1f8
+        with:
+          node-version: 20
+      - uses: expo/expo-github-action@v8
+        with:
+          eas-version: latest
+          token: ${{ secrets.EXPO_TOKEN }}
+      - run: |
+          cd packages/app
+          eas build --platform ios --profile production --non-interactive --no-wait
+          eas build --platform android --profile production --non-interactive --no-wait
+
+  github-release:
+    name: Create GitHub Release
+    runs-on: ubuntu-latest
+    needs: [extract-version, build-docker, publish-npm-cli]
+    steps:
+      - uses: actions/checkout@b4ffde65f46336ab88eb53be808477a3936bae11
+        with:
+          fetch-depth: 0
+
+      - name: Generate changelog
+        id: changelog
+        run: |
+          PREV_TAG=$(git describe --tags --abbrev=0 HEAD^ 2>/dev/null || echo "")
+          if [ -n "$PREV_TAG" ]; then
+            CHANGES=$(git log ${PREV_TAG}..HEAD --pretty=format:"- %s" --no-merges)
+          else
+            CHANGES=$(git log --pretty=format:"- %s" --no-merges -20)
+          fi
+          echo "changes<<EOF" >> "$GITHUB_OUTPUT"
+          echo "$CHANGES" >> "$GITHUB_OUTPUT"
+          echo "EOF" >> "$GITHUB_OUTPUT"
+
+      - name: Package Windows Agent
+        run: |
+          cd packages/windows-agent
+          zip -r ../../windows-agent-${{ needs.extract-version.outputs.tag }}.zip \
+            . -x "__pycache__/*" ".env" "venv/*" "*.pyc"
+          cd ../..
+          sha256sum windows-agent-*.zip > CHECKSUMS.sha256
+
+      - uses: softprops/action-gh-release@de2c0eb89ae2a093876385947365aca7b0e5f844 # v1
+        with:
+          tag_name: ${{ needs.extract-version.outputs.tag }}
+          name: Lagoon Cockpit ${{ needs.extract-version.outputs.tag }}
+          body: |
+            ## What's Changed
+            ${{ steps.changelog.outputs.changes }}
+
+            ## Distribution
+            - **Docker**: `docker pull lagoontechsystems/cockpit:${{ needs.extract-version.outputs.version }}`
+            - **npm CLI**: `npx lagoon-cockpit-cli@${{ needs.extract-version.outputs.version }}`
+            - **Mobile**: EAS builds triggered (check [Expo dashboard](https://expo.dev))
+          files: |
+            windows-agent-*.zip
+            CHECKSUMS.sha256

@@ -30,7 +30,7 @@ router.get("/api/integrations", requireAuth, (_req, res) => {
       config: redactConfig(i.config),
     }));
     res.json({ integrations });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to list integrations" });
   }
 });
@@ -42,7 +42,7 @@ router.get("/api/integrations/:id", requireAuth, (req, res) => {
     if (!integration) return res.status(404).json({ error: "Integration not found" });
     integration.config = redactConfig(integration.config);
     res.json(integration);
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to get integration" });
   }
 });
@@ -74,7 +74,7 @@ router.post("/api/integrations", requireAuth, requireRole("admin"), validateBody
     createIntegration(id, adapter, name, config, poll_interval);
 
     res.status(201).json({ id, adapter, name, poll_interval: poll_interval || 30 });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to create integration" });
   }
 });
@@ -87,7 +87,7 @@ router.put("/api/integrations/:id", requireAuth, requireRole("admin"), (req, res
 
     updateIntegration(req.params.id, req.body);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to update integration" });
   }
 });
@@ -100,7 +100,7 @@ router.delete("/api/integrations/:id", requireAuth, requireRole("admin"), (req, 
 
     deleteIntegration(req.params.id);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to delete integration" });
   }
 });
@@ -148,7 +148,7 @@ router.get("/api/integrations/:id/data", requireAuth, (req, res) => {
     });
 
     res.json({ data });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to query data" });
   }
 });

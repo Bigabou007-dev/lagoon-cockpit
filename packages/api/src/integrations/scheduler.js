@@ -7,7 +7,7 @@
 const { createAdapterInstance } = require("./registry");
 const { listIntegrations, updateIntegrationStatus, storeDataPoints, cleanupOldData } = require("./store");
 
-let timers = new Map(); // integrationId -> timer handle
+const timers = new Map(); // integrationId -> timer handle
 let broadcastFn = null;
 
 /**
@@ -114,7 +114,7 @@ async function pollIntegration(integrationId) {
 
 /** Stop all polling (for graceful shutdown) */
 function stopAll() {
-  for (const [id, timer] of timers) {
+  for (const [, timer] of timers) {
     clearInterval(timer);
   }
   timers.clear();

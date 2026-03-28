@@ -1,6 +1,10 @@
 services:
   cockpit-api:
-    build: .
+    build:
+      context: .
+      args:
+        COCKPIT_VERSION: "1.0.0"
+        COCKPIT_EDITION: "ce"
     container_name: cockpit_api
     restart: unless-stopped
     env_file: .env
@@ -8,9 +12,7 @@ services:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/host/proc:ro
       - cockpit_data:/app/data
-    # Uncomment and set your reverse proxy network:
-    # networks:
-    #   - your_proxy_network
+      - cockpit_extensions:/app/extensions
     deploy:
       resources:
         limits:
@@ -28,8 +30,4 @@ services:
 
 volumes:
   cockpit_data:
-
-# Uncomment to join an external reverse proxy network:
-# networks:
-#   your_proxy_network:
-#     external: true
+  cockpit_extensions:

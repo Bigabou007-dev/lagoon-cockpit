@@ -3,3 +3,10 @@ data
 .env
 .git
 *.md
+*.db
+*.db-wal
+*.db-shm
+__tests__
+.github
+coverage
+docker-compose.override.yml

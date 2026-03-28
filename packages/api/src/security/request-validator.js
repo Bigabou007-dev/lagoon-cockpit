@@ -1,6 +1,8 @@
 const Ajv = require("ajv");
+const addFormats = require("ajv-formats");
 
 const ajv = new Ajv({ allErrors: false, coerceTypes: false, removeAdditional: false });
+addFormats(ajv);
 
 /**
  * Request body validation middleware using JSON Schema (ajv).

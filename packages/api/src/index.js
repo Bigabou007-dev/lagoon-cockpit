@@ -131,7 +131,7 @@ const extensions = loadExtensions(app, db, services);
 app.locals.extensions = extensions;
 
 // ── SSE broadcast loop ─────────────────────────────────────
-let previousContainerStates = {};
+const previousContainerStates = {};
 async function broadcastLoop() {
   try {
     if (getClientCount() === 0) return;

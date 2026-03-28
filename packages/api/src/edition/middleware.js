@@ -1,4 +1,4 @@
-const { hasFeature, requiredEdition: getRequiredEdition, FEATURE_EDITIONS } = require("./features");
+const { hasFeature, requiredEdition: getRequiredEdition } = require("./features");
 
 /**
  * Edition gating middleware factory.

@@ -10,7 +10,30 @@
   "scripts": {
     "start": "node src/index.js"
   },
-  "keywords": ["docker", "devops", "cli", "containers", "monitoring"],
+  "files": [
+    "src/",
+    "LICENSE",
+    "README.md"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/lagoon-tech/cockpit",
+    "directory": "packages/cli"
+  },
+  "homepage": "https://github.com/lagoon-tech/cockpit/tree/main/packages/cli",
+  "bugs": {
+    "url": "https://github.com/lagoon-tech/cockpit/issues"
+  },
+  "keywords": [
+    "docker",
+    "devops",
+    "cli",
+    "containers",
+    "monitoring",
+    "infrastructure",
+    "mobile",
+    "self-hosted"
+  ],
   "license": "MIT",
   "engines": {
     "node": ">=18"
