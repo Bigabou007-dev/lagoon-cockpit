@@ -77,7 +77,7 @@ export default function LockScreen() {
           accessibilityLabel={isLoading ? 'Authenticating' : 'Unlock Cockpit'}
         >
           <LinearGradient
-            colors={['#4A90FF', '#6366F1']}
+            colors={[COLORS.blue, COLORS.indigo]}
             start={{ x: 0, y: 0 }}
             end={{ x: 1, y: 0 }}
             style={styles.button}
