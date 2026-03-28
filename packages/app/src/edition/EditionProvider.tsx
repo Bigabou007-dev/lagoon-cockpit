@@ -43,7 +43,7 @@ export function EditionProvider({ children }: EditionProviderProps) {
 const styles = StyleSheet.create({
   container: { flex: 1 },
   graceBanner: {
-    backgroundColor: "#7C2D12",
+    backgroundColor: COLORS.orange + '15',
     paddingHorizontal: SPACING.lg,
     paddingVertical: SPACING.sm,
   },

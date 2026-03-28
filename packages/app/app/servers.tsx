@@ -16,6 +16,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../src/theme/tokens';
 import Skeleton from '../src/components/Skeleton';
+import { TactileCard } from '../src/components/ui/TactileCard';
 
 /* ─── Constants ─── */
 const REFRESH_INTERVAL = 30_000; // 30 seconds
@@ -137,7 +138,7 @@ function PulsingDot({ color, size = 14 }: { color: string; size?: number }) {
 /* ─── Skeleton card ─── */
 function SkeletonCard() {
   return (
-    <View style={styles.card}>
+    <View style={styles.skeletonCard}>
       <View style={styles.cardHeader}>
         <Skeleton width={14} height={14} borderRadius={7} />
         <View style={{ flex: 1, marginLeft: 10 }}>
@@ -204,10 +205,9 @@ function ServerCard({
 
   return (
     <FadeSlideIn delay={index * 60}>
-      <TouchableOpacity
+      <TactileCard
         style={styles.card}
         onPress={() => onConnect(profile)}
-        activeOpacity={0.7}
       >
         {/* Header: status dot + name + URL */}
         <View style={styles.cardHeader}>
@@ -313,7 +313,7 @@ function ServerCard({
         <View style={styles.chevronContainer}>
           <Ionicons name="chevron-forward" size={18} color={COLORS.textTertiary} />
         </View>
-      </TouchableOpacity>
+      </TactileCard>
     </FadeSlideIn>
   );
 }
@@ -660,11 +660,6 @@ const styles = StyleSheet.create({
 
   /* Card */
   card: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    padding: SPACING.lg,
     position: 'relative',
   },
   cardHeader: {
@@ -785,7 +780,14 @@ const styles = StyleSheet.create({
     top: SPACING.lg,
   },
 
-  /* Skeleton list */
+  /* Skeleton */
+  skeletonCard: {
+    backgroundColor: COLORS.card,
+    borderRadius: RADIUS.lg,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    padding: SPACING.lg,
+  },
   skeletonList: {
     padding: SPACING.lg,
     gap: SPACING.md,

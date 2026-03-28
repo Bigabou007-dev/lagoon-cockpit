@@ -65,8 +65,8 @@ function FadeSlideIn({ delay, children }: { delay: number; children: React.React
 }
 
 export default function AlertsScreen() {
-  const { alerts, clearAlerts } = useDashboardStore();
-  const isLoaded = alerts !== undefined;
+  const { alerts, clearAlerts, isLoading } = useDashboardStore();
+  const isLoaded = !isLoading;
 
   const renderAlert = ({ item, index }: { item: Alert; index: number }) => {
     const iconProps = getAlertIconProps(item);

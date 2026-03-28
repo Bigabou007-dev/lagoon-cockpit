@@ -4,6 +4,8 @@ import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
+import { GlassCard } from '../../src/components/ui/GlassCard';
+import { TactileCard } from '../../src/components/ui/TactileCard';
 
 interface Integration {
   id: string;
@@ -117,16 +119,16 @@ export default function IntegrationsScreen() {
         </Text>
 
         {integrations.length === 0 ? (
-          <View style={styles.emptyState}>
+          <GlassCard style={styles.emptyState}>
             <Ionicons name="git-network" size={48} color={COLORS.textTertiary} />
             <Text style={styles.emptyText}>No integrations configured</Text>
             <Text style={styles.emptySubtext}>
               Add a Prometheus, Grafana, or custom HTTP endpoint
             </Text>
-          </View>
+          </GlassCard>
         ) : (
           integrations.map((integration) => (
-            <View key={integration.id} style={styles.card}>
+            <TactileCard key={integration.id} style={styles.card} haptic="none">
               <View style={styles.cardHeader}>
                 <View style={[styles.iconContainer, { backgroundColor: COLORS.indigo + '20' }]}>
                   <Ionicons name={adapterIcon(integration.adapter)} size={20} color={COLORS.indigo} />
@@ -171,7 +173,7 @@ export default function IntegrationsScreen() {
                   <Text style={[styles.actionText, { color: COLORS.red }]}>Remove</Text>
                 </TouchableOpacity>
               </View>
-            </View>
+            </TactileCard>
           ))
         )}
       </ScrollView>
@@ -185,17 +187,11 @@ const styles = StyleSheet.create({
   center: { flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' },
   title: { color: COLORS.textPrimary, ...FONT.hero, fontSize: 28, marginTop: SPACING.sm },
   subtitle: { color: COLORS.textTertiary, ...FONT.body, fontSize: 14, marginBottom: SPACING.xxl },
-  emptyState: { alignItems: 'center', paddingVertical: 60, gap: SPACING.sm },
+  emptyState: { alignItems: 'center', paddingVertical: 44, gap: SPACING.sm },
   emptyText: { color: COLORS.textSecondary, ...FONT.title, fontSize: 18 },
   emptySubtext: { color: COLORS.textTertiary, ...FONT.body, fontSize: 14 },
   card: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
     marginBottom: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOW.card,
   },
   cardHeader: { flexDirection: 'row', alignItems: 'center', gap: SPACING.md },
   iconContainer: {

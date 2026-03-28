@@ -5,6 +5,8 @@ import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
 import { useEdition } from '../src/edition/useEdition';
 import { EDITION_LABELS } from '../src/edition/features';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../src/theme/tokens';
+import { GlassCard } from '../src/components/ui/GlassCard';
+import { TactileCard } from '../src/components/ui/TactileCard';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -31,16 +33,18 @@ export default function SettingsScreen() {
   };
 
   const renderProfile = ({ item }: { item: ServerProfile }) => (
-    <View style={[styles.card, item.id === activeProfileId && styles.cardActive]}>
-      <View style={styles.cardContent}>
-        <Text style={styles.cardName}>{item.name}</Text>
-        <Text style={styles.cardUrl}>{item.url}</Text>
-        <Text style={styles.cardAuth}>{item.authMode === 'key' ? 'API Key' : 'User Login'}</Text>
+    <TactileCard style={StyleSheet.flatten([styles.card, item.id === activeProfileId ? styles.cardActive : undefined])} haptic="none">
+      <View style={styles.cardInner}>
+        <View style={styles.cardContent}>
+          <Text style={styles.cardName}>{item.name}</Text>
+          <Text style={styles.cardUrl}>{item.url}</Text>
+          <Text style={styles.cardAuth}>{item.authMode === 'key' ? 'API Key' : 'User Login'}</Text>
+        </View>
+        <TouchableOpacity onPress={() => handleDelete(item.id, item.name)}>
+          <Text style={styles.deleteText}>Remove</Text>
+        </TouchableOpacity>
       </View>
-      <TouchableOpacity onPress={() => handleDelete(item.id, item.name)}>
-        <Text style={styles.deleteText}>Remove</Text>
-      </TouchableOpacity>
-    </View>
+    </TactileCard>
   );
 
   return (
@@ -84,30 +88,32 @@ export default function SettingsScreen() {
         {editionLoaded && (
           <>
             <Text style={styles.sectionTitle}>License</Text>
-            <View style={styles.card}>
-              <View style={styles.cardContent}>
-                <Text style={styles.cardName}>
-                  {EDITION_LABELS[edition] || edition} Edition
-                </Text>
-                {org && <Text style={styles.cardUrl}>{org}</Text>}
-                {graceMode && (
-                  <Text style={[styles.cardAuth, { color: COLORS.yellow }]}>
-                    License expired — grace period active
+            <GlassCard>
+              <View style={styles.cardInner}>
+                <View style={styles.cardContent}>
+                  <Text style={styles.cardName}>
+                    {EDITION_LABELS[edition] || edition} Edition
                   </Text>
-                )}
-                {!graceMode && edition !== 'ce' && (
-                  <Text style={styles.cardAuth}>License active</Text>
-                )}
-                {edition === 'ce' && (
-                  <Text style={styles.cardAuth}>Free — upgrade for more features</Text>
-                )}
+                  {org && <Text style={styles.cardUrl}>{org}</Text>}
+                  {graceMode && (
+                    <Text style={[styles.cardAuth, { color: COLORS.yellow }]}>
+                      License expired — grace period active
+                    </Text>
+                  )}
+                  {!graceMode && edition !== 'ce' && (
+                    <Text style={styles.cardAuth}>License active</Text>
+                  )}
+                  {edition === 'ce' && (
+                    <Text style={styles.cardAuth}>Free — upgrade for more features</Text>
+                  )}
+                </View>
+                <Ionicons
+                  name={edition === 'ce' ? 'shield-outline' : 'shield-checkmark'}
+                  size={24}
+                  color={edition === 'ce' ? COLORS.textTertiary : COLORS.green}
+                />
               </View>
-              <Ionicons
-                name={edition === 'ce' ? 'shield-outline' : 'shield-checkmark'}
-                size={24}
-                color={edition === 'ce' ? COLORS.textTertiary : COLORS.green}
-              />
-            </View>
+            </GlassCard>
           </>
         )}
 
@@ -129,15 +135,10 @@ const styles = StyleSheet.create({
     marginTop: SPACING.xl,
   },
   list: { gap: SPACING.sm },
-  card: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
+  card: {},
+  cardInner: {
     flexDirection: 'row',
     alignItems: 'center',
-    borderWidth: 1,
-    borderColor: COLORS.border,
-    ...SHADOW.card,
   },
   cardActive: { borderColor: COLORS.borderActive },
   cardContent: { flex: 1 },
@@ -160,8 +161,8 @@ const styles = StyleSheet.create({
     marginTop: 32,
     paddingVertical: 14,
     borderRadius: RADIUS.lg,
-    backgroundColor: '#7F1D1D',
+    backgroundColor: COLORS.red + '15',
     alignItems: 'center',
   },
-  disconnectText: { color: '#FCA5A5', fontSize: 15, fontWeight: '600' },
+  disconnectText: { color: COLORS.red, fontSize: 15, fontWeight: '600' },
 });

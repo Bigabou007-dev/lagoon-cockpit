@@ -5,6 +5,7 @@ import * as SecureStore from 'expo-secure-store';
 import { Ionicons } from '@expo/vector-icons';
 import { useNotificationStore } from '../../src/stores/notificationStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { GlassCard } from '../../src/components/ui/GlassCard';
 
 const PREFS_KEY = 'cockpit_notification_prefs';
 
@@ -122,7 +123,7 @@ export default function NotificationsScreen() {
       <Stack.Screen options={{ title: 'Notifications', headerBackTitle: 'Manage' }} />
       <ScrollView style={styles.container} contentContainerStyle={styles.content}>
         {/* Registration status */}
-        <View style={styles.statusCard}>
+        <GlassCard style={styles.statusCard}>
           <View style={styles.statusRow}>
             <Ionicons
               name={isRegistered ? 'checkmark-circle' : 'close-circle'}
@@ -143,7 +144,7 @@ export default function NotificationsScreen() {
               Notifications require a physical device and granted permissions.
             </Text>
           )}
-        </View>
+        </GlassCard>
 
         {/* Preferences */}
         <Text style={styles.sectionTitle}>Alert Categories</Text>
@@ -152,21 +153,23 @@ export default function NotificationsScreen() {
         </Text>
 
         {PREF_ITEMS.map((item) => (
-          <View key={item.key} style={styles.prefCard}>
-            <View style={[styles.prefIcon, { backgroundColor: item.iconColor + '20' }]}>
-              <Ionicons name={item.icon} size={20} color={item.iconColor} />
+          <GlassCard key={item.key} style={styles.prefCard}>
+            <View style={styles.prefInner}>
+              <View style={[styles.prefIcon, { backgroundColor: item.iconColor + '20' }]}>
+                <Ionicons name={item.icon} size={20} color={item.iconColor} />
+              </View>
+              <View style={styles.prefContent}>
+                <Text style={styles.prefLabel}>{item.label}</Text>
+                <Text style={styles.prefDesc}>{item.description}</Text>
+              </View>
+              <Switch
+                value={prefs[item.key]}
+                onValueChange={() => togglePref(item.key)}
+                trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                thumbColor={prefs[item.key] ? COLORS.blue : COLORS.textTertiary}
+              />
             </View>
-            <View style={styles.prefContent}>
-              <Text style={styles.prefLabel}>{item.label}</Text>
-              <Text style={styles.prefDesc}>{item.description}</Text>
-            </View>
-            <Switch
-              value={prefs[item.key]}
-              onValueChange={() => togglePref(item.key)}
-              trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
-              thumbColor={prefs[item.key] ? COLORS.blue : COLORS.textTertiary}
-            />
-          </View>
+          </GlassCard>
         ))}
 
         <View style={styles.footer}>
@@ -186,12 +189,7 @@ const styles = StyleSheet.create({
   content: { padding: SPACING.lg, paddingBottom: 40 },
 
   statusCard: {
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
     marginBottom: SPACING.xxl,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   statusRow: {
     flexDirection: 'row',
@@ -231,15 +229,12 @@ const styles = StyleSheet.create({
   },
 
   prefCard: {
+    marginBottom: SPACING.sm,
+  },
+  prefInner: {
     flexDirection: 'row',
     alignItems: 'center',
     gap: SPACING.md,
-    backgroundColor: COLORS.card,
-    borderRadius: RADIUS.lg,
-    padding: SPACING.lg,
-    marginBottom: SPACING.sm,
-    borderWidth: 1,
-    borderColor: COLORS.border,
   },
   prefIcon: {
     width: 40,

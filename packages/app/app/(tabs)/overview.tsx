@@ -447,10 +447,10 @@ export default function OverviewScreen() {
               {/* CPU */}
               <GlassCard
                 elevated
-                style={[
+                style={StyleSheet.flatten([
                   styles.gaugeCardInner,
-                  sys.cpuPercent > 70 && SHADOW.glow(severityColor(sys.cpuPercent)),
-                ]}
+                  sys.cpuPercent > 70 ? SHADOW.glow(severityColor(sys.cpuPercent)) : undefined,
+                ])}
               >
                 <MaterialCommunityIcons name="cpu-64-bit" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
                 <ProgressRing size={70} strokeWidth={6} percent={sys.cpuPercent} color={severityColor(sys.cpuPercent)} />
@@ -461,10 +461,10 @@ export default function OverviewScreen() {
               {/* RAM */}
               <GlassCard
                 elevated
-                style={[
+                style={StyleSheet.flatten([
                   styles.gaugeCardInner,
-                  sys.memory.percent > 70 && SHADOW.glow(severityColor(sys.memory.percent)),
-                ]}
+                  sys.memory.percent > 70 ? SHADOW.glow(severityColor(sys.memory.percent)) : undefined,
+                ])}
               >
                 <MaterialCommunityIcons name="memory" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
                 <ProgressRing size={70} strokeWidth={6} percent={sys.memory.percent} color={severityColor(sys.memory.percent)} />
@@ -475,10 +475,10 @@ export default function OverviewScreen() {
               {/* Disk */}
               <GlassCard
                 elevated
-                style={[
+                style={StyleSheet.flatten([
                   styles.gaugeCardInner,
-                  sys.disk.percent > 70 && SHADOW.glow(severityColor(sys.disk.percent)),
-                ]}
+                  sys.disk.percent > 70 ? SHADOW.glow(severityColor(sys.disk.percent)) : undefined,
+                ])}
               >
                 <MaterialCommunityIcons name="harddisk" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
                 <ProgressRing size={70} strokeWidth={6} percent={sys.disk.percent} color={severityColor(sys.disk.percent)} />

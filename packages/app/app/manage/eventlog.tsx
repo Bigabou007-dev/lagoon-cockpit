@@ -14,6 +14,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import Skeleton from '../../src/components/Skeleton';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { GlassCard } from '../../src/components/ui/GlassCard';
 
 /* ---------- Types ---------- */
 
@@ -221,7 +222,7 @@ export default function EventLogScreen() {
             {item.message}
           </Text>
           {isExpanded && (
-            <View style={styles.expandedDetails}>
+            <GlassCard elevated style={styles.expandedDetails}>
               <View style={styles.detailRow}>
                 <Text style={styles.detailLabel}>Level</Text>
                 <Text style={[styles.detailValue, { color: icon.color }]}>
@@ -242,7 +243,7 @@ export default function EventLogScreen() {
                   {new Date(item.timestamp).toLocaleString()}
                 </Text>
               </View>
-            </View>
+            </GlassCard>
           )}
           <View style={styles.expandHint}>
             <Ionicons
@@ -323,19 +324,21 @@ export default function EventLogScreen() {
 
         {/* Error state */}
         {!loading && error && (
-          <View style={styles.centerContainer}>
-            <Ionicons
-              name="warning"
-              size={48}
-              color={COLORS.yellow}
-              style={{ marginBottom: SPACING.lg }}
-            />
-            <Text style={styles.errorTitle}>Failed to Load</Text>
-            <Text style={styles.errorText}>{error}</Text>
-            <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
-              <Text style={styles.retryText}>Retry</Text>
-            </TouchableOpacity>
-          </View>
+          <GlassCard style={styles.errorCard}>
+            <View style={styles.centerContainer}>
+              <Ionicons
+                name="warning"
+                size={48}
+                color={COLORS.yellow}
+                style={{ marginBottom: SPACING.lg }}
+              />
+              <Text style={styles.errorTitle}>Failed to Load</Text>
+              <Text style={styles.errorText}>{error}</Text>
+              <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
+                <Text style={styles.retryText}>Retry</Text>
+              </TouchableOpacity>
+            </View>
+          </GlassCard>
         )}
 
         {/* Event list */}
@@ -477,9 +480,6 @@ const styles = StyleSheet.create({
   expandedDetails: {
     marginTop: SPACING.md,
     marginLeft: 28,
-    paddingTop: SPACING.md,
-    borderTopWidth: 1,
-    borderTopColor: COLORS.border,
   },
   detailRow: {
     flexDirection: 'row',
@@ -515,9 +515,12 @@ const styles = StyleSheet.create({
   },
 
   /* Center / Error / Empty */
+  errorCard: {
+    marginHorizontal: SPACING.lg,
+    marginTop: 60,
+  },
   centerContainer: {
     alignItems: 'center',
-    marginTop: 80,
     paddingHorizontal: SPACING.xxl,
   },
   errorTitle: {
