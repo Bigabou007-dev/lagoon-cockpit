@@ -10,7 +10,7 @@ import {
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
-import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 /* ---------- Constants ---------- */
 
@@ -276,8 +276,8 @@ const styles = StyleSheet.create({
   serverLabel: {
     flex: 1,
     color: COLORS.textSecondary,
+    ...FONT.bodyMedium,
     fontSize: 13,
-    fontWeight: '600',
   },
   platformBadge: {
     paddingHorizontal: SPACING.sm,
@@ -301,11 +301,14 @@ const styles = StyleSheet.create({
     flex: 1,
     paddingVertical: SPACING.sm,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.card,
     alignItems: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   selectorBtnActive: {
     backgroundColor: COLORS.blue,
+    borderColor: COLORS.blue,
   },
   selectorBtnText: {
     color: COLORS.textSecondary,
@@ -319,7 +322,9 @@ const styles = StyleSheet.create({
     minWidth: 44,
     minHeight: 44,
     borderRadius: RADIUS.sm,
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.card,
+    borderWidth: 1,
+    borderColor: COLORS.border,
     justifyContent: 'center',
     alignItems: 'center',
   },
@@ -369,10 +374,12 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.xl,
   },
   retryBtn: {
-    backgroundColor: COLORS.border,
+    backgroundColor: COLORS.card,
     paddingHorizontal: SPACING.xl,
-    paddingVertical: 10,
+    paddingVertical: SPACING.sm,
     borderRadius: RADIUS.sm,
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   retryText: {
     color: COLORS.blue,

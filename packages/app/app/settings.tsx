@@ -2,7 +2,7 @@ import { View, Text, TouchableOpacity, FlatList, StyleSheet, Alert, Platform } f
 import { useRouter, Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
-import { COLORS, RADIUS, SPACING } from '../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../src/theme/tokens';
 
 export default function SettingsScreen() {
   const router = useRouter();
@@ -90,10 +90,8 @@ const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg, padding: SPACING.xl },
   sectionTitle: {
     color: COLORS.textSecondary,
+    ...FONT.label,
     fontSize: 13,
-    fontWeight: '600',
-    textTransform: 'uppercase',
-    letterSpacing: 1,
     marginBottom: SPACING.md,
     marginTop: SPACING.xl,
   },
@@ -106,21 +104,22 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...SHADOW.card,
   },
-  cardActive: { borderColor: '#2563EB' },
+  cardActive: { borderColor: COLORS.borderActive },
   cardContent: { flex: 1 },
-  cardName: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  cardName: { color: COLORS.textPrimary, ...FONT.heading, fontSize: 16 },
   cardUrl: { color: COLORS.textTertiary, fontSize: 13, marginTop: 2 },
   cardAuth: { color: COLORS.blue, fontSize: 12, marginTop: 2 },
   deleteText: { color: COLORS.red, fontSize: 13, fontWeight: '500' },
   addBtn: {
     marginTop: SPACING.lg,
-    paddingVertical: 14,
+    paddingVertical: SPACING.md,
     borderRadius: RADIUS.lg,
-    backgroundColor: COLORS.border,
+    backgroundColor: 'transparent',
     alignItems: 'center',
     borderWidth: 1,
-    borderColor: COLORS.border,
+    borderColor: COLORS.glassBorder,
     borderStyle: 'dashed',
   },
   addText: { color: COLORS.blue, fontSize: 15, fontWeight: '600' },

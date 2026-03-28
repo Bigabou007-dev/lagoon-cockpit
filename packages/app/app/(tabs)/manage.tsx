@@ -4,7 +4,7 @@ import { useRouter } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
 import { useDashboardStore } from '../../src/stores/dashboardStore';
-import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 interface MenuItem {
   label: string;
@@ -100,14 +100,15 @@ export default function ManageScreen() {
 const styles = StyleSheet.create({
   container: { flex: 1, backgroundColor: COLORS.bg },
   content: { padding: SPACING.lg, paddingBottom: 40 },
-  title: { color: COLORS.textPrimary, fontSize: 28, fontWeight: '800', marginTop: SPACING.sm },
-  subtitle: { color: COLORS.textTertiary, fontSize: 14, marginBottom: SPACING.xxl },
+  title: { color: COLORS.textPrimary, ...FONT.hero, fontSize: 28, marginTop: SPACING.sm },
+  subtitle: { color: COLORS.textTertiary, ...FONT.body, fontSize: 14, marginBottom: SPACING.xxl },
   section: { marginBottom: SPACING.xxl },
-  sectionTitle: { color: COLORS.textSecondary, fontSize: 12, fontWeight: '700', textTransform: 'uppercase', letterSpacing: 1.2, marginBottom: 10 },
+  sectionTitle: { color: COLORS.textSecondary, ...FONT.label, fontSize: 12, marginBottom: SPACING.sm },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
     backgroundColor: COLORS.card, borderRadius: RADIUS.lg, padding: SPACING.lg, marginBottom: SPACING.sm,
     borderWidth: 1, borderColor: COLORS.border,
+    ...SHADOW.card,
   },
   menuIconContainer: {
     width: 40,
@@ -117,7 +118,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   menuContent: { flex: 1 },
-  menuLabel: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600' },
+  menuLabel: { color: COLORS.textPrimary, ...FONT.heading, fontSize: 16 },
   menuDesc: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
   adminBadge: {
     color: COLORS.yellow, fontSize: 10, fontWeight: '700', backgroundColor: '#422006',

@@ -3,7 +3,7 @@ import { useRef, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardStore, type Alert } from '../../src/stores/dashboardStore';
 import Skeleton from '../../src/components/Skeleton';
-import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, SHADOW } from '../../src/theme/tokens';
 
 function getAlertIconProps(alert: Alert): { name: keyof typeof Ionicons.glyphMap; color: string } {
   if (alert.currentState === 'running') return { name: 'checkmark-circle', color: COLORS.green };
@@ -130,8 +130,8 @@ const styles = StyleSheet.create({
     marginTop: SPACING.md,
     paddingHorizontal: SPACING.md,
     paddingVertical: 6,
-    borderRadius: 6,
-    backgroundColor: COLORS.border,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.glass,
   },
   clearText: { color: COLORS.textSecondary, fontSize: 13 },
   list: { padding: SPACING.lg, paddingBottom: SPACING.xl },
@@ -140,10 +140,11 @@ const styles = StyleSheet.create({
     gap: SPACING.md,
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
-    padding: 14,
+    padding: SPACING.md,
     marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...SHADOW.card,
   },
   alertContent: { flex: 1 },
   alertTitle: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600', marginBottom: 2 },
@@ -152,7 +153,7 @@ const styles = StyleSheet.create({
   skeletonCard: {
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.lg,
-    padding: 14,
+    padding: SPACING.md,
     marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,

@@ -7,7 +7,7 @@ import ContainerCard from '../../src/components/ContainerCard';
 import Skeleton from '../../src/components/Skeleton';
 import { Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
-import { COLORS } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import * as Haptics from 'expo-haptics';
 
 type Filter = 'all' | 'running' | 'stopped' | 'unhealthy';
@@ -311,7 +311,7 @@ function WindowsServicesView() {
           }}
           keyExtractor={(item) => item.name}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No services found</Text>}
@@ -586,7 +586,7 @@ function LinuxContainersView() {
           }}
           keyExtractor={(item) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           contentContainerStyle={styles.list}
           ListEmptyComponent={<Text style={styles.empty}>No containers found</Text>}
@@ -649,10 +649,10 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.card,
-    margin: 16,
-    marginBottom: 8,
-    borderRadius: 12,
-    paddingHorizontal: 14,
+    margin: SPACING.lg,
+    marginBottom: SPACING.sm,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -680,9 +680,9 @@ const styles = StyleSheet.create({
   filterPill: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 10,
-    borderRadius: 20,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.xl,
     backgroundColor: COLORS.card,
     borderWidth: 1,
     borderColor: COLORS.border,
@@ -710,14 +710,15 @@ const styles = StyleSheet.create({
 
   errorCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.red + '30',
-    padding: 32,
-    margin: 16,
+    padding: SPACING.xxxl,
+    margin: SPACING.lg,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: SPACING.sm,
+    ...SHADOW.card,
   },
   errorTitle: {
     color: COLORS.textPrimary,
@@ -735,11 +736,11 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: COLORS.blue + '1A',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.sm,
     gap: 6,
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
   retryText: {
     color: COLORS.blue,
@@ -750,9 +751,9 @@ const styles = StyleSheet.create({
   list: { paddingHorizontal: 16, paddingBottom: 100 },
   skeletonCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderLeftWidth: 4,
@@ -772,13 +773,14 @@ const styles = StyleSheet.create({
   },
   bulkInner: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
     borderWidth: 1,
     borderColor: COLORS.purple + '44',
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
+    ...SHADOW.elevated,
   },
   bulkCount: {
     color: COLORS.purple,
@@ -792,9 +794,9 @@ const styles = StyleSheet.create({
   bulkBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 14,
-    paddingVertical: 8,
-    borderRadius: 20,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.xl,
     gap: 6,
   },
   bulkBtnIcon: {
@@ -809,12 +811,13 @@ const styles = StyleSheet.create({
   // ── Windows service card styles ──
   serviceCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
     borderLeftWidth: 4,
+    ...SHADOW.card,
   },
   serviceHeader: {
     flexDirection: 'row',
@@ -850,9 +853,9 @@ const styles = StyleSheet.create({
   statusBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    borderRadius: 12,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    borderRadius: RADIUS.sm,
     gap: 5,
   },
   statusDot: {
@@ -888,9 +891,9 @@ const styles = StyleSheet.create({
   actionBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingHorizontal: 12,
+    paddingHorizontal: SPACING.md,
     paddingVertical: 6,
-    borderRadius: 16,
+    borderRadius: RADIUS.md,
     gap: 4,
   },
   actionBtnText: {

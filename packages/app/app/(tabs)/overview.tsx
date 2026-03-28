@@ -1,18 +1,15 @@
-import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, Easing, ActivityIndicator } from 'react-native';
+import { View, Text, ScrollView, RefreshControl, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { MaterialCommunityIcons, Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
 import { useDashboardStore } from '../../src/stores/dashboardStore';
 import { apiFetch } from '../../src/lib/api';
 import { useRouter } from 'expo-router';
-import { COLORS, RADIUS } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
+import { GlassCard } from '../../src/components/ui/GlassCard';
+import { TactileCard } from '../../src/components/ui/TactileCard';
+import { StatusDot } from '../../src/components/ui/StatusDot';
 import Skeleton from '../../src/components/Skeleton';
-
-/* ─── Design tokens ─── */
-const T = {
-  ...COLORS,
-  radius: RADIUS.lg,
-};
 
 /* ─── Helpers ─── */
 function formatBytes(bytes: number): string {
@@ -32,6 +29,15 @@ function formatUptime(seconds: number): string {
   return `${m}m`;
 }
 
+/** Returns a severity color based on a percentage value */
+function severityColor(percent: number): string {
+  if (percent < 30) return COLORS.optimal;
+  if (percent < 60) return COLORS.green;
+  if (percent < 75) return COLORS.yellow;
+  if (percent < 90) return COLORS.orange;
+  return COLORS.red;
+}
+
 /* ─── Circular Progress Ring ─── */
 function ProgressRing({
   size = 70,
@@ -44,8 +50,6 @@ function ProgressRing({
   percent: number;
   color: string;
 }) {
-  // We build a ring out of two half-circles clipped by wrapper views.
-  // percent 0-100 maps to 0-360 degrees.
   const radius = size / 2;
   const clampedPercent = Math.min(Math.max(percent, 0), 100);
   const degrees = (clampedPercent / 100) * 360;
@@ -68,17 +72,12 @@ function ProgressRing({
     position: 'absolute' as const,
   };
 
-  // Right half rotation: fills 0-180 degrees
   const rightDeg = Math.min(degrees, 180);
-  // Left half rotation: fills 180-360 degrees
   const leftDeg = Math.max(degrees - 180, 0);
 
   return (
     <View style={{ width: size, height: size }}>
-      {/* Track ring */}
       <View style={baseCircle} />
-
-      {/* Right half (0-180 deg) */}
       <View
         style={{
           width: size / 2,
@@ -100,8 +99,6 @@ function ProgressRing({
           ]}
         />
       </View>
-
-      {/* Left half (180-360 deg) */}
       {degrees > 180 && (
         <View
           style={{
@@ -125,36 +122,11 @@ function ProgressRing({
           />
         </View>
       )}
-
-      {/* Center label */}
-      <View style={{ position: 'absolute', top: 0, left: 0, right: 0, bottom: 0, alignItems: 'center', justifyContent: 'center' }}>
-        <Text style={{ color: T.textPrimary, fontSize: 16, fontWeight: '700' }}>
+      <View style={styles.ringCenter}>
+        <Text style={[FONT.metric, { color: COLORS.textPrimary, fontSize: 16 }]}>
           {clampedPercent.toFixed(0)}%
         </Text>
       </View>
-    </View>
-  );
-}
-
-/* ─── Live Indicator (pulsing dot) ─── */
-function LiveIndicator() {
-  const opacity = useRef(new Animated.Value(1)).current;
-
-  useEffect(() => {
-    const pulse = Animated.loop(
-      Animated.sequence([
-        Animated.timing(opacity, { toValue: 0.3, duration: 1000, useNativeDriver: true }),
-        Animated.timing(opacity, { toValue: 1, duration: 1000, useNativeDriver: true }),
-      ]),
-    );
-    pulse.start();
-    return () => pulse.stop();
-  }, [opacity]);
-
-  return (
-    <View style={styles.liveContainer}>
-      <Animated.View style={[styles.liveDot, { opacity }]} />
-      <Text style={styles.liveText}>Live</Text>
     </View>
   );
 }
@@ -164,11 +136,11 @@ function SkeletonStatGrid() {
   return (
     <View style={styles.statGrid}>
       {[0, 1, 2, 3].map((i) => (
-        <View key={i} style={styles.statCard}>
+        <GlassCard key={i} style={styles.skeletonStatCard}>
           <Skeleton width={32} height={32} borderRadius={10} />
           <Skeleton width={60} height={32} borderRadius={8} style={{ marginTop: 10 }} />
           <Skeleton width={80} height={12} borderRadius={4} style={{ marginTop: 8 }} />
-        </View>
+        </GlassCard>
       ))}
     </View>
   );
@@ -177,14 +149,14 @@ function SkeletonStatGrid() {
 function SkeletonGaugeRow() {
   return (
     <View style={styles.section}>
-      <Skeleton width={140} height={14} borderRadius={4} style={{ marginBottom: 12 }} />
+      <Skeleton width={140} height={14} borderRadius={4} style={{ marginBottom: SPACING.md }} />
       <View style={styles.gaugeRow}>
         {[0, 1, 2].map((i) => (
-          <View key={i} style={styles.gaugeCard}>
+          <GlassCard key={i} style={styles.skeletonGaugeCard}>
             <Skeleton width={64} height={64} borderRadius={32} />
             <Skeleton width={30} height={12} borderRadius={4} style={{ marginTop: 8 }} />
             <Skeleton width={50} height={10} borderRadius={4} style={{ marginTop: 4 }} />
-          </View>
+          </GlassCard>
         ))}
       </View>
     </View>
@@ -237,18 +209,15 @@ export default function OverviewScreen() {
     try {
       setError(null);
 
-      // Always fetch overview first to determine platform
       const overviewData = await apiFetch<any>('/api/overview');
       setOverview(overviewData);
 
       const detectedPlatform = overviewData.platform === 'windows' ? 'windows' : 'linux';
 
       if (detectedPlatform === 'windows') {
-        // Windows: fetch services instead of containers/stacks
         const servicesData = await apiFetch<any>('/api/services');
         useDashboardStore.getState().setServices(servicesData.services);
       } else {
-        // Linux: fetch containers and stacks as usual
         const [containerData, stackData] = await Promise.all([
           apiFetch<any>('/api/containers'),
           apiFetch<any>('/api/stacks'),
@@ -282,32 +251,43 @@ export default function OverviewScreen() {
   );
 
   const alertColorForState = (state: string, health?: string) =>
-    health === 'unhealthy' ? T.yellow : state === 'running' ? T.green : state === 'exited' ? T.red : T.orange;
+    health === 'unhealthy' ? COLORS.yellow : state === 'running' ? COLORS.green : state === 'exited' ? COLORS.red : COLORS.orange;
 
   return (
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
       refreshControl={
-        <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={T.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+        <RefreshControl
+          refreshing={refreshing}
+          onRefresh={onRefresh}
+          tintColor={COLORS.blue}
+          colors={[COLORS.blue]}
+          progressBackgroundColor={COLORS.card}
+        />
       }
     >
       {/* ── 1. Server Header ── */}
       <View style={styles.headerBanner}>
         <View style={styles.headerRow}>
           <View style={styles.headerLeft}>
-            <Text style={styles.serverName}>{serverName || 'Server'}</Text>
+            <Text style={[FONT.hero, styles.serverName]}>{serverName || 'Server'}</Text>
             <View style={styles.headerMeta}>
-              <View style={styles.greenDot} />
+              <StatusDot status="healthy" size={8} />
               {sys && (
                 <View style={styles.uptimeBadge}>
-                  <Text style={styles.uptimeText}>Up {formatUptime(sys.uptimeSeconds)}</Text>
+                  <Text style={[FONT.bodyMedium, styles.uptimeText]}>
+                    Up {formatUptime(sys.uptimeSeconds)}
+                  </Text>
                 </View>
               )}
             </View>
           </View>
           <View style={styles.headerRight}>
-            <LiveIndicator />
+            <View style={styles.liveContainer}>
+              <StatusDot status="healthy" size={5} />
+              <Text style={[FONT.label, styles.liveText]}>Live</Text>
+            </View>
             <TouchableOpacity
               style={styles.switchBtn}
               onPress={() => {
@@ -317,7 +297,7 @@ export default function OverviewScreen() {
               accessibilityRole="button"
               accessibilityLabel="Switch server"
             >
-              <Text style={styles.switchText}>Switch</Text>
+              <Text style={[FONT.bodyMedium, { color: COLORS.textSecondary, fontSize: 13 }]}>Switch</Text>
             </TouchableOpacity>
           </View>
         </View>
@@ -333,110 +313,125 @@ export default function OverviewScreen() {
 
       {/* ── Error State ── */}
       {error && !overview && (
-        <View style={styles.errorCard}>
-          <Ionicons name="cloud-offline-outline" size={32} color={T.red} />
-          <Text style={styles.errorTitle}>Connection Error</Text>
-          <Text style={styles.errorText}>{error}</Text>
+        <GlassCard style={styles.errorCard}>
+          <Ionicons name="cloud-offline-outline" size={32} color={COLORS.red} />
+          <Text style={[FONT.heading, { color: COLORS.textPrimary, marginTop: SPACING.xs }]}>
+            Connection Error
+          </Text>
+          <Text style={[FONT.body, styles.errorText]}>{error}</Text>
           <TouchableOpacity style={styles.retryBtn} onPress={fetchAll}>
-            <Ionicons name="refresh" size={16} color={T.blue} />
-            <Text style={styles.retryText}>Retry</Text>
+            <Ionicons name="refresh" size={16} color={COLORS.blue} />
+            <Text style={[FONT.bodyMedium, { color: COLORS.blue }]}>Retry</Text>
           </TouchableOpacity>
-        </View>
+        </GlassCard>
       )}
 
-      {/* ── 2. Quick Stat Cards (2x2) ── */}
+      {/* ── 2. Quick Stat Cards — Windows ── */}
       {overview && platform === 'windows' && (
         <FadeSlideIn delay={0}>
           <View style={styles.statGrid}>
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: T.blue + '20' }]}>
-                <Ionicons name="cog-outline" size={16} color={T.blue} />
+            <GlassCard style={styles.statCardInner} elevated>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.blue + '20' }]}>
+                <Ionicons name="cog-outline" size={16} color={COLORS.blue} />
               </View>
-              <Text style={styles.statNumber}>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>
                 {overview.services?.total ?? 0}
               </Text>
-              <Text style={styles.statLabel}>SERVICES</Text>
-            </View>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>SERVICES</Text>
+            </GlassCard>
 
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: T.green + '20' }]}>
-                <Ionicons name="checkmark-circle-outline" size={16} color={T.green} />
+            <GlassCard style={styles.statCardInner} elevated>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.green + '20' }]}>
+                <Ionicons name="checkmark-circle-outline" size={16} color={COLORS.green} />
               </View>
-              <Text style={styles.statNumber}>{overview.services?.running ?? 0}</Text>
-              <Text style={styles.statLabel}>RUNNING</Text>
-            </View>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>
+                {overview.services?.running ?? 0}
+              </Text>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>RUNNING</Text>
+            </GlassCard>
 
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: T.red + '20' }]}>
-                <Ionicons name="stop-circle-outline" size={16} color={T.red} />
+            <GlassCard style={styles.statCardInner} elevated>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.red + '20' }]}>
+                <Ionicons name="stop-circle-outline" size={16} color={COLORS.red} />
               </View>
-              <Text style={[styles.statNumber, (overview.services?.stopped ?? 0) > 0 && { color: T.red }]}>
+              <Text style={[
+                FONT.metric,
+                { color: (overview.services?.stopped ?? 0) > 0 ? COLORS.red : COLORS.textPrimary },
+              ]}>
                 {overview.services?.stopped ?? 0}
               </Text>
-              <Text style={styles.statLabel}>STOPPED</Text>
-            </View>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>STOPPED</Text>
+            </GlassCard>
 
-            <View style={styles.statCard}>
-              <View style={[styles.statIcon, { backgroundColor: T.purple + '20' }]}>
-                <Ionicons name="list-outline" size={16} color={T.purple} />
+            <GlassCard style={styles.statCardInner} elevated>
+              <View style={[styles.statIcon, { backgroundColor: COLORS.purple + '20' }]}>
+                <Ionicons name="list-outline" size={16} color={COLORS.purple} />
               </View>
-              <Text style={styles.statNumber}>-</Text>
-              <Text style={styles.statLabel}>PROCESSES</Text>
-            </View>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>-</Text>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>PROCESSES</Text>
+            </GlassCard>
           </View>
         </FadeSlideIn>
       )}
 
+      {/* ── 2. Quick Stat Cards — Linux ── */}
       {overview && platform !== 'windows' && (
         <FadeSlideIn delay={0}>
           <View style={styles.statGrid}>
-            <TouchableOpacity
-              style={styles.statCard}
+            <TactileCard
+              style={styles.statCardOuter}
               onPress={() => router.push('/(tabs)/containers')}
             >
-              <View style={[styles.statIcon, { backgroundColor: T.blue + '20' }]}>
-                <Ionicons name="cube-outline" size={16} color={T.blue} />
+              <View style={[styles.statIcon, { backgroundColor: COLORS.blue + '20' }]}>
+                <Ionicons name="cube-outline" size={16} color={COLORS.blue} />
               </View>
-              <Text style={styles.statNumber}>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>
                 {overview.containers.running + overview.containers.stopped}
               </Text>
-              <Text style={styles.statLabel}>CONTAINERS</Text>
-            </TouchableOpacity>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>CONTAINERS</Text>
+            </TactileCard>
 
-            <TouchableOpacity
-              style={styles.statCard}
+            <TactileCard
+              style={styles.statCardOuter}
               onPress={() => router.push('/(tabs)/containers')}
             >
-              <View style={[styles.statIcon, { backgroundColor: T.green + '20' }]}>
-                <Ionicons name="checkmark-circle-outline" size={16} color={T.green} />
+              <View style={[styles.statIcon, { backgroundColor: COLORS.green + '20' }]}>
+                <Ionicons name="checkmark-circle-outline" size={16} color={COLORS.green} />
               </View>
-              <Text style={styles.statNumber}>{overview.containers.running}</Text>
-              <Text style={styles.statLabel}>RUNNING</Text>
-            </TouchableOpacity>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>
+                {overview.containers.running}
+              </Text>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>RUNNING</Text>
+            </TactileCard>
 
-            <TouchableOpacity
-              style={styles.statCard}
+            <TactileCard
+              style={styles.statCardOuter}
               onPress={() => router.push('/(tabs)/containers')}
             >
-              <View style={[styles.statIcon, { backgroundColor: T.red + '20' }]}>
-                <Ionicons name="stop-circle-outline" size={16} color={T.red} />
+              <View style={[styles.statIcon, { backgroundColor: COLORS.red + '20' }]}>
+                <Ionicons name="stop-circle-outline" size={16} color={COLORS.red} />
               </View>
-              <Text style={[styles.statNumber, overview.containers.stopped > 0 && { color: T.red }]}>
+              <Text style={[
+                FONT.metric,
+                { color: overview.containers.stopped > 0 ? COLORS.red : COLORS.textPrimary },
+              ]}>
                 {overview.containers.stopped}
               </Text>
-              <Text style={styles.statLabel}>STOPPED</Text>
-            </TouchableOpacity>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>STOPPED</Text>
+            </TactileCard>
 
-            <TouchableOpacity
-              style={styles.statCard}
+            <TactileCard
+              style={styles.statCardOuter}
               onPress={() => router.push('/(tabs)/stacks')}
             >
-              <View style={[styles.statIcon, { backgroundColor: T.purple + '20' }]}>
-                <Ionicons name="layers-outline" size={16} color={T.purple} />
+              <View style={[styles.statIcon, { backgroundColor: COLORS.purple + '20' }]}>
+                <Ionicons name="layers-outline" size={16} color={COLORS.purple} />
               </View>
-              <Text style={styles.statNumber}>{overview.stacks.total}</Text>
-              <Text style={styles.statLabel}>STACKS</Text>
-            </TouchableOpacity>
+              <Text style={[FONT.metric, { color: COLORS.textPrimary }]}>
+                {overview.stacks.total}
+              </Text>
+              <Text style={[FONT.label, { color: COLORS.textTertiary }]}>STACKS</Text>
+            </TactileCard>
           </View>
         </FadeSlideIn>
       )}
@@ -445,134 +440,156 @@ export default function OverviewScreen() {
       {sys && (
         <FadeSlideIn delay={100}>
           <View style={styles.section}>
-            <Text style={styles.sectionHeader}>SYSTEM RESOURCES</Text>
+            <Text style={[FONT.label, { color: COLORS.textTertiary, marginBottom: SPACING.md }]}>
+              SYSTEM RESOURCES
+            </Text>
             <View style={styles.gaugeRow}>
-              <View style={styles.gaugeCard}>
-                <MaterialCommunityIcons name="cpu-64-bit" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
-                <ProgressRing size={70} strokeWidth={6} percent={sys.cpuPercent} color={T.blue} />
-                <Text style={styles.gaugeLabel}>CPU</Text>
-                <Text style={styles.gaugeDetail}>{sys.cpuCount} cores</Text>
-              </View>
-              <View style={styles.gaugeCard}>
-                <MaterialCommunityIcons name="memory" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
-                <ProgressRing
-                  size={70}
-                  strokeWidth={6}
-                  percent={sys.memory.percent}
-                  color={T.purple}
-                />
-                <Text style={styles.gaugeLabel}>RAM</Text>
-                <Text style={styles.gaugeDetail}>{formatBytes(sys.memory.used)}</Text>
-              </View>
-              <View style={styles.gaugeCard}>
-                <MaterialCommunityIcons name="harddisk" size={16} color={T.textTertiary} style={{ marginBottom: 4 }} />
-                <ProgressRing
-                  size={70}
-                  strokeWidth={6}
-                  percent={sys.disk.percent}
-                  color={T.orange}
-                />
-                <Text style={styles.gaugeLabel}>Disk</Text>
-                <Text style={styles.gaugeDetail}>{formatBytes(sys.disk.used)}</Text>
-              </View>
+              {/* CPU */}
+              <GlassCard
+                elevated
+                style={[
+                  styles.gaugeCardInner,
+                  sys.cpuPercent > 70 && SHADOW.glow(severityColor(sys.cpuPercent)),
+                ]}
+              >
+                <MaterialCommunityIcons name="cpu-64-bit" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
+                <ProgressRing size={70} strokeWidth={6} percent={sys.cpuPercent} color={severityColor(sys.cpuPercent)} />
+                <Text style={[FONT.label, { color: COLORS.textSecondary, marginTop: SPACING.sm }]}>CPU</Text>
+                <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 10 }]}>{sys.cpuCount} cores</Text>
+              </GlassCard>
+
+              {/* RAM */}
+              <GlassCard
+                elevated
+                style={[
+                  styles.gaugeCardInner,
+                  sys.memory.percent > 70 && SHADOW.glow(severityColor(sys.memory.percent)),
+                ]}
+              >
+                <MaterialCommunityIcons name="memory" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
+                <ProgressRing size={70} strokeWidth={6} percent={sys.memory.percent} color={severityColor(sys.memory.percent)} />
+                <Text style={[FONT.label, { color: COLORS.textSecondary, marginTop: SPACING.sm }]}>RAM</Text>
+                <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 10 }]}>{formatBytes(sys.memory.used)}</Text>
+              </GlassCard>
+
+              {/* Disk */}
+              <GlassCard
+                elevated
+                style={[
+                  styles.gaugeCardInner,
+                  sys.disk.percent > 70 && SHADOW.glow(severityColor(sys.disk.percent)),
+                ]}
+              >
+                <MaterialCommunityIcons name="harddisk" size={16} color={COLORS.textTertiary} style={{ marginBottom: SPACING.xs }} />
+                <ProgressRing size={70} strokeWidth={6} percent={sys.disk.percent} color={severityColor(sys.disk.percent)} />
+                <Text style={[FONT.label, { color: COLORS.textSecondary, marginTop: SPACING.sm }]}>Disk</Text>
+                <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 10 }]}>{formatBytes(sys.disk.used)}</Text>
+              </GlassCard>
             </View>
           </View>
         </FadeSlideIn>
       )}
 
-      {/* ── 4. Load Average (Linux only — Windows has no load average) ── */}
+      {/* ── 4. Load Average (Linux only) ── */}
       {sys && sys.load && platform !== 'windows' && (
-        <View style={styles.loadCard}>
-          <Text style={styles.loadTitle}>LOAD AVG</Text>
+        <GlassCard elevated style={styles.loadCard}>
+          <Text style={[FONT.label, { color: COLORS.textTertiary }]}>LOAD AVG</Text>
           <View style={styles.loadValues}>
-            <Text style={styles.loadNum}>{sys.load.load1.toFixed(2)}</Text>
-            <Text style={styles.loadDot}>{'\u00B7'}</Text>
-            <Text style={styles.loadNum}>{sys.load.load5.toFixed(2)}</Text>
-            <Text style={styles.loadDot}>{'\u00B7'}</Text>
-            <Text style={styles.loadNum}>{sys.load.load15.toFixed(2)}</Text>
+            <Text style={[FONT.mono, { color: COLORS.textPrimary, fontSize: 15 }]}>{sys.load.load1.toFixed(2)}</Text>
+            <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 18 }]}>{'\u00B7'}</Text>
+            <Text style={[FONT.mono, { color: COLORS.textPrimary, fontSize: 15 }]}>{sys.load.load5.toFixed(2)}</Text>
+            <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 18 }]}>{'\u00B7'}</Text>
+            <Text style={[FONT.mono, { color: COLORS.textPrimary, fontSize: 15 }]}>{sys.load.load15.toFixed(2)}</Text>
           </View>
-        </View>
+        </GlassCard>
       )}
 
       {/* ── 5. Problem Containers (Linux only) ── */}
       {platform !== 'windows' && problemContainers.length > 0 && (
         <FadeSlideIn delay={200}>
           <View style={styles.section}>
-            <Text style={[styles.sectionHeader, { color: T.red }]}>ATTENTION REQUIRED</Text>
-            <View style={styles.problemSection}>
+            <Text style={[FONT.label, { color: COLORS.red, marginBottom: SPACING.md }]}>
+              ATTENTION REQUIRED
+            </Text>
+            <GlassCard noPadding style={styles.problemSection}>
               {problemContainers.map((c) => (
                 <TouchableOpacity
                   key={c.id}
                   style={styles.problemRow}
                   onPress={() => router.push(`/containers/${c.id}`)}
                 >
-                  <View style={styles.problemDot} />
-                  <Text style={styles.problemName} numberOfLines={1}>
+                  <StatusDot
+                    status={c.health === 'unhealthy' ? 'warning' : c.state === 'exited' ? 'critical' : 'elevated'}
+                    size={8}
+                  />
+                  <Text style={[FONT.bodyMedium, { color: COLORS.textPrimary, flex: 1 }]} numberOfLines={1}>
                     {c.name}
                   </Text>
-                  <Text style={styles.problemState}>
+                  <Text style={[FONT.label, { color: COLORS.red }]}>
                     {c.health === 'unhealthy' ? 'unhealthy' : c.state}
                   </Text>
                 </TouchableOpacity>
               ))}
-            </View>
+            </GlassCard>
           </View>
         </FadeSlideIn>
       )}
 
       {/* ── 6. Recent Alerts (timeline) ── */}
       <FadeSlideIn delay={300}>
-      <View style={styles.section}>
-        <TouchableOpacity
-          style={styles.sectionHeaderRow}
-          onPress={() => router.push('/(tabs)/alerts')}
-        >
-          <Text style={styles.sectionHeader}>RECENT ACTIVITY</Text>
-          {alerts.length > 0 && (
-            <Text style={styles.seeAll}>{alerts.length} alerts ›</Text>
-          )}
-        </TouchableOpacity>
+        <View style={styles.section}>
+          <TouchableOpacity
+            style={styles.sectionHeaderRow}
+            onPress={() => router.push('/(tabs)/alerts')}
+          >
+            <Text style={[FONT.label, { color: COLORS.textTertiary }]}>RECENT ACTIVITY</Text>
+            {alerts.length > 0 && (
+              <Text style={[FONT.bodyMedium, { color: COLORS.blue, fontSize: 12 }]}>
+                {alerts.length} alerts ›
+              </Text>
+            )}
+          </TouchableOpacity>
 
-        {alerts.length === 0 ? (
-          <View style={styles.allGood}>
-            <Ionicons name="checkmark-circle" size={20} color={T.green} />
-            <Text style={styles.allGoodText}>All systems operational</Text>
-          </View>
-        ) : (
-          <View style={styles.timelineCard}>
-            {alerts.slice(0, 5).map((alert, i) => {
-              const stateColor = alertColorForState(alert.currentState || '');
-              const isLast = i === Math.min(alerts.length, 5) - 1;
-              return (
-                <View key={i} style={styles.timelineItem}>
-                  {/* Vertical line + dot */}
-                  <View style={styles.timelineTrack}>
-                    <View style={[styles.timelineDot, { backgroundColor: stateColor }]} />
-                    {!isLast && <View style={styles.timelineLine} />}
-                  </View>
-                  {/* Content */}
-                  <View style={styles.timelineContent}>
-                    <Text style={styles.timelineName}>
-                      {alert.containerName || alert.type}
-                    </Text>
-                    <Text style={[styles.timelineState, { color: stateColor }]}>
-                      {alert.currentState || alert.message}
-                    </Text>
-                    <Text style={styles.timelineTime}>
-                      {new Date(alert.timestamp).toLocaleTimeString()}
-                    </Text>
-                  </View>
-                </View>
-              );
-            })}
-          </View>
-        )}
-      </View>
+          {alerts.length === 0 ? (
+            <GlassCard elevated style={styles.allGood}>
+              <Ionicons name="checkmark-circle" size={20} color={COLORS.green} />
+              <Text style={[FONT.bodyMedium, { color: COLORS.green }]}>All systems operational</Text>
+            </GlassCard>
+          ) : (
+            <GlassCard elevated noPadding>
+              <View style={{ padding: SPACING.lg }}>
+                {alerts.slice(0, 5).map((alert, i) => {
+                  const stateColor = alertColorForState(alert.currentState || '');
+                  const isLast = i === Math.min(alerts.length, 5) - 1;
+                  return (
+                    <View key={i} style={styles.timelineItem}>
+                      <View style={styles.timelineTrack}>
+                        <View style={[styles.timelineDot, { backgroundColor: stateColor }]} />
+                        {!isLast && <View style={styles.timelineLine} />}
+                      </View>
+                      <View style={styles.timelineContent}>
+                        <Text style={[FONT.bodyMedium, { color: COLORS.textPrimary, fontSize: 13 }]}>
+                          {alert.containerName || alert.type}
+                        </Text>
+                        <Text style={[FONT.body, { color: stateColor, fontSize: 12 }]}>
+                          {alert.currentState || alert.message}
+                        </Text>
+                        <Text style={[FONT.body, { color: COLORS.textTertiary, fontSize: 11, marginTop: 2 }]}>
+                          {new Date(alert.timestamp).toLocaleTimeString()}
+                        </Text>
+                      </View>
+                    </View>
+                  );
+                })}
+              </View>
+            </GlassCard>
+          )}
+        </View>
       </FadeSlideIn>
 
       {/* Bottom spacer */}
       {overview && (
-        <Text style={styles.footer}>
+        <Text style={[FONT.body, styles.footer]}>
           Last update {new Date(overview.timestamp).toLocaleTimeString()}
         </Text>
       )}
@@ -582,17 +599,17 @@ export default function OverviewScreen() {
 
 /* ─── Styles ─── */
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: T.bg },
-  content: { padding: 16, paddingBottom: 48 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  content: { padding: SPACING.lg, paddingBottom: 48, backgroundColor: COLORS.bgDeep },
 
   /* Header */
   headerBanner: {
-    marginBottom: 20,
-    paddingTop: 8,
-    paddingBottom: 16,
-    paddingHorizontal: 4,
+    marginBottom: SPACING.xxl,
+    paddingTop: SPACING.sm,
+    paddingBottom: SPACING.lg,
+    paddingHorizontal: SPACING.xs,
     borderBottomWidth: 1,
-    borderBottomColor: T.border,
+    borderBottomColor: COLORS.border,
   },
   headerRow: {
     flexDirection: 'row',
@@ -601,292 +618,176 @@ const styles = StyleSheet.create({
   },
   headerLeft: { flex: 1 },
   serverName: {
-    color: T.textPrimary,
-    fontSize: 24,
-    fontWeight: '800',
-    marginBottom: 6,
+    color: COLORS.textPrimary,
+    marginBottom: SPACING.sm,
   },
-  headerMeta: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  greenDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: T.green,
-  },
+  headerMeta: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
   uptimeBadge: {
-    backgroundColor: T.green + '18',
-    paddingHorizontal: 8,
+    backgroundColor: COLORS.green + '18',
+    paddingHorizontal: SPACING.sm,
     paddingVertical: 3,
-    borderRadius: 8,
+    borderRadius: RADIUS.sm,
   },
   uptimeText: {
-    color: T.green,
-    fontSize: 11,
-    fontWeight: '600',
+    color: COLORS.textSecondary,
+    fontSize: 13,
   },
-  headerRight: { alignItems: 'flex-end', gap: 10 },
+  headerRight: { alignItems: 'flex-end', gap: SPACING.md },
   switchBtn: {
-    paddingHorizontal: 16,
-    paddingVertical: 12,
-    borderRadius: 10,
-    backgroundColor: T.card,
+    paddingHorizontal: SPACING.lg,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.sm,
+    backgroundColor: COLORS.glass,
     borderWidth: 1,
-    borderColor: T.border,
+    borderColor: COLORS.glassBorder,
     minHeight: 44,
     justifyContent: 'center',
   },
-  switchText: { color: T.textSecondary, fontSize: 13, fontWeight: '500' },
 
   /* Live indicator */
-  liveContainer: { flexDirection: 'row', alignItems: 'center', gap: 5 },
-  liveDot: {
-    width: 6,
-    height: 6,
-    borderRadius: 3,
-    backgroundColor: T.green,
-  },
-  liveText: { color: T.green, fontSize: 11, fontWeight: '600' },
+  liveContainer: { flexDirection: 'row', alignItems: 'center', gap: SPACING.xs },
+  liveText: { color: COLORS.green, fontSize: 11 },
 
   /* Quick stat grid */
   statGrid: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    gap: 10,
-    marginBottom: 24,
+    gap: SPACING.xl,
+    marginBottom: SPACING.xxxl,
   },
-  statCard: {
+  /* For TactileCard (wraps GlassCard internally) */
+  statCardOuter: {
     flex: 1,
     minWidth: 150,
-    backgroundColor: T.card,
-    borderRadius: T.radius,
-    borderWidth: 1,
-    borderColor: T.border,
-    padding: 16,
+  },
+  /* For GlassCard used directly (Windows) */
+  statCardInner: {
+    flex: 1,
+    minWidth: 150,
   },
   statIcon: {
     width: 32,
     height: 32,
-    borderRadius: 10,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 10,
-  },
-  statIconText: { fontSize: 14, fontWeight: '700' },
-  statNumber: {
-    color: T.textPrimary,
-    fontSize: 32,
-    fontWeight: '800',
-    lineHeight: 36,
-  },
-  statLabel: {
-    color: T.textSecondary,
-    fontSize: 12,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-    marginTop: 4,
+    marginBottom: SPACING.md,
   },
 
   /* Section */
-  section: { marginBottom: 24 },
-  sectionHeader: {
-    color: T.textSecondary,
-    fontSize: 14,
-    fontWeight: '600',
-    marginBottom: 12,
-  },
+  section: { marginBottom: SPACING.xxxl },
   sectionHeaderRow: {
     flexDirection: 'row',
     justifyContent: 'space-between',
     alignItems: 'center',
-    marginBottom: 12,
+    marginBottom: SPACING.md,
   },
-  seeAll: { color: T.blue, fontSize: 12, fontWeight: '500' },
 
   /* Gauges */
-  gaugeRow: { flexDirection: 'row', gap: 10 },
-  gaugeCard: {
+  gaugeRow: { flexDirection: 'row', gap: SPACING.xl },
+  gaugeCardInner: {
     flex: 1,
-    backgroundColor: T.card,
-    borderRadius: T.radius,
-    borderWidth: 1,
-    borderColor: T.border,
-    paddingVertical: 16,
     alignItems: 'center',
-  },
-  gaugeLabel: {
-    color: T.textSecondary,
-    fontSize: 11,
-    fontWeight: '600',
-    marginTop: 8,
-  },
-  gaugeDetail: {
-    color: T.textTertiary,
-    fontSize: 10,
-    marginTop: 2,
+    paddingVertical: SPACING.lg,
   },
 
   /* Load average */
   loadCard: {
-    backgroundColor: T.card,
-    borderRadius: T.radius,
-    borderWidth: 1,
-    borderColor: T.border,
-    paddingVertical: 12,
-    paddingHorizontal: 16,
     flexDirection: 'row',
     alignItems: 'center',
     justifyContent: 'space-between',
-    marginBottom: 24,
+    marginBottom: SPACING.xxxl,
   },
-  loadTitle: {
-    color: T.textSecondary,
-    fontSize: 12,
-    fontWeight: '500',
-    textTransform: 'uppercase',
-    letterSpacing: 1.5,
-  },
-  loadValues: { flexDirection: 'row', alignItems: 'center', gap: 8 },
-  loadNum: {
-    color: T.textPrimary,
-    fontSize: 15,
-    fontWeight: '600',
-    fontFamily: 'monospace',
-  },
-  loadDot: { color: T.textTertiary, fontSize: 18 },
+  loadValues: { flexDirection: 'row', alignItems: 'center', gap: SPACING.sm },
 
   /* Problem containers */
   problemSection: {
-    backgroundColor: T.red + '0A',
-    borderRadius: T.radius,
     borderWidth: 1,
-    borderColor: T.red + '30',
-    overflow: 'hidden',
+    borderColor: COLORS.red + '30',
   },
   problemRow: {
     flexDirection: 'row',
     alignItems: 'center',
-    paddingVertical: 12,
-    paddingHorizontal: 14,
-    gap: 10,
+    paddingVertical: SPACING.md,
+    paddingHorizontal: SPACING.lg,
+    gap: SPACING.md,
     borderBottomWidth: 1,
-    borderBottomColor: T.red + '15',
-  },
-  problemDot: {
-    width: 8,
-    height: 8,
-    borderRadius: 4,
-    backgroundColor: T.red,
-  },
-  problemName: {
-    color: T.textPrimary,
-    fontSize: 14,
-    fontWeight: '500',
-    flex: 1,
-  },
-  problemState: {
-    color: T.red,
-    fontSize: 12,
-    fontWeight: '600',
-    textTransform: 'uppercase',
+    borderBottomColor: COLORS.red + '15',
   },
 
   /* All good */
   allGood: {
-    backgroundColor: T.card,
-    borderRadius: T.radius,
-    borderWidth: 1,
-    borderColor: T.border,
-    paddingVertical: 24,
+    paddingVertical: SPACING.xxl,
     alignItems: 'center',
     justifyContent: 'center',
     flexDirection: 'row',
-    gap: 10,
+    gap: SPACING.md,
   },
-  allGoodDot: { width: 10, height: 10, borderRadius: 5 },
-  allGoodText: { color: T.green, fontSize: 14, fontWeight: '500' },
 
   /* Timeline */
-  timelineCard: {
-    backgroundColor: T.card,
-    borderRadius: T.radius,
-    borderWidth: 1,
-    borderColor: T.border,
-    padding: 14,
-  },
   timelineItem: { flexDirection: 'row', minHeight: 48 },
   timelineTrack: { width: 20, alignItems: 'center' },
   timelineDot: { width: 10, height: 10, borderRadius: 5, marginTop: 2 },
   timelineLine: {
     width: 2,
     flex: 1,
-    backgroundColor: T.border,
-    marginTop: 4,
-    marginBottom: 4,
+    backgroundColor: COLORS.border,
+    marginTop: SPACING.xs,
+    marginBottom: SPACING.xs,
   },
-  timelineContent: { flex: 1, paddingLeft: 8, paddingBottom: 12 },
-  timelineName: { color: T.textPrimary, fontSize: 13, fontWeight: '600' },
-  timelineState: { fontSize: 12, fontWeight: '500', marginTop: 1 },
-  timelineTime: { color: T.textTertiary, fontSize: 11, marginTop: 2 },
+  timelineContent: { flex: 1, paddingLeft: SPACING.sm, paddingBottom: SPACING.md },
 
   /* Error */
   errorCard: {
-    backgroundColor: T.card,
-    borderRadius: T.radius,
     borderWidth: 1,
-    borderColor: T.red + '30',
-    padding: 32,
+    borderColor: COLORS.red + '30',
     alignItems: 'center',
     justifyContent: 'center',
-    marginBottom: 24,
-    gap: 10,
-  },
-  errorTitle: {
-    color: T.textPrimary,
-    fontSize: 16,
-    fontWeight: '700',
-    marginTop: 4,
+    marginBottom: SPACING.xxxl,
+    gap: SPACING.md,
   },
   errorText: {
-    color: T.red,
-    fontSize: 13,
+    color: COLORS.red,
     textAlign: 'center',
-    paddingHorizontal: 16,
+    paddingHorizontal: SPACING.lg,
   },
   retryBtn: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: T.blue + '1A',
-    paddingHorizontal: 20,
-    paddingVertical: 10,
-    borderRadius: 10,
-    gap: 6,
-    marginTop: 8,
-  },
-  retryText: {
-    color: T.blue,
-    fontWeight: '600',
-    fontSize: 14,
+    backgroundColor: COLORS.blue + '1A',
+    paddingHorizontal: SPACING.xl,
+    paddingVertical: SPACING.md,
+    borderRadius: RADIUS.sm,
+    gap: SPACING.sm,
+    marginTop: SPACING.sm,
   },
 
-  /* Loading */
-  loadingContainer: {
+  /* Ring center */
+  ringCenter: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
     alignItems: 'center',
     justifyContent: 'center',
-    paddingVertical: 60,
-    gap: 16,
   },
-  loadingText: {
-    color: T.textSecondary,
-    fontSize: 14,
-    fontWeight: '500',
+
+  /* Skeleton cards */
+  skeletonStatCard: {
+    flex: 1,
+    minWidth: 150,
+  },
+  skeletonGaugeCard: {
+    flex: 1,
+    alignItems: 'center',
   },
 
   /* Footer */
   footer: {
-    color: T.textTertiary,
+    color: COLORS.textTertiary,
     fontSize: 10,
     textAlign: 'center',
-    marginTop: 8,
+    marginTop: SPACING.sm,
   },
 });

@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { useSSE } from '../../src/hooks/useSSE';
 import { useNotifications } from '../../src/hooks/useNotifications';
 import { useDashboardStore } from '../../src/stores/dashboardStore';
-import { COLORS } from '../../src/theme/tokens';
+import { COLORS, FONT } from '../../src/theme/tokens';
 
 const TAB_ICONS: Record<string, keyof typeof Ionicons.glyphMap> = {
   Overview: 'bar-chart-outline',
@@ -69,8 +69,8 @@ export default function TabLayout() {
         tabBarActiveTintColor: COLORS.blue,
         tabBarInactiveTintColor: COLORS.textTertiary,
         tabBarLabelStyle: {
+          fontFamily: FONT.label.fontFamily,
           fontSize: 11,
-          fontWeight: '600',
           marginTop: -2,
         },
         headerStyle: {
@@ -79,6 +79,7 @@ export default function TabLayout() {
         headerTintColor: COLORS.textPrimary,
         headerShadowVisible: false,
         headerTitleStyle: {
+          fontFamily: FONT.title.fontFamily,
           fontWeight: '700',
         },
       }}

@@ -6,7 +6,7 @@ import { useDashboardStore, type StackSummary, type WindowsProcess } from '../..
 import { apiFetch } from '../../src/lib/api';
 import StackCard from '../../src/components/StackCard';
 import Skeleton from '../../src/components/Skeleton';
-import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 type ProcessSortKey = 'cpu' | 'memory';
 
@@ -344,12 +344,13 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.red + '30',
-    padding: 32,
+    padding: SPACING.xxxl,
     margin: SPACING.lg,
     marginTop: 60,
     alignItems: 'center',
     justifyContent: 'center',
-    gap: 10,
+    gap: SPACING.sm,
+    ...SHADOW.card,
   },
   errorTitle: {
     color: COLORS.textPrimary,
@@ -368,8 +369,8 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     backgroundColor: COLORS.blue + '1A',
     paddingHorizontal: SPACING.xl,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.sm,
     gap: 6,
     marginTop: SPACING.sm,
   },
@@ -427,8 +428,8 @@ const styles = StyleSheet.create({
     borderColor: COLORS.border,
   },
   sortBtnActive: {
-    borderColor: COLORS.blue + '60',
-    backgroundColor: COLORS.blue + '15',
+    borderColor: COLORS.borderActive,
+    backgroundColor: COLORS.blueGlow,
   },
   sortBtnText: {
     color: COLORS.textSecondary,
@@ -442,9 +443,10 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.card,
     borderRadius: RADIUS.md,
     padding: SPACING.lg,
-    marginBottom: 10,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
+    ...SHADOW.card,
   },
   processHeader: {
     flexDirection: 'row',

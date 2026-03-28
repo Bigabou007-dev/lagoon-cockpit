@@ -17,7 +17,7 @@ import * as SecureStore from 'expo-secure-store';
 import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
-import { COLORS } from '../src/theme/tokens';
+import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../src/theme/tokens';
 
 export default function ServerSelectScreen() {
   const router = useRouter();
@@ -151,7 +151,7 @@ export default function ServerSelectScreen() {
       </View>
       <View style={styles.cardRight}>
         {connectingId === item.id ? (
-          <ActivityIndicator size="small" color="#4A90FF" />
+          <ActivityIndicator size="small" color={COLORS.blue} />
         ) : (
           <Ionicons name="chevron-forward" size={20} color={COLORS.textSecondary} />
         )}
@@ -213,7 +213,7 @@ export default function ServerSelectScreen() {
             <TextInput
               style={styles.input}
               placeholder="Server Name"
-              placeholderTextColor="#8E8E93"
+              placeholderTextColor={COLORS.textSecondary}
               value={name}
               onChangeText={setName}
             />
@@ -223,7 +223,7 @@ export default function ServerSelectScreen() {
             <TextInput
               style={styles.input}
               placeholder="URL (e.g. https://your-server:3000)"
-              placeholderTextColor="#8E8E93"
+              placeholderTextColor={COLORS.textSecondary}
               value={url}
               onChangeText={setUrl}
               autoCapitalize="none"
@@ -260,7 +260,7 @@ export default function ServerSelectScreen() {
               <TextInput
                 style={styles.input}
                 placeholder="Email"
-                placeholderTextColor="#8E8E93"
+                placeholderTextColor={COLORS.textSecondary}
                 value={email}
                 onChangeText={setEmail}
                 autoCapitalize="none"
@@ -273,7 +273,7 @@ export default function ServerSelectScreen() {
             <TextInput
               style={styles.input}
               placeholder={authMode === 'key' ? 'API Key' : 'Password'}
-              placeholderTextColor="#8E8E93"
+              placeholderTextColor={COLORS.textSecondary}
               value={credential}
               onChangeText={setCredential}
               secureTextEntry
@@ -300,14 +300,14 @@ export default function ServerSelectScreen() {
               activeOpacity={0.8}
             >
               <LinearGradient
-                colors={['#4A90FF', '#6366F1']}
+                colors={[COLORS.blue, COLORS.indigo]}
                 start={{ x: 0, y: 0 }}
                 end={{ x: 1, y: 0 }}
                 style={styles.connectBtn}
               >
                 {connecting ? (
                   <View style={styles.connectingRow}>
-                    <ActivityIndicator size="small" color="#FFFFFF" />
+                    <ActivityIndicator size="small" color={COLORS.textPrimary} />
                     <Text style={styles.connectBtnText}>Connecting...</Text>
                   </View>
                 ) : (
@@ -329,30 +329,30 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.bg,
   },
   containerContent: {
-    padding: 24,
+    padding: SPACING.xxl,
     paddingTop: 80,
     paddingBottom: 120,
   },
   title: {
     color: COLORS.textPrimary,
+    ...FONT.hero,
     fontSize: 36,
-    fontWeight: '800',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
   subtitle: {
     color: COLORS.textSecondary,
-    fontSize: 17,
-    marginBottom: 28,
+    ...FONT.heading,
+    marginBottom: SPACING.xxxl,
   },
 
   // Error card
   errorCard: {
-    backgroundColor: 'rgba(255, 107, 107, 0.1)',
-    borderRadius: 16,
+    backgroundColor: COLORS.red + '1A',
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
-    borderColor: 'rgba(255, 107, 107, 0.25)',
-    padding: 16,
-    marginBottom: 16,
+    borderColor: COLORS.red + '40',
+    padding: SPACING.lg,
+    marginBottom: SPACING.lg,
     flexDirection: 'row',
     alignItems: 'flex-start',
   },
@@ -390,13 +390,14 @@ const styles = StyleSheet.create({
   // Server card
   profileCard: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
-    padding: 16,
-    marginBottom: 10,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.lg,
+    marginBottom: SPACING.sm,
     borderWidth: 1,
     borderColor: COLORS.border,
     flexDirection: 'row',
     alignItems: 'center',
+    ...SHADOW.card,
   },
   cardLeft: {
     flex: 1,
@@ -412,8 +413,7 @@ const styles = StyleSheet.create({
   },
   profileName: {
     color: COLORS.textPrimary,
-    fontSize: 17,
-    fontWeight: '600',
+    ...FONT.heading,
   },
   profileUrl: {
     color: COLORS.textSecondary,
@@ -424,11 +424,11 @@ const styles = StyleSheet.create({
   },
   authBadge: {
     alignSelf: 'flex-start',
-    backgroundColor: 'rgba(74, 144, 255, 0.15)',
-    borderRadius: 8,
-    paddingHorizontal: 10,
-    paddingVertical: 4,
-    marginLeft: 16,
+    backgroundColor: COLORS.blueGlow,
+    borderRadius: RADIUS.sm,
+    paddingHorizontal: SPACING.sm,
+    paddingVertical: SPACING.xs,
+    marginLeft: SPACING.lg,
   },
   authBadgeText: {
     color: COLORS.blue,
@@ -450,15 +450,15 @@ const styles = StyleSheet.create({
   // Add server card
   addCard: {
     backgroundColor: 'transparent',
-    borderRadius: 16,
-    padding: 20,
+    borderRadius: RADIUS.lg,
+    padding: SPACING.xl,
     alignItems: 'center',
     justifyContent: 'center',
     borderWidth: 1.5,
-    borderColor: COLORS.border,
+    borderColor: COLORS.glassBorder,
     borderStyle: 'dashed',
     flexDirection: 'row',
-    gap: 8,
+    gap: SPACING.sm,
   },
   addIcon: {
     color: COLORS.blue,
@@ -474,25 +474,26 @@ const styles = StyleSheet.create({
   // Form
   form: {
     backgroundColor: COLORS.card,
-    borderRadius: 16,
+    borderRadius: RADIUS.lg,
     borderWidth: 1,
     borderColor: COLORS.border,
-    padding: 20,
-    gap: 14,
+    padding: SPACING.xl,
+    gap: SPACING.md,
+    ...SHADOW.card,
   },
   formTitle: {
     color: COLORS.textPrimary,
+    ...FONT.title,
     fontSize: 18,
-    fontWeight: '700',
-    marginBottom: 4,
+    marginBottom: SPACING.xs,
   },
   inputGroup: {},
   input: {
     backgroundColor: COLORS.bg,
-    borderRadius: 12,
-    padding: 16,
+    borderRadius: RADIUS.md,
+    padding: SPACING.lg,
     color: COLORS.textPrimary,
-    fontSize: 15,
+    ...FONT.body,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
@@ -501,15 +502,15 @@ const styles = StyleSheet.create({
   segmentedControl: {
     flexDirection: 'row',
     backgroundColor: COLORS.bg,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     padding: 3,
     borderWidth: 1,
     borderColor: COLORS.border,
   },
   segment: {
     flex: 1,
-    paddingVertical: 10,
-    borderRadius: 10,
+    paddingVertical: SPACING.sm,
+    borderRadius: RADIUS.sm,
     alignItems: 'center',
   },
   segmentActive: {
@@ -532,11 +533,13 @@ const styles = StyleSheet.create({
   },
   cancelBtn: {
     flex: 1,
-    paddingVertical: 16,
-    borderRadius: 12,
-    backgroundColor: COLORS.border,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
+    backgroundColor: COLORS.cardElevated,
     alignItems: 'center',
     justifyContent: 'center',
+    borderWidth: 1,
+    borderColor: COLORS.border,
   },
   cancelBtnText: {
     color: COLORS.textPrimary,
@@ -545,12 +548,12 @@ const styles = StyleSheet.create({
   },
   connectBtnWrapper: {
     flex: 1,
-    borderRadius: 12,
+    borderRadius: RADIUS.md,
     overflow: 'hidden',
   },
   connectBtn: {
-    paddingVertical: 16,
-    borderRadius: 12,
+    paddingVertical: SPACING.lg,
+    borderRadius: RADIUS.md,
     alignItems: 'center',
     justifyContent: 'center',
   },
