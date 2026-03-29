@@ -1,5 +1,7 @@
 <div align="center">
 
+<img src="docs/social-card.png" alt="Lagoon Cockpit" width="600">
+
 # Lagoon Cockpit
 
 **The only self-hosted, mobile-first Docker management app.**
@@ -129,6 +131,7 @@ npx lagoon-cockpit-cli overview
 | Uptime Monitoring | 25 endpoints | Unlimited |
 | SLA Tracking | Basic | Full PDF Export |
 | ChatOps | Telegram + Slack | + WhatsApp |
+| Multi-Server | 20 servers | Unlimited |
 | RBAC | 5 users | Unlimited + Custom Roles |
 | Audit Trail | 30 days | Unlimited + Export |
 | Data Integrations | 10 | Unlimited + Datadog, CloudWatch, PagerDuty |
@@ -216,6 +219,18 @@ CORS_ORIGINS=              # Comma-separated allowed origins
 ```
 
 See [.env.example](packages/api/.env.example) for all options.
+
+### Zero-Downtime Deploy & Rollback
+
+```bash
+# Deploy with automatic rollback on failure
+./scripts/deploy.sh
+
+# Manual rollback to previous version
+./scripts/deploy.sh --rollback
+```
+
+The deploy script saves the current image before upgrading, waits for the deep health check (`/health` verifies API + DB + Docker), and auto-rolls back if the new container fails.
 
 ---
 
