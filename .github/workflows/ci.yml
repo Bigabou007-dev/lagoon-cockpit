@@ -69,6 +69,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --ignore-scripts
+      - run: cd node_modules/better-sqlite3 && npx --yes prebuild-install || npm run build-release
       - run: cd packages/api && npm test
 
   build-docker:
