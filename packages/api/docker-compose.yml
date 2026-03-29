@@ -8,6 +8,14 @@ services:
     container_name: cockpit_api
     restart: unless-stopped
     env_file: .env
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+      - /var/run:size=8M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/host/proc:ro

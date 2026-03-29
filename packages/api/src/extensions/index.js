@@ -95,8 +95,14 @@ function loadExtensions(app, db, services) {
 
       ext.init(extRouter, scopedServices);
 
-      // Mount extension router under /api/ext/<name>
-      app.use(`/api/ext/${extName}`, extRouter);
+      // Mount public routes WITHOUT auth (if extension exposes them)
+      if (ext.publicRoutes) {
+        app.use(`/api/ext/${extName}/status-pages`, ext.publicRoutes);
+      }
+
+      // Mount extension router under /api/ext/<name> (auth required)
+      const { requireAuth } = require("../auth/middleware");
+      app.use(`/api/ext/${extName}`, requireAuth, extRouter);
 
       const info = { name: extName, version: ext.version || "0.0.0" };
       loaded.push(info);

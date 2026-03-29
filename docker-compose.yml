@@ -7,6 +7,12 @@ services:
     container_name: lagoon_cockpit_api
     restart: unless-stopped
     env_file: ./packages/api/.env
+    cap_drop:
+      - ALL
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+      - /var/run:size=8M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock:ro
       - cockpit-data:/app/data

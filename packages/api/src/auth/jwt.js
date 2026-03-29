@@ -74,24 +74,30 @@ function validateRefreshToken(token, fingerprint) {
 
   if (!db) return null;
 
-  const entry = db.prepare("SELECT * FROM refresh_tokens WHERE hash = ?").get(hash);
-  if (!entry) return null;
+  // H8: Wrap read + delete in a transaction to prevent race conditions
+  // where the same refresh token could be used concurrently
+  const result = db.transaction(() => {
+    const entry = db.prepare("SELECT * FROM refresh_tokens WHERE hash = ?").get(hash);
+    if (!entry) return null;
 
-  // Always delete the token (one-time use rotation)
-  db.prepare("DELETE FROM refresh_tokens WHERE hash = ?").run(hash);
+    // Always delete the token (one-time use rotation)
+    db.prepare("DELETE FROM refresh_tokens WHERE hash = ?").run(hash);
 
-  // Check expiration
-  if (Date.now() > entry.expires_at) return null;
+    // Check expiration
+    if (Date.now() > entry.expires_at) return null;
 
-  // Check fingerprint binding if configured and present
-  if (entry.fingerprint && fingerprint && entry.fingerprint !== fingerprint) {
-    console.warn(`[AUTH] Refresh token fingerprint mismatch for user ${entry.user_id}`);
-    // Potential token theft — revoke all tokens for this user
-    db.prepare("DELETE FROM refresh_tokens WHERE user_id = ?").run(entry.user_id);
-    return null;
-  }
+    // Check fingerprint binding if configured and present
+    if (entry.fingerprint && fingerprint && entry.fingerprint !== fingerprint) {
+      console.warn(`[AUTH] Refresh token fingerprint mismatch for user ${entry.user_id}`);
+      // Potential token theft — revoke all tokens for this user
+      db.prepare("DELETE FROM refresh_tokens WHERE user_id = ?").run(entry.user_id);
+      return null;
+    }
 
-  return { userId: entry.user_id, role: entry.role };
+    return { userId: entry.user_id, role: entry.role };
+  })();
+
+  return result;
 }
 
 /** Revoke all refresh tokens for a user (e.g., on password change or forced logout) */

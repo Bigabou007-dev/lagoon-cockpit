@@ -170,7 +170,13 @@ const METRICS_TOKEN = process.env.METRICS_TOKEN || null;
 router.get("/metrics", async (req, res) => {
   if (METRICS_TOKEN) {
     const auth = req.headers.authorization || "";
-    if (auth !== `Bearer ${METRICS_TOKEN}`) {
+    const prefix = "Bearer ";
+    if (!auth.startsWith(prefix)) {
+      return res.status(401).set("Content-Type", "text/plain").send("Unauthorized\n");
+    }
+    const provided = Buffer.from(auth.slice(prefix.length));
+    const expected = Buffer.from(METRICS_TOKEN);
+    if (provided.length !== expected.length || !require("crypto").timingSafeEqual(provided, expected)) {
       return res.status(401).set("Content-Type", "text/plain").send("Unauthorized\n");
     }
   }

@@ -19,6 +19,7 @@ export default function StacksScreen() {
   const [error, setError] = useState<string | null>(null);
   const [isLoaded, setIsLoaded] = useState(false);
   const fadeAnims = useRef<Animated.Value[]>([]).current;
+  const animatedIndices = useRef<Set<number>>(new Set()).current;
 
   // Windows-specific state
   const [sortKey, setSortKey] = useState<ProcessSortKey>('cpu');
@@ -190,7 +191,8 @@ export default function StacksScreen() {
                 fadeAnims.push(new Animated.Value(0));
               }
               const fadeAnim = fadeAnims[index];
-              if ((fadeAnim as any).__getValue() === 0) {
+              if (!animatedIndices.has(index)) {
+                animatedIndices.add(index);
                 Animated.timing(fadeAnim, {
                   toValue: 1,
                   duration: 400,
@@ -300,7 +302,8 @@ export default function StacksScreen() {
             }
             const fadeAnim = fadeAnims[index];
             // Trigger staggered fade-in on first load
-            if ((fadeAnim as any).__getValue() === 0) {
+            if (!animatedIndices.has(index)) {
+              animatedIndices.add(index);
               Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 400,

@@ -94,6 +94,7 @@ interface DashboardState {
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearAlerts: () => void;
+  reset: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -149,4 +150,17 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   clearAlerts: () => set({ alerts: [] }),
+  reset: () =>
+    set({
+      overview: null,
+      platform: 'linux',
+      containers: [],
+      stacks: [],
+      services: [],
+      processes: [],
+      alerts: [],
+      isLoading: false,
+      error: null,
+      lastUpdated: null,
+    }),
 }));

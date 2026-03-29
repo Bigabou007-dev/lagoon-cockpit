@@ -201,6 +201,9 @@ export const useServerStore = create<ServerState>((set, get) => ({
 
   disconnect: () => {
     set({ accessToken: null, error: null, serverName: null, userRole: null });
+    // Reset dashboard state to prevent stale data when switching servers
+    const { useDashboardStore } = require('./dashboardStore');
+    useDashboardStore.getState().reset();
   },
 
   getActiveUrl: () => {

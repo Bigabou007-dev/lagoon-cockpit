@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
@@ -160,6 +161,7 @@ export default function ServerSelectScreen() {
   );
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }} edges={['top']}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
@@ -320,6 +322,7 @@ export default function ServerSelectScreen() {
       )}
     </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -330,7 +333,7 @@ const styles = StyleSheet.create({
   },
   containerContent: {
     padding: SPACING.xxl,
-    paddingTop: 80,
+    paddingTop: SPACING.xxl,
     paddingBottom: 120,
   },
   title: {

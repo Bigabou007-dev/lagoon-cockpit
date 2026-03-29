@@ -54,6 +54,7 @@ function WindowsServicesView() {
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
   const fadeAnims = useRef<Animated.Value[]>([]).current;
+  const animatedIndices = useRef<Set<number>>(new Set()).current;
 
   const fetchServices = useCallback(async () => {
     try {
@@ -224,7 +225,8 @@ function WindowsServicesView() {
               fadeAnims.push(new Animated.Value(0));
             }
             const fadeAnim = fadeAnims[index];
-            if ((fadeAnim as any).__getValue() === 0) {
+            if (!animatedIndices.has(index)) {
+              animatedIndices.add(index);
               Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 400,
@@ -353,6 +355,7 @@ function LinuxContainersView() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const fadeAnims = useRef<Animated.Value[]>([]).current;
+  const animatedIndices = useRef<Set<number>>(new Set()).current;
 
   const fetchContainers = useCallback(async () => {
     try {
@@ -562,7 +565,8 @@ function LinuxContainersView() {
             }
             const fadeAnim = fadeAnims[index];
             // Trigger staggered fade-in on first load
-            if ((fadeAnim as any).__getValue() === 0) {
+            if (!animatedIndices.has(index)) {
+              animatedIndices.add(index);
               Animated.timing(fadeAnim, {
                 toValue: 1,
                 duration: 400,

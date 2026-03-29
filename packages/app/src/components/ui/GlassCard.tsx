@@ -8,6 +8,7 @@ interface GlassCardProps {
   intensity?: number;
   noPadding?: boolean;
   elevated?: boolean;
+  tint?: 'dark' | 'light' | 'default';
 }
 
 export function GlassCard({
@@ -16,12 +17,13 @@ export function GlassCard({
   intensity = 30,
   noPadding = false,
   elevated = false,
+  tint = 'dark',
 }: GlassCardProps) {
   return (
     <View style={[styles.outer, elevated && SHADOW.card, style]}>
       <BlurView
         intensity={intensity}
-        tint="dark"
+        tint={tint}
         style={[styles.blur, noPadding ? null : styles.padded]}
       >
         {/* Top-edge highlight for depth illusion */}

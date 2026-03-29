@@ -5,10 +5,10 @@ TIMEOUT = 5
 
 
 def _bridge_get(path):
-    sep = "&" if "?" in path else "?"
-    url = f"{MT5_BRIDGE_URL}{path}{sep}api_key={MT5_BRIDGE_API_KEY}"
+    url = f"{MT5_BRIDGE_URL}{path}"
+    headers = {"X-API-Key": MT5_BRIDGE_API_KEY}
     try:
-        resp = requests.get(url, timeout=TIMEOUT)
+        resp = requests.get(url, headers=headers, timeout=TIMEOUT)
         return resp.json(), resp.status_code
     except requests.ConnectionError:
         return {"error": "MT5 Bridge unreachable"}, 503
