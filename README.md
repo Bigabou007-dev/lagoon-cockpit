@@ -3,7 +3,7 @@
 **The only self-hosted, mobile-first Docker management app.** Monitor, manage, and automate your infrastructure from your phone.
 
 [![CI](https://github.com/lagoon-tech/cockpit/actions/workflows/ci.yml/badge.svg)](https://github.com/lagoon-tech/cockpit/actions/workflows/ci.yml)
-[![Docker](https://img.shields.io/docker/v/lagoontechsystems/cockpit?label=Docker%20Hub)](https://hub.docker.com/r/lagoontechsystems/cockpit)
+[![Docker](https://img.shields.io/badge/ghcr.io-cockpit-blue)](https://github.com/orgs/lagoon-tech-systems/packages/container/cockpit)
 [![npm](https://img.shields.io/npm/v/lagoon-cockpit-cli)](https://www.npmjs.com/package/lagoon-cockpit-cli)
 [![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
@@ -26,7 +26,7 @@ docker run -d \
   -v /var/run/docker.sock:/var/run/docker.sock \
   -v /proc:/host/proc:ro \
   -p 3000:3000 \
-  lagoontechsystems/cockpit:latest
+  ghcr.io/lagoon-tech-systems/cockpit:latest
 ```
 
 Then connect from the mobile app or CLI:
@@ -121,7 +121,7 @@ See [SECURITY.md](SECURITY.md) for the full security architecture.
 ```yaml
 services:
   cockpit:
-    image: lagoontechsystems/cockpit:latest
+    image: ghcr.io/lagoon-tech-systems/cockpit:latest
     restart: unless-stopped
     env_file: .env
     volumes:
