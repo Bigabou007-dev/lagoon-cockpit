@@ -17,12 +17,12 @@
   ],
   "repository": {
     "type": "git",
-    "url": "https://github.com/lagoon-tech/cockpit",
+    "url": "https://github.com/Lagoon-Tech-Systems/lagoon-cockpit",
     "directory": "packages/cli"
   },
-  "homepage": "https://github.com/lagoon-tech/cockpit/tree/main/packages/cli",
+  "homepage": "https://github.com/Lagoon-Tech-Systems/lagoon-cockpit/tree/main/packages/cli",
   "bugs": {
-    "url": "https://github.com/lagoon-tech/cockpit/issues"
+    "url": "https://github.com/Lagoon-Tech-Systems/lagoon-cockpit/issues"
   },
   "keywords": [
     "docker",
@@ -34,7 +34,7 @@
     "mobile",
     "self-hosted"
   ],
-  "license": "MIT",
+  "license": "AGPL-3.0-only",
   "engines": {
     "node": ">=18"
   }
