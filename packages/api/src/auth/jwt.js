@@ -38,7 +38,7 @@ function signAccessToken(payload) {
 
 /** Verify an access token */
 function verifyAccessToken(token) {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
 }
 
 /**

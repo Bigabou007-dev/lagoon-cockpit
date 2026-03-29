@@ -1,4 +1,5 @@
 const { BaseAdapter, createAlert, createEvent } = require("../adapter");
+const { safeFetch } = require("../../security/url-validator");
 
 /**
  * Grafana adapter — pulls alerts, annotations, and dashboard health.
@@ -23,7 +24,7 @@ class GrafanaAdapter extends BaseAdapter {
   async testConnection() {
     const start = Date.now();
     try {
-      const res = await fetch(`${this._baseUrl()}/api/health`, {
+      const res = await safeFetch(`${this._baseUrl()}/api/health`, {
         headers: this._headers(),
         signal: AbortSignal.timeout(10000),
       });
@@ -44,7 +45,7 @@ class GrafanaAdapter extends BaseAdapter {
 
     // Pull active alerts
     try {
-      const res = await fetch(`${this._baseUrl()}/api/v1/provisioning/alert-rules`, {
+      const res = await safeFetch(`${this._baseUrl()}/api/v1/provisioning/alert-rules`, {
         headers: this._headers(),
         signal: AbortSignal.timeout(10000),
       });
@@ -74,7 +75,7 @@ class GrafanaAdapter extends BaseAdapter {
     if (this.config.pullAnnotations !== false) {
       try {
         const from = Date.now() - (this.pollInterval * 1000 * 2); // 2x interval for overlap
-        const res = await fetch(
+        const res = await safeFetch(
           `${this._baseUrl()}/api/annotations?from=${from}&to=${Date.now()}`,
           { headers: this._headers(), signal: AbortSignal.timeout(10000) }
         );

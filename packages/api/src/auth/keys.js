@@ -1,5 +1,5 @@
 const crypto = require("crypto");
-const { signAccessToken, generateRefreshToken } = require("./jwt");
+const { signAccessToken } = require("./jwt");
 
 /**
  * Single-admin API key authentication.
@@ -28,9 +28,8 @@ function authenticateWithKey(providedKey) {
   const role = "admin";
 
   const accessToken = signAccessToken({ sub: userId, role });
-  const refreshToken = generateRefreshToken(userId, role);
 
-  return { accessToken, refreshToken, userId, role };
+  return { accessToken, userId, role };
 }
 
 module.exports = { authenticateWithKey };

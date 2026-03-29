@@ -1,0 +1,37 @@
+version: "3.8"
+
+services:
+  cockpit-api:
+    build: ./packages/api
+    image: ghcr.io/lagoon-tech-systems/cockpit:latest
+    container_name: lagoon_cockpit_api
+    restart: unless-stopped
+    env_file: ./packages/api/.env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock:ro
+      - cockpit-data:/app/data
+      - cockpit-extensions:/app/extensions
+    networks:
+      - internal
+    deploy:
+      resources:
+        limits:
+          cpus: "0.50"
+          memory: 512M
+        reservations:
+          cpus: "0.25"
+          memory: 256M
+    healthcheck:
+      test: ["CMD", "wget", "--no-verbose", "--tries=1", "--spider", "http://localhost:3000/health"]
+      interval: 30s
+      timeout: 5s
+      start_period: 10s
+      retries: 3
+
+volumes:
+  cockpit-data:
+  cockpit-extensions:
+
+networks:
+  internal:
+    driver: bridge

@@ -131,8 +131,6 @@ jobs:
 
             ## Distribution
             - **Docker**: `docker pull ghcr.io/lagoon-tech-systems/cockpit:${{ needs.extract-version.outputs.version }}`
-            - **npm CLI**: `npx lagoon-cockpit-cli@${{ needs.extract-version.outputs.version }}`
-            - **Mobile**: EAS builds triggered (check [Expo dashboard](https://expo.dev))
           files: |
             windows-agent-*.zip
             CHECKSUMS.sha256

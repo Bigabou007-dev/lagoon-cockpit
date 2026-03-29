@@ -21,7 +21,7 @@ jobs:
           node-version: 20
           cache: npm
       - run: npm ci --ignore-scripts
-      - run: npx eslint packages/api/src packages/cli/src
+      - run: npx eslint packages/api/src
       - run: cd packages/api && npm test
       - run: npm audit --audit-level=high --workspaces
 

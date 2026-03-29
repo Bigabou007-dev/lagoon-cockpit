@@ -1,5 +1,5 @@
 const bcrypt = require("bcryptjs");
-const { signAccessToken, generateRefreshToken } = require("./jwt");
+const { signAccessToken } = require("./jwt");
 
 let db = null;
 
@@ -18,12 +18,11 @@ function authenticateWithCredentials(email, password) {
   if (!bcrypt.compareSync(password, user.password_hash)) return null;
 
   const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
-  const refreshToken = generateRefreshToken(user.id, user.role);
 
   // Update last_login
   db.prepare("UPDATE users SET last_login = datetime('now') WHERE id = ?").run(user.id);
 
-  return { accessToken, refreshToken, userId: user.id, role: user.role, email: user.email };
+  return { accessToken, userId: user.id, role: user.role, email: user.email };
 }
 
 /** Create a new user (admin only) */

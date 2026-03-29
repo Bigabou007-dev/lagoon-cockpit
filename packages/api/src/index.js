@@ -182,12 +182,15 @@ const server = app.listen(PORT, () => {
   console.log(`[COCKPIT] API on :${PORT} | ${SERVER_NAME} | auth=${AUTH_MODE} | edition=${edition.name} | SSE=15s`);
 });
 
-// Graceful shutdown — close SSE clients, stop broadcast, checkpoint SQLite WAL
+// Graceful shutdown — stop integrations, close SSE, checkpoint WAL
+const { stopAll: stopIntegrations } = require("./integrations/scheduler");
 function shutdown(signal) {
   console.log(`[COCKPIT] ${signal} received — shutting down gracefully`);
   clearInterval(broadcastInterval);
+  stopIntegrations();
   closeAllClients();
   server.close(() => {
+    try { db.pragma("wal_checkpoint(TRUNCATE)"); } catch { /* ignore */ }
     console.log("[COCKPIT] HTTP server closed");
     process.exit(0);
   });

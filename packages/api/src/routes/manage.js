@@ -147,12 +147,16 @@ router.delete("/api/schedules/:id", requireAuth, requireRole("admin"), (req, res
 });
 
 router.put("/api/schedules/:id/toggle", requireAuth, requireRole("admin"), (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
-  const schedule = scheduler.toggleSchedule(id, req.body.enabled !== false);
-  if (!schedule) return res.status(404).json({ error: "Schedule not found" });
-  auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
-  res.json(schedule);
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
+    const schedule = scheduler.toggleSchedule(id, req.body.enabled !== false);
+    if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+    auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
+    res.json(schedule);
+  } catch {
+    res.status(500).json({ error: "Failed to toggle schedule" });
+  }
 });
 
 router.get("/api/schedules/history", requireAuth, (req, res) => {

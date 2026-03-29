@@ -1,11 +1,17 @@
 node_modules
 data
 .env
+.env.*
 .git
 *.md
 *.db
 *.db-wal
 *.db-shm
+*.pem
+*.key
+*.crt
+*.p12
+*.pfx
 __tests__
 .github
 coverage

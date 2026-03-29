@@ -1,4 +1,5 @@
 const { BaseAdapter, createMetric, createEvent } = require("../adapter");
+const { safeFetch } = require("../../security/url-validator");
 
 /**
  * Generic HTTP/JSON adapter — pulls data from any REST API endpoint.
@@ -24,7 +25,7 @@ class HttpJsonAdapter extends BaseAdapter {
   async testConnection() {
     const start = Date.now();
     try {
-      const res = await fetch(this.config.url, {
+      const res = await safeFetch(this.config.url, {
         method: this.config.method || "GET",
         headers: this._headers(),
         signal: AbortSignal.timeout(15000),
@@ -41,7 +42,7 @@ class HttpJsonAdapter extends BaseAdapter {
   }
 
   async pull() {
-    const res = await fetch(this.config.url, {
+    const res = await safeFetch(this.config.url, {
       method: this.config.method || "GET",
       headers: this._headers(),
       body: this.config.body ? JSON.stringify(this.config.body) : undefined,

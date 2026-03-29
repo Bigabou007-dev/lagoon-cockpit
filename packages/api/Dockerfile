@@ -17,7 +17,7 @@ ARG DOCKER_GID=988
 LABEL org.opencontainers.image.title="Lagoon Cockpit API"
 LABEL org.opencontainers.image.description="Mobile-first Docker infrastructure management API"
 LABEL org.opencontainers.image.version="${COCKPIT_VERSION}"
-LABEL org.opencontainers.image.source="https://github.com/lagoon-tech/cockpit"
+LABEL org.opencontainers.image.source="https://github.com/Lagoon-Tech-Systems/lagoon-cockpit"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-only"
 LABEL org.opencontainers.image.vendor="Lagoon Tech Systems"
 

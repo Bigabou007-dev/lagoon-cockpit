@@ -80,7 +80,7 @@ router.post("/api/integrations", requireAuth, requireRole("admin"), validateBody
 });
 
 // ── Update integration ─────────────────────────────────────
-router.put("/api/integrations/:id", requireAuth, requireRole("admin"), (req, res) => {
+router.put("/api/integrations/:id", requireAuth, requireRole("admin"), validateBody("integration"), (req, res) => {
   try {
     const integration = getIntegration(req.params.id);
     if (!integration) return res.status(404).json({ error: "Integration not found" });
@@ -116,8 +116,8 @@ router.post("/api/integrations/:id/test", requireAuth, requireRole("admin"), asy
 
     const result = await adapter.testConnection();
     res.json(result);
-  } catch (err) {
-    res.status(500).json({ error: "Connection test failed", message: err.message });
+  } catch {
+    res.status(500).json({ error: "Connection test failed" });
   }
 });
 
@@ -129,8 +129,8 @@ router.post("/api/integrations/:id/poll", requireAuth, requireRole("admin"), asy
 
     await forcePoll(req.params.id);
     res.json({ ok: true });
-  } catch (err) {
-    res.status(500).json({ error: "Poll failed", message: err.message });
+  } catch {
+    res.status(500).json({ error: "Poll failed" });
   }
 });
 
