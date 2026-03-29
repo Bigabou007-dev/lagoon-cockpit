@@ -7,7 +7,7 @@ module.exports = {
     version: "1.0.0",
     orientation: "portrait",
     scheme: "lagoon-cockpit",
-    userInterfaceStyle: "dark",
+    userInterfaceStyle: "automatic",
     ios: {
       bundleIdentifier: "com.lagoontechsystems.cockpit",
       supportsTablet: true,
