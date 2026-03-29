@@ -15,6 +15,9 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
+import { FeatureGate } from '../../src/edition/FeatureGate';
+
+const PRO_API = '/api/ext/cockpit-pro';
 
 /* ---------- Types ---------- */
 
@@ -63,7 +66,7 @@ const SEVERITY_OPTIONS: SeverityOption[] = [
 
 /* ---------- Screen ---------- */
 
-export default function IncidentCreateScreen() {
+function IncidentCreateContent() {
   const router = useRouter();
 
   const [title, setTitle] = useState('');
@@ -79,7 +82,7 @@ export default function IncidentCreateScreen() {
 
     setSubmitting(true);
     try {
-      await apiFetch('/api/incidents', {
+      await apiFetch(`${PRO_API}/incidents`, {
         method: 'POST',
         body: JSON.stringify({
           title: title.trim(),
@@ -232,6 +235,14 @@ export default function IncidentCreateScreen() {
         </ScrollView>
       </KeyboardAvoidingView>
     </>
+  );
+}
+
+export default function IncidentCreateScreen() {
+  return (
+    <FeatureGate feature="incidents">
+      <IncidentCreateContent />
+    </FeatureGate>
   );
 }
 

@@ -19,6 +19,8 @@ import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
 
+const PRO_API = '/api/ext/cockpit-pro';
+
 /* ---------- types ---------- */
 interface RemediationRule {
   id: string;
@@ -84,7 +86,7 @@ function RemediationCreateContent() {
     if (!id) return;
     try {
       setError(null);
-      const res = await apiFetch<{ rules: RemediationRule[] }>('/api/remediation/rules');
+      const res = await apiFetch<{ rules: RemediationRule[] }>(`${PRO_API}/remediation/rules`);
       const rule = (res.rules ?? []).find((r) => r.id === id);
       if (!rule) {
         Alert.alert('Error', 'Rule not found');
@@ -174,12 +176,12 @@ function RemediationCreateContent() {
       }
 
       if (isEdit) {
-        await apiFetch(`/api/remediation/rules/${id}`, {
+        await apiFetch(`${PRO_API}/remediation/rules/${id}`, {
           method: 'PUT',
           body: JSON.stringify(body),
         });
       } else {
-        await apiFetch('/api/remediation/rules', {
+        await apiFetch(`${PRO_API}/remediation/rules`, {
           method: 'POST',
           body: JSON.stringify(body),
         });

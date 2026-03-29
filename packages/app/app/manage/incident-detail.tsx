@@ -1,4 +1,4 @@
-import { useState, useEffect, useCallback, useRef } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -9,17 +9,19 @@ import {
   RefreshControl,
   Modal,
   Alert,
-  Animated,
-  Easing,
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withDelay, withTiming, Easing } from 'react-native-reanimated';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import Skeleton from '../../src/components/Skeleton';
+
+const PRO_API = '/api/ext/cockpit-pro';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
+import { FeatureGate } from '../../src/edition/FeatureGate';
 
 /* ---------- Types ---------- */
 
@@ -129,31 +131,21 @@ function getStatusColor(status: IncidentStatus): string {
 /* ---------- Staggered Animation ---------- */
 
 function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(16)).current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(16);
 
   useEffect(() => {
-    const anim = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]);
-    anim.start();
-  }, [opacity, translateY, delay]);
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 400, easing: Easing.out(Easing.ease) }));
+  }, []);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+    <Animated.View style={animStyle}>
       {children}
     </Animated.View>
   );
@@ -258,7 +250,7 @@ function SkeletonDetail() {
 
 /* ---------- Screen ---------- */
 
-export default function IncidentDetailScreen() {
+function IncidentDetailContent() {
   const router = useRouter();
   const { id } = useLocalSearchParams<{ id: string }>();
 
@@ -285,7 +277,7 @@ export default function IncidentDetailScreen() {
     if (showLoading) setLoading(true);
     setError(null);
     try {
-      const res = await apiFetch<IncidentDetail>(`/api/incidents/${id}`);
+      const res = await apiFetch<IncidentDetail>(`${PRO_API}/incidents/${id}`);
       setIncident(res);
     } catch (err: unknown) {
       const message = err instanceof Error ? err.message : 'Failed to load incident';
@@ -309,7 +301,7 @@ export default function IncidentDetailScreen() {
     if (!selectedStatus || !id) return;
     setUpdatingStatus(true);
     try {
-      await apiFetch(`/api/incidents/${id}/status`, {
+      await apiFetch(`${PRO_API}/incidents/${id}/status`, {
         method: 'PUT',
         body: JSON.stringify({
           status: selectedStatus,
@@ -332,7 +324,7 @@ export default function IncidentDetailScreen() {
     if (!noteText.trim() || !id) return;
     setAddingNote(true);
     try {
-      await apiFetch(`/api/incidents/${id}/timeline`, {
+      await apiFetch(`${PRO_API}/incidents/${id}/timeline`, {
         method: 'POST',
         body: JSON.stringify({ message: noteText.trim() }),
       });
@@ -358,7 +350,7 @@ export default function IncidentDetailScreen() {
           onPress: async () => {
             setDeleting(true);
             try {
-              await apiFetch(`/api/incidents/${id}`, { method: 'DELETE' });
+              await apiFetch(`${PRO_API}/incidents/${id}`, { method: 'DELETE' });
               router.back();
             } catch (err: unknown) {
               const message = err instanceof Error ? err.message : 'Failed to delete incident';
@@ -721,6 +713,14 @@ export default function IncidentDetailScreen() {
         </Modal>
       </KeyboardAvoidingView>
     </>
+  );
+}
+
+export default function IncidentDetailScreen() {
+  return (
+    <FeatureGate feature="incidents">
+      <IncidentDetailContent />
+    </FeatureGate>
   );
 }
 

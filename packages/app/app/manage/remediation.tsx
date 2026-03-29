@@ -17,6 +17,8 @@ import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
 
+const PRO_API = '/api/ext/cockpit-pro';
+
 /* ---------- types ---------- */
 interface RemediationRule {
   id: string;
@@ -124,8 +126,8 @@ function RemediationContent() {
     try {
       setError(null);
       const [rulesRes, historyRes] = await Promise.all([
-        apiFetch<{ rules: RemediationRule[] }>('/api/remediation/rules'),
-        apiFetch<{ history: HistoryEntry[] }>('/api/remediation/history?limit=50'),
+        apiFetch<{ rules: RemediationRule[] }>(`${PRO_API}/remediation/rules`),
+        apiFetch<{ history: HistoryEntry[] }>(`${PRO_API}/remediation/history?limit=50`),
       ]);
       setRules(rulesRes.rules ?? []);
       setHistory(historyRes.history ?? []);
@@ -149,7 +151,7 @@ function RemediationContent() {
   /* toggle rule enabled/disabled */
   const toggleRule = async (rule: RemediationRule) => {
     try {
-      await apiFetch(`/api/remediation/rules/${rule.id}/toggle`, {
+      await apiFetch(`${PRO_API}/remediation/rules/${rule.id}/toggle`, {
         method: 'PUT',
         body: JSON.stringify({ enabled: !rule.enabled }),
       });
@@ -170,7 +172,7 @@ function RemediationContent() {
         style: 'destructive',
         onPress: async () => {
           try {
-            await apiFetch(`/api/remediation/rules/${rule.id}`, { method: 'DELETE' });
+            await apiFetch(`${PRO_API}/remediation/rules/${rule.id}`, { method: 'DELETE' });
             setRules((prev) => prev.filter((r) => r.id !== rule.id));
           } catch (e: any) {
             Alert.alert('Error', e.message);
