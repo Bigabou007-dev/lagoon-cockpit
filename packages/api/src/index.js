@@ -220,16 +220,31 @@ const walCheckpointInterval = setInterval(
   5 * 60 * 1000,
 );
 
+// Daily audit log rotation — prune entries older than retention period
+const { pruneAuditLog } = require("./db/sqlite");
+const auditPruneInterval = setInterval(() => {
+  try {
+    pruneAuditLog();
+  } catch (err) {
+    console.error("[COCKPIT] Audit log prune error:", err.message);
+  }
+}, 24 * 60 * 60 * 1000);
+
 const server = app.listen(PORT, () => {
   console.log(`[COCKPIT] API on :${PORT} | ${SERVER_NAME} | auth=${AUTH_MODE} | edition=${edition.name} | SSE=15s`);
 });
 
 // Graceful shutdown — stop integrations, close SSE, checkpoint WAL
 const { stopAll: stopIntegrations } = require("./integrations/scheduler");
+const { stopCleanup: stopJwtCleanup } = require("./auth/jwt");
+const { stopLockoutCleanup } = require("./auth/middleware");
 function shutdown(signal) {
   console.log(`[COCKPIT] ${signal} received — shutting down gracefully`);
   clearInterval(broadcastInterval);
   clearInterval(walCheckpointInterval);
+  clearInterval(auditPruneInterval);
+  stopJwtCleanup();
+  stopLockoutCleanup();
   stopIntegrations();
   closeAllClients();
   server.close(() => {

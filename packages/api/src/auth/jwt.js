@@ -108,7 +108,12 @@ function cleanupRefreshTokens() {
 }
 
 // Cleanup every hour
-setInterval(cleanupRefreshTokens, 60 * 60 * 1000);
+const _cleanupInterval = setInterval(cleanupRefreshTokens, 60 * 60 * 1000);
+
+/** Stop the background cleanup interval (for graceful shutdown / tests) */
+function stopCleanup() {
+  clearInterval(_cleanupInterval);
+}
 
 module.exports = {
   initJwt,
@@ -117,4 +122,5 @@ module.exports = {
   generateRefreshToken,
   validateRefreshToken,
   revokeUserTokens,
+  stopCleanup,
 };

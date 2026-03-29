@@ -129,4 +129,15 @@ function auditLog(userId, action, target, detail) {
   );
 }
 
-module.exports = { init, getDb, auditLog };
+/** Prune audit log entries older than the retention period (default: 90 days) */
+function pruneAuditLog(retentionDays) {
+  if (!db) return 0;
+  const days = retentionDays || parseInt(process.env.AUDIT_RETENTION_DAYS || "90", 10);
+  const result = db.prepare("DELETE FROM audit_log WHERE created_at < datetime('now', '-' || ? || ' days')").run(days);
+  if (result.changes > 0) {
+    console.log(`[DB] Pruned ${result.changes} audit log entries older than ${days} days`);
+  }
+  return result.changes;
+}
+
+module.exports = { init, getDb, auditLog, pruneAuditLog };

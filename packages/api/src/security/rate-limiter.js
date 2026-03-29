@@ -141,4 +141,11 @@ const strictLimiter = createRateLimiter({
   message: "Too many requests to this endpoint. Please try again later.",
 });
 
-module.exports = { createRateLimiter, globalLimiter, strictLimiter, setStore, RedisStore, MemoryStore };
+/** Per-user rate limiter (200 req/min per user, falls back to per-IP) */
+const userLimiter = createRateLimiter({
+  windowMs: 60 * 1000,
+  max: parseInt(process.env.RATE_LIMIT_USER_MAX || "200", 10),
+  keyFn: (req) => (req.user && req.user.id) ? `user:${req.user.id}` : req.ip || req.connection.remoteAddress,
+});
+
+module.exports = { createRateLimiter, globalLimiter, strictLimiter, userLimiter, setStore, RedisStore, MemoryStore };

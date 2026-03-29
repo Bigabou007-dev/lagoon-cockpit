@@ -97,6 +97,11 @@ let accessToken = null;
 let refreshToken = null;
 
 afterAll(() => {
+  // Stop background intervals to prevent open handle warnings
+  const { stopCleanup } = require("../src/auth/jwt");
+  const { stopLockoutCleanup } = require("../src/auth/middleware");
+  stopCleanup();
+  stopLockoutCleanup();
   try { database.close(); } catch { /* ignore */ }
   fs.rmSync(tmpDir, { recursive: true, force: true });
 });

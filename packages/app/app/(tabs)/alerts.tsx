@@ -3,6 +3,8 @@ import { useRef, useEffect } from 'react';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardStore, type Alert } from '../../src/stores/dashboardStore';
 import Skeleton from '../../src/components/Skeleton';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING, SHADOW } from '../../src/theme/tokens';
 
 function getAlertIconProps(alert: Alert): { name: keyof typeof Ionicons.glyphMap; color: string } {
@@ -66,11 +68,13 @@ function FadeSlideIn({ delay, children }: { delay: number; children: React.React
 
 export default function AlertsScreen() {
   const { alerts, clearAlerts, isLoading } = useDashboardStore();
+  const { listColumns } = useLayout();
   const isLoaded = !isLoading;
 
   const renderAlert = ({ item, index }: { item: Alert; index: number }) => {
     const iconProps = getAlertIconProps(item);
     return (
+      <View style={listColumns > 1 ? { flex: 1 } : undefined}>
       <FadeSlideIn delay={index * 60}>
         <View style={styles.alertItem}>
           <Ionicons name={iconProps.name} size={18} color={iconProps.color} style={{ marginTop: 2 }} />
@@ -89,13 +93,20 @@ export default function AlertsScreen() {
           </View>
         </View>
       </FadeSlideIn>
+      </View>
     );
   };
 
   return (
+    <ScreenErrorBoundary screenName="Alerts">
     <View style={styles.container}>
       {alerts.length > 0 && (
-        <TouchableOpacity style={styles.clearBtn} onPress={clearAlerts}>
+        <TouchableOpacity
+          style={styles.clearBtn}
+          onPress={clearAlerts}
+          accessibilityRole="button"
+          accessibilityLabel={`Clear all ${alerts.length} alerts`}
+        >
           <Text style={styles.clearText}>Clear All</Text>
         </TouchableOpacity>
       )}
@@ -108,6 +119,9 @@ export default function AlertsScreen() {
           data={alerts}
           renderItem={renderAlert}
           keyExtractor={(_, i) => String(i)}
+          numColumns={listColumns}
+          key={`alerts-${listColumns}`}
+          {...(listColumns > 1 && { columnWrapperStyle: { gap: SPACING.sm } })}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -119,6 +133,7 @@ export default function AlertsScreen() {
         />
       )}
     </View>
+    </ScreenErrorBoundary>
   );
 }
 

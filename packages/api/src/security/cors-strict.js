@@ -13,6 +13,7 @@ function strictCors(allowedOrigins = []) {
       // Strict mode: only allow configured origins
       if (origin && allowedOrigins.includes(origin)) {
         res.header("Access-Control-Allow-Origin", origin);
+        res.header("Access-Control-Allow-Credentials", "true");
         res.header("Vary", "Origin");
       }
       // If origin not in allowlist, no CORS headers are set → browser blocks the request

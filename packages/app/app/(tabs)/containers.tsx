@@ -9,6 +9,7 @@ import { Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import * as Haptics from 'expo-haptics';
 
 type Filter = 'all' | 'running' | 'stopped' | 'unhealthy';
@@ -143,6 +144,8 @@ function WindowsServicesView() {
           placeholderTextColor={COLORS.textTertiary}
           value={search}
           onChangeText={setSearch}
+          accessibilityLabel="Search services"
+          accessibilityRole="search"
         />
       </View>
 
@@ -159,6 +162,9 @@ function WindowsServicesView() {
                 isActive && { backgroundColor: pillColor + '26', borderColor: pillColor },
               ]}
               onPress={() => setFilter(f.key)}
+              accessibilityRole="button"
+              accessibilityLabel={`Filter: ${f.label}, ${f.count}`}
+              accessibilityState={{ selected: isActive }}
             >
               <Text style={[
                 styles.filterText,
@@ -285,6 +291,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.green + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'start')}
                           disabled={item.status === 'Running'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Start ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Running' }}
                         >
                           <Ionicons name="play" size={14} color={item.status === 'Running' ? COLORS.textTertiary : COLORS.green} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Running' ? COLORS.textTertiary : COLORS.green }]}>Start</Text>
@@ -293,6 +302,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.red + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'stop')}
                           disabled={item.status === 'Stopped'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Stop ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Stopped' }}
                         >
                           <Ionicons name="stop" size={14} color={item.status === 'Stopped' ? COLORS.textTertiary : COLORS.red} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Stopped' ? COLORS.textTertiary : COLORS.red }]}>Stop</Text>
@@ -301,6 +313,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.blue + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'restart')}
                           disabled={item.status === 'Stopped'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Restart ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Stopped' }}
                         >
                           <Ionicons name="refresh-circle" size={14} color={item.status === 'Stopped' ? COLORS.textTertiary : COLORS.blue} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Stopped' ? COLORS.textTertiary : COLORS.blue }]}>Restart</Text>
@@ -331,13 +346,11 @@ function WindowsServicesView() {
 export default function ContainersScreen() {
   const platform = useDashboardStore((s) => s.platform);
 
-  // ── Windows: render services view ──
-  if (platform === 'windows') {
-    return <WindowsServicesView />;
-  }
-
-  // ── Linux: original containers view (unchanged) ──
-  return <LinuxContainersView />;
+  return (
+    <ScreenErrorBoundary screenName="Containers">
+      {platform === 'windows' ? <WindowsServicesView /> : <LinuxContainersView />}
+    </ScreenErrorBoundary>
+  );
 }
 
 /* ──────────────────────────────────────────────
@@ -466,6 +479,8 @@ function LinuxContainersView() {
           placeholderTextColor={COLORS.textTertiary}
           value={search}
           onChangeText={setSearch}
+          accessibilityLabel="Search containers"
+          accessibilityRole="search"
         />
       </View>
 
@@ -482,6 +497,9 @@ function LinuxContainersView() {
                 isActive && { backgroundColor: pillColor + '26', borderColor: pillColor },
               ]}
               onPress={() => setFilter(f.key)}
+              accessibilityRole="button"
+              accessibilityLabel={`Filter: ${f.label}, ${f.count}`}
+              accessibilityState={{ selected: isActive }}
             >
               <Text style={[
                 styles.filterText,
@@ -511,6 +529,9 @@ function LinuxContainersView() {
             bulkMode && { backgroundColor: COLORS.purple + '26', borderColor: COLORS.purple },
           ]}
           onPress={() => { setBulkMode(!bulkMode); setSelectedIds(new Set()); }}
+          accessibilityRole="button"
+          accessibilityLabel={bulkMode ? `Bulk select mode, ${selectedIds.size} selected` : 'Toggle bulk select'}
+          accessibilityState={{ selected: bulkMode }}
         >
           <Text style={[
             styles.filterText,
@@ -612,6 +633,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.green + '26' }]}
                 onPress={() => handleBulkAction('start')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Start ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="play" size={14} color={COLORS.green} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.green }]}>Start</Text>
@@ -620,6 +643,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.red + '26' }]}
                 onPress={() => handleBulkAction('stop')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Stop ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="stop" size={14} color={COLORS.red} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.red }]}>Stop</Text>
@@ -628,6 +653,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.blue + '26' }]}
                 onPress={() => handleBulkAction('restart')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Restart ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="refresh-circle" size={14} color={COLORS.blue} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.blue }]}>Restart</Text>

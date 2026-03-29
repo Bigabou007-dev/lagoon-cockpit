@@ -6,12 +6,15 @@ import { useDashboardStore, type StackSummary, type WindowsProcess } from '../..
 import { apiFetch } from '../../src/lib/api';
 import StackCard from '../../src/components/StackCard';
 import Skeleton from '../../src/components/Skeleton';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 type ProcessSortKey = 'cpu' | 'memory';
 
 export default function StacksScreen() {
   const router = useRouter();
+  const { listColumns } = useLayout();
   const { stacks, setStacks } = useDashboardStore();
   const platform = useDashboardStore((s) => s.platform);
   const processes = useDashboardStore((s) => s.processes);
@@ -105,6 +108,7 @@ export default function StacksScreen() {
   /* Error state */
   if (error && !isLoaded && (platform === 'windows' ? processes.length === 0 : stacks.length === 0)) {
     return (
+      <ScreenErrorBoundary screenName="Stacks">
       <View style={styles.container}>
         <View style={styles.errorCard}>
           <Ionicons name="cloud-offline-outline" size={32} color={COLORS.red} />
@@ -116,12 +120,14 @@ export default function StacksScreen() {
           </TouchableOpacity>
         </View>
       </View>
+      </ScreenErrorBoundary>
     );
   }
 
   /* ─── Windows: Process list ─── */
   if (platform === 'windows') {
     return (
+      <ScreenErrorBoundary screenName="Stacks">
       <View style={styles.container}>
         {/* Skeleton loading state */}
         {!isLoaded && !error && processes.length === 0 && (
@@ -145,6 +151,9 @@ export default function StacksScreen() {
         {(isLoaded || processes.length > 0) && (
           <FlatList
             data={filteredProcesses}
+            numColumns={listColumns}
+            key={`procs-${listColumns}`}
+            {...(listColumns > 1 && { columnWrapperStyle: { gap: SPACING.sm } })}
             ListHeaderComponent={
               <View style={styles.winHeader}>
                 {/* Search bar */}
@@ -202,6 +211,7 @@ export default function StacksScreen() {
                 }).start();
               }
               return (
+                <View style={listColumns > 1 ? { flex: 1 } : undefined}>
                 <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
                   <View style={styles.processCard}>
                     <View style={styles.processHeader}>
@@ -251,6 +261,7 @@ export default function StacksScreen() {
                     ) : null}
                   </View>
                 </Animated.View>
+                </View>
               );
             }}
             keyExtractor={(item) => `${item.pid}-${item.name}`}
@@ -266,11 +277,13 @@ export default function StacksScreen() {
           />
         )}
       </View>
+      </ScreenErrorBoundary>
     );
   }
 
   /* ─── Linux: Docker stacks (original behavior) ─── */
   return (
+    <ScreenErrorBoundary screenName="Stacks">
     <View style={styles.container}>
       {/* Skeleton loading state */}
       {!isLoaded && !error && stacks.length === 0 && (
@@ -295,6 +308,9 @@ export default function StacksScreen() {
       {(isLoaded || stacks.length > 0) && (
         <FlatList
           data={stacks}
+          numColumns={listColumns}
+          key={`stacks-${listColumns}`}
+          {...(listColumns > 1 && { columnWrapperStyle: { gap: SPACING.sm } })}
           renderItem={({ item, index }) => {
             // Ensure we have an animated value for this index
             while (fadeAnims.length <= index) {
@@ -313,9 +329,11 @@ export default function StacksScreen() {
               }).start();
             }
             return (
+              <View style={listColumns > 1 ? { flex: 1 } : undefined}>
               <Animated.View style={{ opacity: fadeAnim, transform: [{ translateY: fadeAnim.interpolate({ inputRange: [0, 1], outputRange: [16, 0] }) }] }}>
                 <StackCard stack={item} onPress={() => router.push(`/stacks/${item.name}`)} />
               </Animated.View>
+              </View>
             );
           }}
           keyExtractor={(item) => item.name}
@@ -327,6 +345,7 @@ export default function StacksScreen() {
         />
       )}
     </View>
+    </ScreenErrorBoundary>
   );
 }
 

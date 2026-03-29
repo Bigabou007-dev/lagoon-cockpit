@@ -189,8 +189,9 @@ router.get("/api/audit", requireAuth, requireRole("admin"), (req, res) => {
   const db = getDb();
   const limit = Math.min(Math.max(parseInt(req.query.limit || "50", 10), 1), 500);
   const offset = Math.max(parseInt(req.query.offset || "0", 10), 0);
+  const { total } = db.prepare("SELECT COUNT(*) as total FROM audit_log").get();
   const logs = db.prepare("SELECT * FROM audit_log ORDER BY created_at DESC LIMIT ? OFFSET ?").all(limit, offset);
-  res.json({ logs });
+  res.json({ logs, total, limit, offset });
 });
 
 module.exports = router;

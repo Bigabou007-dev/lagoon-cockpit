@@ -10,6 +10,7 @@ import {
 import { WebView } from 'react-native-webview';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore } from '../../src/stores/serverStore';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 /* ---------- Constants ---------- */
@@ -101,6 +102,7 @@ export default function MonitoringTab() {
   // No server connected
   if (!activeProfileId) {
     return (
+      <ScreenErrorBoundary screenName="Monitoring">
       <View style={styles.screen}>
         <View style={styles.center}>
           <Ionicons
@@ -115,10 +117,12 @@ export default function MonitoringTab() {
           </Text>
         </View>
       </View>
+      </ScreenErrorBoundary>
     );
   }
 
   return (
+    <ScreenErrorBoundary screenName="Monitoring">
     <View style={styles.screen}>
       {/* Server indicator */}
       <View style={styles.serverBar}>
@@ -156,6 +160,9 @@ export default function MonitoringTab() {
               key={panel.label}
               style={[styles.selectorBtn, isActive && styles.selectorBtnActive]}
               onPress={() => handlePanelChange(panel)}
+              accessibilityRole="tab"
+              accessibilityLabel={`${panel.label} panel`}
+              accessibilityState={{ selected: isActive }}
             >
               <Text
                 style={[
@@ -168,7 +175,12 @@ export default function MonitoringTab() {
             </TouchableOpacity>
           );
         })}
-        <TouchableOpacity style={styles.refreshBtn} onPress={handleRefresh}>
+        <TouchableOpacity
+          style={styles.refreshBtn}
+          onPress={handleRefresh}
+          accessibilityRole="button"
+          accessibilityLabel="Refresh monitoring dashboard"
+        >
           <Ionicons name="refresh" size={20} color={COLORS.textSecondary} />
         </TouchableOpacity>
       </View>
@@ -188,7 +200,7 @@ export default function MonitoringTab() {
               Could not connect to the monitoring dashboard. Check that Grafana
               is running and accessible.
             </Text>
-            <TouchableOpacity style={styles.retryBtn} onPress={handleRetry}>
+            <TouchableOpacity style={styles.retryBtn} onPress={handleRetry} accessibilityRole="button" accessibilityLabel="Retry loading dashboard">
               <Text style={styles.retryText}>Retry</Text>
             </TouchableOpacity>
           </View>
@@ -254,6 +266,7 @@ export default function MonitoringTab() {
         )}
       </View>
     </View>
+    </ScreenErrorBoundary>
   );
 }
 

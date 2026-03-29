@@ -21,7 +21,12 @@ export default function ConnectionBanner() {
   const message = isOffline ? 'No internet connection' : 'Reconnecting...';
 
   return (
-    <View style={[styles.banner, { backgroundColor: bg }]}>
+    <View
+      style={[styles.banner, { backgroundColor: bg }]}
+      accessibilityRole="alert"
+      accessibilityLiveRegion="assertive"
+      accessibilityLabel={message}
+    >
       <Text style={[styles.text, { color: fg }]}>{message}</Text>
     </View>
   );

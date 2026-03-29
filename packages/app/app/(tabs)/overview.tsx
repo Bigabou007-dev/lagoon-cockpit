@@ -7,6 +7,7 @@ import { apiFetch } from '../../src/lib/api';
 import { useRouter } from 'expo-router';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { TactileCard } from '../../src/components/ui/TactileCard';
 import { StatusDot } from '../../src/components/ui/StatusDot';
@@ -256,6 +257,7 @@ export default function OverviewScreen() {
     health === 'unhealthy' ? COLORS.yellow : state === 'running' ? COLORS.green : state === 'exited' ? COLORS.red : COLORS.orange;
 
   return (
+    <ScreenErrorBoundary screenName="Overview">
     <ScrollView
       style={styles.container}
       contentContainerStyle={[styles.content, layout.isTablet && styles.contentTablet]}
@@ -596,6 +598,7 @@ export default function OverviewScreen() {
         </Text>
       )}
     </ScrollView>
+    </ScreenErrorBoundary>
   );
 }
 

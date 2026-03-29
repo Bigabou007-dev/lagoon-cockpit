@@ -33,7 +33,7 @@ function clearFailedAttempts(ip) {
 }
 
 // Periodically clean up expired lockouts to prevent memory leak
-setInterval(
+const _lockoutCleanupInterval = setInterval(
   () => {
     const now = Date.now();
     for (const [ip, entry] of failedAttempts) {
@@ -90,10 +90,16 @@ function requireRole(...roles) {
   };
 }
 
+/** Stop the background lockout cleanup interval (for graceful shutdown / tests) */
+function stopLockoutCleanup() {
+  clearInterval(_lockoutCleanupInterval);
+}
+
 module.exports = {
   rateLimitAuth,
   recordFailedAttempt,
   clearFailedAttempts,
   requireAuth,
   requireRole,
+  stopLockoutCleanup,
 };

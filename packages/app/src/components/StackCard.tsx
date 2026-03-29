@@ -10,7 +10,13 @@ interface StackCardProps {
 
 export default function StackCard({ stack, onPress }: StackCardProps) {
   return (
-    <TouchableOpacity style={styles.card} onPress={onPress} activeOpacity={0.7}>
+    <TouchableOpacity
+      style={styles.card}
+      onPress={onPress}
+      activeOpacity={0.7}
+      accessibilityRole="button"
+      accessibilityLabel={`Stack ${stack.name}, ${stack.running} of ${stack.containerCount} running`}
+    >
       <View style={styles.header}>
         <Text style={styles.name}>{stack.name}</Text>
         <StatusBadge status={stack.status} size="sm" />
