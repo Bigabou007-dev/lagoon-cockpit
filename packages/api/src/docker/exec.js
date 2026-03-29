@@ -25,7 +25,7 @@ const ALLOWED_COMMANDS = [
 ];
 
 // Block shell metacharacters that enable injection
-const SHELL_METACHAR_RE = /[`$|;&><()\[\]{}!\\'\n\r]/;
+const SHELL_METACHAR_RE = /[`$|;&><()[\]{}!\\'\n\r]/;
 
 /**
  * Check if a command is allowed.
@@ -82,7 +82,7 @@ async function execInContainer(containerId, command) {
       try {
         const inspect = await dockerAPI("GET", `/exec/${execId}/json`);
         exitCode = inspect.ExitCode || 0;
-      } catch {}
+      } catch { /* ignore */ }
 
       resolve({ output: lines.join("").trimEnd(), exitCode });
     });

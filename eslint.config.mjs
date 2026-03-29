@@ -34,6 +34,21 @@ export default [
     },
   },
   {
+    files: ["packages/api/__tests__/**/*.js"],
+    languageOptions: {
+      globals: {
+        describe: "readonly",
+        test: "readonly",
+        expect: "readonly",
+        beforeAll: "readonly",
+        beforeEach: "readonly",
+        afterAll: "readonly",
+        afterEach: "readonly",
+        jest: "readonly",
+      },
+    },
+  },
+  {
     ignores: [
       "node_modules/",
       "packages/app/",

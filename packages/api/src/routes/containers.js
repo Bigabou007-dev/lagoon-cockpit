@@ -5,7 +5,7 @@ const containers = require("../docker/containers");
 const { execInContainer, isCommandAllowed, getContainerTop } = require("../docker/exec");
 const { requireAuth, requireRole } = require("../auth/middleware");
 const { auditLog } = require("../db/sqlite");
-const { validateContainerId, blockSelfAction, safeError, CONTAINER_ID_RE, SELF_HOSTNAME } = require("../middleware");
+const { validateContainerId, blockSelfAction, safeError, SELF_HOSTNAME } = require("../middleware");
 
 // ── List Containers ──────────────────────────────────────
 router.get("/api/containers", requireAuth, async (_req, res) => {
@@ -57,10 +57,10 @@ router.get("/api/containers/:id/logs/search", requireAuth, validateContainerId, 
     let pattern = null;
     if (regex === "true") {
       if (q.length > 200) return res.status(400).json({ error: "Regex pattern too long (max 200 chars)" });
-      if (/(\(.+[\+\*]\)[\+\*]|\(.+\|.+\)[\+\*]|\(.+\)\{[2-9]|\\1)/.test(q)) return res.status(400).json({ error: "Potentially unsafe regex pattern" });
+      if (/(\(.+[+*]\)[+*]|\(.+\|.+\)[+*]|\(.+\)\{[2-9]|\\1)/.test(q)) return res.status(400).json({ error: "Potentially unsafe regex pattern" });
       try {
         pattern = new RegExp(q, "i");
-      } catch (regexErr) {
+      } catch {
         return res.status(400).json({ error: "Invalid regex pattern" });
       }
     }

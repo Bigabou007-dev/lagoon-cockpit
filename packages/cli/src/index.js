@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 
-const { loadConfig, saveConfig, getActiveServer, request, authenticate } = require("./api");
+const { loadConfig, saveConfig, request, authenticate } = require("./api");
 
 const COLORS = {
   reset: "\x1b[0m", bold: "\x1b[1m", dim: "\x1b[2m",

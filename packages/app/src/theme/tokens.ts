@@ -1,46 +1,40 @@
 /* ─────────────────────────────────────────────
  *  Lagoon Cockpit — Design Tokens v2
  *  Premium dark theme with depth & personality
+ *
+ *  COLORS is now a Proxy that reads from the Zustand
+ *  theme store. All existing `COLORS.bg` references
+ *  automatically resolve to the active palette.
  * ───────────────────────────────────────────── */
 
-/* Surface elevation: darker = deeper, lighter = elevated */
-export const COLORS = {
-  /* Surfaces — luminance stepping for depth */
-  bgDeep: '#08090f',     // deepest background (mesh gradient base)
-  bg: '#0e1019',         // primary background
-  card: '#161822',       // card surface (level 1)
-  cardElevated: '#1e2030', // elevated card (level 2)
-  border: 'rgba(255,255,255,0.06)',  // subtle glass border
-  borderActive: 'rgba(99,155,255,0.3)', // active/selected border
+import { useThemeStore } from './themeStore';
+import { darkColors, lightColors, type ColorPalette } from './colors';
 
-  /* Primary accent — shifted from flat blue to vibrant cyan-blue */
-  blue: '#639BFF',
-  blueGlow: 'rgba(99,155,255,0.25)',
+export { darkColors, lightColors } from './colors';
+export type { ColorPalette } from './colors';
 
-  /* Semantic palette — 5-level severity scale */
-  optimal: '#22d3ee',    // cyan — cool, under control
-  green: '#4ade80',      // success, running
-  yellow: '#fbbf24',     // elevated, attention
-  orange: '#f97316',     // warning, act soon
-  red: '#f43f5e',        // critical, rose-red (not harsh)
-
-  /* Accents */
-  purple: '#a78bfa',
-  pink: '#f472b6',
-  teal: '#2dd4bf',
-  indigo: '#818cf8',
-  rose: '#fb7185',
-
-  /* Text — heavier on dark for readability */
-  textPrimary: '#f1f5f9',    // not pure white — easier on eyes
-  textSecondary: '#94a3b8',  // slate-400
-  textTertiary: '#64748b',   // slate-500
-
-  /* Glass effect */
-  glass: 'rgba(255,255,255,0.06)',
-  glassBorder: 'rgba(255,255,255,0.10)',
-  glassHighlight: 'rgba(255,255,255,0.04)', // top-edge inner highlight
-};
+/**
+ * COLORS — reactive proxy.
+ * When accessed (e.g. COLORS.bg), reads the current colors
+ * from the Zustand theme store. Falls back to darkColors
+ * if the store hasn't initialized yet.
+ *
+ * NOTE: This works for runtime reads inside render functions,
+ * event handlers, and effects. For StyleSheet.create() calls
+ * at module scope, the value is captured at import time (dark).
+ * Components that need dynamic styles should use useTheme().colors
+ * or inline styles.
+ */
+export const COLORS: ColorPalette = new Proxy(darkColors, {
+  get(_target, prop: string) {
+    try {
+      const storeColors = useThemeStore.getState().colors;
+      return (storeColors as any)[prop];
+    } catch {
+      return (darkColors as any)[prop];
+    }
+  },
+});
 
 /* Mesh gradient colors for screen backgrounds */
 export const MESH = {
@@ -109,3 +103,13 @@ export const SHADOW = {
     elevation: 8,
   }),
 };
+
+/**
+ * useColors() — React hook for components that need to
+ * re-render when the theme changes. Returns the active palette.
+ * Prefer this over COLORS in components where dynamic theme
+ * switching matters (StyleSheet.create values won't update).
+ */
+export function useColors(): ColorPalette {
+  return useThemeStore((s) => s.colors);
+}

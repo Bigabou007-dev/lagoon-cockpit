@@ -104,7 +104,7 @@ router.delete("/auth/users/:id", requireAuth, requireRole("admin"), (req, res) =
     deleteUser(id);
     auditLog(req.user.id, "user.delete", req.params.id);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to delete user" });
   }
 });

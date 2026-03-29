@@ -1,312 +1,211 @@
 # Lagoon Cockpit
 
-**Open-source mobile DevOps command center for Docker infrastructure.** Monitor, manage, and automate your containers from your phone or terminal.
+**The only self-hosted, mobile-first Docker management app.** Monitor, manage, and automate your infrastructure from your phone.
 
-Built for DevOps engineers who need to resolve incidents without SSH.
-
----
-
-## Why Lagoon Cockpit?
-
-Portainer and Rancher are powerful — but they're desktop web UIs. When your server goes down at 2 AM, you're not at your desk. You're reaching for your phone.
-
-Lagoon Cockpit gives you a **native mobile app** + **CLI tool** backed by a **lightweight API agent** on each server. No heavy dependencies. No Kubernetes required. Just Docker.
-
-### What you can do
-
-- **Dashboard**: CPU, RAM, disk gauges with auto-refresh and problem detection
-- **Container management**: Start, stop, restart, bulk operations, inline actions
-- **Compose stacks**: Manage entire stacks as groups
-- **Run commands**: Execute whitelisted diagnostics inside containers from your phone
-- **View logs**: Full log viewer with regex search
-- **System map**: Visual node-graph of your entire infrastructure
-- **Metrics history**: CPU/RAM/disk trends with sparkline charts (7-day retention)
-- **Image management**: List, delete, prune unused Docker images
-- **Network topology**: See which containers share networks with IPs
-- **Disk breakdown**: Storage by category — containers, images, volumes, build cache
-- **System prune**: One-tap cleanup to reclaim disk space
-- **Alert rules**: Custom threshold-based alerts (e.g., CPU > 90% for 5 min)
-- **Webhooks**: Fire events to Slack, Discord, n8n, or any HTTP endpoint
-- **Scheduled actions**: Cron-based container automation (restart weekly, stop at night)
-- **Maintenance mode**: Pause alerts during planned work
-- **Activity feed**: Audit log of who did what and when
-- **SSL monitoring**: Certificate expiry countdown
-- **Endpoint probing**: HTTP health checks with response times
-- **Push notifications**: Native mobile alerts when things break
-- **Multi-server**: Connect to multiple VPS instances from one app
-- **Biometric lock**: Face ID / fingerprint with auto-lock
-- **Grafana monitoring**: Embedded Grafana dashboards with panel selector (Overview, CPU, Memory, Containers)
-- **Prometheus metrics**: `/metrics` endpoint exports 37+ metrics in OpenMetrics format for Prometheus scraping
-- **CLI companion**: 20 terminal commands for the same API
+[![CI](https://github.com/lagoon-tech/cockpit/actions/workflows/ci.yml/badge.svg)](https://github.com/lagoon-tech/cockpit/actions/workflows/ci.yml)
+[![Docker](https://img.shields.io/docker/v/lagoontechsystems/cockpit?label=Docker%20Hub)](https://hub.docker.com/r/lagoontechsystems/cockpit)
+[![npm](https://img.shields.io/npm/v/lagoon-cockpit-cli)](https://www.npmjs.com/package/lagoon-cockpit-cli)
+[![License: AGPL v3](https://img.shields.io/badge/License-AGPL%20v3-blue.svg)](https://www.gnu.org/licenses/agpl-3.0)
 
 ---
 
-## Prometheus & Grafana Integration
+## The Problem
 
-Cockpit exposes a `/metrics` endpoint that Prometheus can scrape. This feeds into Grafana for rich dashboards, alerting, and historical analysis beyond the built-in 7-day SQLite retention.
+Portainer and Rancher are powerful, but they're desktop web UIs. When your server goes down at 2 AM, you're reaching for your phone, not your laptop.
 
-### Metrics Exported
+**Lagoon Cockpit** gives you a native mobile app + CLI + lightweight API agent. No Kubernetes required. Just Docker.
 
-- `cockpit_cpu_percent`, `cockpit_memory_*`, `cockpit_disk_*`, `cockpit_load_*`
-- `cockpit_uptime_seconds`, `cockpit_cpu_count`
-- `cockpit_containers_running`, `cockpit_containers_stopped`, `cockpit_containers_total`
-- `cockpit_container_running{name="...",image="..."}` — per-container state
-
-### Configuration
-
-Set `METRICS_TOKEN` in your `.env` to protect the endpoint:
+## Quick Start
 
 ```bash
-METRICS_TOKEN=your-random-token-here
+# One command to deploy
+docker run -d \
+  --name cockpit \
+  -e API_KEY=your-secret-key \
+  -e JWT_SECRET=$(openssl rand -hex 32) \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  -v /proc:/host/proc:ro \
+  -p 3000:3000 \
+  lagoontechsystems/cockpit:latest
 ```
 
-Then configure Prometheus to scrape with the bearer token:
+Then connect from the mobile app or CLI:
+
+```bash
+npx lagoon-cockpit-cli connect http://your-server:3000 your-secret-key
+npx lagoon-cockpit-cli overview
+```
+
+## Features
+
+### Core (Community Edition — Free)
+
+| Feature | Description |
+|---------|-------------|
+| **Dashboard** | CPU, RAM, disk gauges with auto-refresh and problem detection |
+| **Container Management** | Start, stop, restart, bulk ops, logs, exec |
+| **Compose Stacks** | Manage Docker Compose stacks as groups |
+| **Windows Support** | Services, processes, Event Log on Windows Server |
+| **Multi-Server** | Connect up to 3 servers from one app |
+| **Alert Rules** | Threshold-based alerts (CPU > 90% for 5 min) |
+| **Webhooks** | Fire events to Slack, Discord, n8n |
+| **Scheduled Actions** | Cron-based container automation |
+| **Real-Time** | Server-Sent Events for live updates |
+| **Metrics History** | 7-day CPU/RAM/disk trends with sparklines |
+| **System Map** | Visual node-graph of infrastructure |
+| **Network Topology** | Container networks with IPs |
+| **Disk Management** | Breakdown by category, system prune |
+| **SSL Monitoring** | Certificate expiry countdown |
+| **Endpoint Probing** | HTTP health checks with response times |
+| **Biometric Lock** | Face ID / fingerprint with auto-lock |
+| **CLI Tool** | 25+ terminal commands |
+| **Prometheus Export** | 37+ metrics at `/metrics` |
+| **Data Integrations** | Connect Prometheus, Grafana, or any JSON API |
+
+### Pro & Enterprise
+
+| Feature | Pro | Enterprise |
+|---------|-----|-----------|
+| Push Notifications | Yes | Yes |
+| Incident Management | Yes | War Room + Postmortem |
+| Automated Remediation | 10 rules | Unlimited + Runbooks |
+| Status Pages | 3 | Unlimited + Custom Domain |
+| Uptime Monitoring | 25 endpoints | Unlimited |
+| SLA Tracking | Basic | Full PDF Export |
+| ChatOps | Telegram + Slack | + WhatsApp |
+| RBAC | 5 users | Unlimited + Custom Roles |
+| Audit Trail | 30 days | Unlimited + Export |
+| Data Integrations | 10 | Unlimited + Datadog, CloudWatch, PagerDuty |
+| SSO/SAML | - | Yes |
+| White-Label | - | Yes |
+
+## Architecture
+
+```
+Mobile App (iOS/Android)          CLI Tool
+         \                        /
+          \                      /
+           +----- REST API -----+
+                    |
+            Cockpit API Agent        Windows Agent
+           (Node.js + SQLite)       (Python + Flask)
+                    |                     |
+            Docker Engine            Windows Services
+```
+
+- **Mobile App**: Expo 55 / React Native / React 19
+- **API**: Express + SQLite + Docker Engine API (22MB container)
+- **CLI**: Zero-dep Node.js, installable via `npx`
+- **Windows Agent**: Python Flask + psutil + pywin32
+
+## Security
+
+Built for production environments. Security at every layer:
+
+- **JWT auth** with token rotation and fingerprint binding
+- **Rate limiting** with sliding window (global + per-endpoint)
+- **JSON Schema validation** on all inputs
+- **Helmet** security headers (CSP, HSTS, X-Frame-Options)
+- **Strict CORS** with origin allowlist
+- **Enhanced audit logging** (IP, user-agent, request fingerprint)
+- **Non-root Docker container** with resource limits
+- **Offline license validation** (no phone-home)
+- **Secret scanning** in CI (TruffleHog)
+
+See [SECURITY.md](SECURITY.md) for the full security architecture.
+
+## Self-Hosting
+
+### Docker Compose (Recommended)
+
+```yaml
+services:
+  cockpit:
+    image: lagoontechsystems/cockpit:latest
+    restart: unless-stopped
+    env_file: .env
+    volumes:
+      - /var/run/docker.sock:/var/run/docker.sock
+      - /proc:/host/proc:ro
+      - cockpit_data:/app/data
+    deploy:
+      resources:
+        limits:
+          cpus: "0.25"
+          memory: 256M
+
+volumes:
+  cockpit_data:
+```
+
+### Environment Variables
+
+```bash
+# Required
+API_KEY=your-secret-key
+JWT_SECRET=random-64-char-string
+
+# Optional
+AUTH_MODE=key              # "key" or "users" (multi-user RBAC)
+SERVER_NAME=Production VPS
+LICENSE_KEY=               # Pro/Enterprise license (CE if empty)
+FORCE_HTTPS=false
+CORS_ORIGINS=              # Comma-separated allowed origins
+```
+
+See [.env.example](packages/api/.env.example) for all options.
+
+## Data Integrations
+
+Cockpit natively pulls data from external monitoring sources:
+
+| Adapter | Edition | Protocol |
+|---------|---------|----------|
+| Prometheus | CE | HTTP (PromQL queries + alerts) |
+| Grafana | CE | HTTP API (alerts + annotations) |
+| Generic HTTP/JSON | CE | Any REST API with field mappings |
+| Datadog | Pro | Datadog API |
+| CloudWatch | Pro | AWS API |
+| PagerDuty | Pro | PagerDuty API |
+| Custom Webhook | Pro | Inbound HTTP push |
+
+```bash
+# Add a Prometheus integration via CLI
+curl -X POST http://localhost:3000/api/integrations \
+  -H "Authorization: Bearer $TOKEN" \
+  -d '{"adapter":"prometheus","name":"My Prom","config":{"url":"http://prometheus:9090"}}'
+```
+
+## Prometheus & Grafana
+
+Cockpit exports 37+ metrics at `/metrics` for Prometheus scraping:
 
 ```yaml
 - job_name: 'cockpit'
   scrape_interval: 30s
   static_configs:
-    - targets: ['cockpit-api:3000']
+    - targets: ['cockpit:3000']
   metrics_path: '/metrics'
   authorization:
     type: Bearer
-    credentials: your-random-token-here
+    credentials: your-metrics-token
 ```
-
-If `METRICS_TOKEN` is not set, the endpoint is unauthenticated (suitable for isolated Docker networks).
-
-### Mobile App
-
-The "Grafana Monitoring" screen in the manage hub embeds Grafana dashboards via WebView with kiosk mode. Configure your Grafana URL and dashboard UID in the monitoring page source.
-
----
-
-## Architecture
-
-```
-┌────────────────────────────┐     ┌──────────────────┐
-│  Mobile App (Expo/RN)      │     │  CLI (Node.js)   │
-│  Biometric lock            │     │  cockpit overview │
-│  Multi-server profiles     │     │  cockpit ps       │
-│  Real-time SSE dashboard   │     │  cockpit exec ... │
-└──────────┬─────────────────┘     └────────┬─────────┘
-           │ HTTPS (Tailscale/VPN)           │
-    ┌──────┴──────┐  ┌──────────────┐  ┌────┴─────────┐
-    │ cockpit-api │  │ cockpit-api  │  │ cockpit-api  │
-    │ Server A    │  │ Server B     │  │ Server C     │
-    └─────────────┘  └──────────────┘  └──────────────┘
-```
-
-Each server runs its own `cockpit-api` container (~22 MB RAM). Both the mobile app and CLI connect to the same API.
-
----
-
-## Quick Start
-
-### 1. Deploy the API on your server
-
-```bash
-git clone https://github.com/Bigabou007-dev/lagoon-cockpit.git
-cd lagoon-cockpit/packages/api
-cp .env.example .env
-# Edit .env: set API_KEY, JWT_SECRET, SERVER_NAME
-docker compose up -d
-```
-
-### 2. Connect from mobile
-
-Build the app with EAS or run in development:
-
-```bash
-cd lagoon-cockpit/packages/app
-npm install
-npx expo start
-```
-
-### 3. Windows Server Agent
-
-For monitoring Windows servers (services, processes, system metrics):
-
-```bash
-# Copy to Windows server
-scp -r packages/windows-agent/ Administrator@your-server:C:\lagoon\cockpit-agent\
-
-# On Windows: install dependencies
-cd C:\lagoon\cockpit-agent
-pip install -r requirements.txt
-
-# Create .env from template
-copy .env.example .env
-# Edit .env with your API_KEY and JWT_SECRET
-
-# Start the agent
-pythonw.exe agent.py
-
-# Or install as Windows Service for auto-start
-python service_wrapper.py install
-net start LagoonCockpitAgent
-```
-
-The Windows agent provides:
-- System metrics (CPU, RAM, disk via psutil)
-- Windows Services management (list, start, stop, restart)
-- Process monitoring and management
-- MT5 Bridge proxy (for trading setups)
-- Windows Event Log access
-- SSE real-time streaming
-
-Add server in the mobile app:
-- URL: `https://your-windows-cockpit-domain`
-- Auth: API Key
-
-### 4. Or use the CLI
-
-```bash
-cd lagoon-cockpit/packages/cli
-node src/index.js connect http://your-server:3000 your-api-key "My Server"
-node src/index.js overview
-```
-
----
-
-## CLI Commands
-
-```
-cockpit connect <url> <key> [name]   Connect to a server
-cockpit overview                     System dashboard with gauges
-cockpit ps [running|stopped]         List containers with status
-cockpit stacks                       List compose stacks
-cockpit start/stop/restart <id>      Container actions
-cockpit logs <id> [--tail N]         View container logs
-cockpit logs <id> --search <query>   Search logs with regex
-cockpit exec <id> <command>          Run command in container
-cockpit images                       List Docker images
-cockpit networks                     Show network topology
-cockpit disk                         Disk usage breakdown
-cockpit prune                        System prune
-cockpit ssl                          SSL certificate status
-cockpit endpoints                    HTTP endpoint probes
-cockpit maintenance [on|off]         Toggle maintenance mode
-cockpit audit                        View activity log
-cockpit servers                      List configured servers
-cockpit use <name>                   Switch active server
-```
-
----
-
-## API Endpoints (23)
-
-### Auth
-| Method | Path | Description |
-|--------|------|-------------|
-| POST | `/auth/token` | API key → JWT (single-admin) |
-| POST | `/auth/login` | Email/password → JWT (multi-user) |
-| POST | `/auth/refresh` | Refresh access token |
-
-### Containers
-| Method | Path | Role | Description |
-|--------|------|------|-------------|
-| GET | `/api/containers` | viewer+ | List all containers |
-| GET | `/api/containers/:id` | viewer+ | Detail + live stats |
-| GET | `/api/containers/:id/logs` | viewer+ | Container logs |
-| GET | `/api/containers/:id/logs/search` | viewer+ | Regex log search |
-| GET | `/api/containers/:id/top` | viewer+ | Running processes |
-| POST | `/api/containers/:id/start` | operator+ | Start |
-| POST | `/api/containers/:id/stop` | operator+ | Stop |
-| POST | `/api/containers/:id/restart` | operator+ | Restart |
-| POST | `/api/containers/:id/exec` | admin | Run whitelisted command |
-| POST | `/api/containers/:id/rebuild` | admin | Nuke & rebuild |
-| POST | `/api/containers/bulk` | operator+ | Bulk start/stop/restart |
-
-### Docker Resources
-| Method | Path | Role | Description |
-|--------|------|------|-------------|
-| GET | `/api/stacks` | viewer+ | List compose stacks |
-| GET | `/api/networks` | viewer+ | Docker networks with IPs |
-| GET | `/api/volumes` | viewer+ | Docker volumes |
-| GET | `/api/images` | viewer+ | Docker images with sizes |
-| POST | `/api/system/prune` | admin | System-wide cleanup |
-
-### Monitoring & Automation
-| Method | Path | Role | Description |
-|--------|------|------|-------------|
-| GET | `/api/overview` | viewer+ | Full system dashboard |
-| GET | `/api/metrics/history` | viewer+ | Historical metrics (sparklines) |
-| GET | `/api/ssl` | viewer+ | SSL certificate expiry |
-| GET | `/api/endpoints` | viewer+ | HTTP endpoint probes |
-| GET/POST | `/api/alerts/rules` | admin | Custom threshold alerts |
-| GET/POST | `/api/webhooks` | admin | Webhook integrations |
-| GET/POST | `/api/schedules` | admin | Cron-based actions |
-| GET/POST | `/api/maintenance` | admin | Maintenance mode |
-| GET | `/api/audit` | admin | Activity log |
-| GET | `/api/stream` | viewer+ | SSE real-time stream |
-
----
-
-## Mobile App Screens
-
-**5 tabs**: Overview, Containers, Stacks, Alerts, Manage
-
-**Overview** — Interactive gauges, quick stats, problem containers, stack health, auto-refresh every 30s
-
-**Containers** — Search + filter chips, bulk select mode, inline start/stop/restart actions. Detail view with 5 tabs: Stats, Logs (regex search), Exec (run commands), Env (with secret masking), Top (processes)
-
-**Stacks** — Compose projects grouped by Docker labels, stack-level actions
-
-**Alerts** — Real-time event feed from SSE stream
-
-**Manage** — Hub linking to 10 management screens:
-- System Map (visual node-graph)
-- Disk Usage (breakdown by category + prune)
-- Images (list, delete, prune)
-- Networks (topology with container IPs)
-- Metrics History (sparkline charts, 1h/6h/24h/7d)
-- Alert Rules (custom thresholds)
-- Webhooks (Slack/Discord/n8n integration)
-- Scheduled Actions (cron-based automation)
-- Activity Log (audit trail)
-- Maintenance Mode (pause alerts)
-
----
-
-## Security
-
-- **No public ports** by default — connect via Tailscale, VPN, or reverse proxy
-- **Exec whitelist**: Only pre-approved diagnostic commands, no shell interpretation, metacharacter blocking
-- **SSRF protection**: Webhooks block private IPs, localhost, cloud metadata endpoints
-- **Input validation**: All Docker IDs, names, and URLs validated with strict regexes
-- **Constant-time auth**: API key comparison via SHA-256 + `timingSafeEqual`
-- **JWT**: 15-minute access tokens, 7-day refresh tokens with rotation
-- **Rate limiting**: 5 failed auth attempts → 15-minute lockout
-- **Biometric lock**: Face ID / fingerprint with auto-lock after 2 minutes
-- **Audit logging**: All actions logged to SQLite with user, target, and timestamp
-- **Entry limits**: Max 50 webhooks, 100 alert rules, 50 scheduled actions
-- **CLI security**: Config file stored with 0600 permissions, raw API keys not persisted
-
----
-
-## Tech Stack
-
-| Component | Stack |
-|-----------|-------|
-| **API** | Node.js 20, Express, Docker Engine API (unix socket), SQLite (better-sqlite3) |
-| **Mobile** | Expo 55, React Native 0.83, expo-router, Zustand, expo-secure-store |
-| **CLI** | Node.js, zero dependencies |
-| **Deployment** | Docker (Alpine, ~45 MB image, ~22 MB runtime) |
-
----
 
 ## Contributing
 
-PRs welcome. Please:
+We welcome contributions. Please read our [Security Policy](SECURITY.md) before reporting vulnerabilities.
 
-1. Follow existing code patterns
-2. Test against a real Docker environment
-3. Don't add heavy dependencies — the API is intentionally lightweight
-4. Run the security checklist: input validation, role gating, audit logging
-
----
+```bash
+# Development setup
+git clone https://github.com/lagoon-tech/cockpit.git
+cd cockpit
+npm install
+cd packages/api && npm run dev    # API with hot reload
+cd packages/app && npm start      # Expo dev server
+```
 
 ## License
 
-[MIT](LICENSE) — Copyright 2026 [Lagoon Tech Systems](https://lagoontechsystems.com)
+Community Edition: [AGPL-3.0](LICENSE)
+CLI Tool: [MIT](packages/cli/LICENSE)
+Pro/Enterprise: Commercial License

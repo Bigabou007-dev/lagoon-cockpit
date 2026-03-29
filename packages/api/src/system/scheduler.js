@@ -61,7 +61,7 @@ function init(database, auditLog) {
  * Parse a cron field against a value.
  * Supports: * , / - and literal numbers.
  */
-function fieldMatches(field, value, max) {
+function fieldMatches(field, value, _max) {
   if (field === "*") return true;
 
   const parts = field.split(",");

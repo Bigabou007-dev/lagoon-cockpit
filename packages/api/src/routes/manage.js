@@ -44,7 +44,7 @@ router.delete("/api/alerts/rules/:id", requireAuth, requireRole("admin"), (req, 
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.deleteRule(id);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to delete alert rule" });
   }
 });
@@ -55,7 +55,7 @@ router.put("/api/alerts/rules/:id/toggle", requireAuth, requireRole("admin"), (r
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.toggleRule(id, req.body.enabled !== false);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to toggle alert rule" });
   }
 });
@@ -99,7 +99,7 @@ router.delete("/api/webhooks/:id", requireAuth, requireRole("admin"), (req, res)
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid webhook ID" });
     webhooks.deleteWebhook(id);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to delete webhook" });
   }
 });
@@ -141,7 +141,7 @@ router.delete("/api/schedules/:id", requireAuth, requireRole("admin"), (req, res
     scheduler.deleteSchedule(id);
     auditLog(req.user.id, "schedule.delete", req.params.id);
     res.json({ ok: true });
-  } catch (err) {
+  } catch {
     res.status(500).json({ error: "Failed to delete schedule" });
   }
 });

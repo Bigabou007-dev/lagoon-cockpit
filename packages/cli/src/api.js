@@ -95,7 +95,7 @@ async function authenticate(url, apiKey) {
           const data = JSON.parse(Buffer.concat(chunks).toString());
           if (res.statusCode !== 200) reject(new Error(data.error || "Auth failed"));
           else resolve(data);
-        } catch (e) {
+        } catch {
           reject(new Error("Invalid auth response"));
         }
       });

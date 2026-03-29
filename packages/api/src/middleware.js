@@ -6,7 +6,7 @@ const SELF_HOSTNAME = os.hostname();
 const CONTAINER_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
 const STACK_NAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,63}$/;
 const VOLUME_NAME_RE = /^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$/;
-const IMAGE_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9_.:\/@-]{0,255}$/;
+const IMAGE_ID_RE = /^[a-zA-Z0-9][a-zA-Z0-9_.:/@-]{0,255}$/;
 
 function validateContainerId(req, res, next) {
   if (!CONTAINER_ID_RE.test(req.params.id)) {
