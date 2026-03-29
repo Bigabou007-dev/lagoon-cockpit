@@ -46,7 +46,12 @@ interface ThemeState {
   setSystemScheme: (scheme: 'light' | 'dark') => void;
 }
 
+// Light mode disabled for launch — ~95% of components only support dark.
+// Remove FORCE_DARK and restore the original logic when light mode is ready.
+const FORCE_DARK = true;
+
 function resolveColors(mode: ThemeMode, systemScheme: 'light' | 'dark'): { isDark: boolean; colors: ColorPalette } {
+  if (FORCE_DARK) return { isDark: true, colors: darkColors };
   const isDark = mode === 'system' ? systemScheme === 'dark' : mode === 'dark';
   return { isDark, colors: isDark ? darkColors : lightColors };
 }

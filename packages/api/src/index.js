@@ -98,8 +98,32 @@ app.use((req, _res, next) => {
 app.get("/", (_req, res) => {
   res.json({ service: "lagoon-cockpit-api", status: "ok", edition: edition.name, docs: "/health" });
 });
-app.get("/health", (_req, res) => {
-  res.json({ status: "ok", timestamp: new Date().toISOString() });
+app.get("/health", async (_req, res) => {
+  const checks = { api: "ok", db: "ok", docker: "ok" };
+  let status = 200;
+
+  // Verify SQLite is responsive
+  try {
+    db.prepare("SELECT 1").get();
+  } catch {
+    checks.db = "error";
+    status = 503;
+  }
+
+  // Verify Docker socket is reachable
+  try {
+    await require("./docker/client").dockerAPI("GET", "/_ping", null, { timeout: 3000 });
+  } catch {
+    checks.docker = "error";
+    status = 503;
+  }
+
+  res.status(status).json({
+    status: status === 200 ? "ok" : "degraded",
+    checks,
+    uptime: process.uptime(),
+    timestamp: new Date().toISOString(),
+  });
 });
 
 // ── Edition info endpoint ──────────────────────────────────

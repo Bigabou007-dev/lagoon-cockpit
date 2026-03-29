@@ -172,52 +172,8 @@ export default function SettingsScreen() {
       showsVerticalScrollIndicator={false}
     >
       {/* ── APPEARANCE ─────────────────────────── */}
-      <SectionHeader title="Appearance" color={colors.textSecondary} />
-      <GlassCard noPadding>
-        <View style={[styles.themeRow, { paddingHorizontal: SPACING.lg, paddingVertical: SPACING.lg }]}>
-          <View style={styles.themeLabel}>
-            <View style={[rowStyles.iconWrap, { backgroundColor: colors.blue + '18' }]}>
-              <Ionicons
-                name={mode === 'light' ? 'sunny' : mode === 'dark' ? 'moon' : 'phone-portrait-outline'}
-                size={18}
-                color={colors.blue}
-              />
-            </View>
-            <Text style={[rowStyles.label, { color: colors.textPrimary }]}>Theme</Text>
-          </View>
-          <View style={[styles.segmentedControl, { backgroundColor: colors.bgDeep }]}>
-            {THEME_OPTIONS.map((opt) => {
-              const isActive = mode === opt.value;
-              return (
-                <TouchableOpacity
-                  key={opt.value}
-                  style={[
-                    styles.segment,
-                    isActive && { backgroundColor: colors.blue },
-                  ]}
-                  onPress={() => setMode(opt.value)}
-                  activeOpacity={0.7}
-                >
-                  <Ionicons
-                    name={opt.icon}
-                    size={14}
-                    color={isActive ? colors.buttonPrimaryText : colors.textSecondary}
-                    style={{ marginRight: 4 }}
-                  />
-                  <Text
-                    style={[
-                      styles.segmentText,
-                      { color: isActive ? colors.buttonPrimaryText : colors.textSecondary },
-                    ]}
-                  >
-                    {opt.label}
-                  </Text>
-                </TouchableOpacity>
-              );
-            })}
-          </View>
-        </View>
-      </GlassCard>
+      {/* Theme toggle hidden for launch — light mode not ready (B6).
+          Restore this block when FORCE_DARK is removed from themeStore. */}
 
       {/* ── SERVERS ────────────────────────────── */}
       <SectionHeader title="Servers" color={colors.textSecondary} />

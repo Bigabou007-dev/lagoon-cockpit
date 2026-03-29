@@ -1,0 +1,24 @@
+<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 1024 1024" width="1024" height="1024">
+  <!-- Transparent background — adaptive icon uses backgroundColor from config -->
+  <!-- Logo centered with more padding for adaptive icon safe zone (66% inner) -->
+  <g transform="translate(512,512) scale(3.5)">
+    <!-- Outer hexagon -->
+    <polygon points="0,-50 43.3,-25 43.3,25 0,50 -43.3,25 -43.3,-25"
+             stroke="#B0B0B0" stroke-width="4" fill="none" stroke-linejoin="round"/>
+    <polygon points="0,-40 34.6,-20 34.6,20 0,40 -34.6,20 -34.6,-20"
+             stroke="#C8C8C8" stroke-width="1.5" fill="none" opacity="0.4" stroke-linejoin="round"/>
+
+    <!-- Vertical stem -->
+    <line x1="0" y1="-8" x2="0" y2="-30" stroke="#D4A012" stroke-width="2" stroke-linecap="round"/>
+    <circle cx="0" cy="-32" r="3" fill="#D4A012"/>
+
+    <!-- Wave curve -->
+    <path d="M-28,8 C-18,-8 -8,-8 0,4 C8,16 18,16 28,0"
+          stroke="#8B7D3C" stroke-width="4" fill="none" stroke-linecap="round"/>
+
+    <!-- Dots -->
+    <circle cx="-28" cy="8" r="5" fill="#1E3A5F"/>
+    <circle cx="0" cy="4" r="4" fill="#D4A012"/>
+    <circle cx="28" cy="0" r="5" fill="#F97316"/>
+  </g>
+</svg>
