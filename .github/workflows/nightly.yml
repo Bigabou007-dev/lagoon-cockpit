@@ -43,7 +43,7 @@ jobs:
         with:
           ref: develop
       - run: docker build -t cockpit-scan packages/api
-      - uses: aquasecurity/trivy-action@0.28.0
+      - uses: aquasecurity/trivy-action@0.35.0
         with:
           image-ref: cockpit-scan
           format: table
