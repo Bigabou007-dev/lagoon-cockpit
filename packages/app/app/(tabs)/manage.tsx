@@ -144,7 +144,7 @@ const styles = StyleSheet.create({
   menuLabelLocked: { color: COLORS.textTertiary },
   menuDesc: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
   adminBadge: {
-    color: COLORS.yellow, fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
+    color: COLORS.warningText, fontSize: 10, fontWeight: '700', backgroundColor: COLORS.warningBg,
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, overflow: 'hidden', marginRight: 4,
   },
 });

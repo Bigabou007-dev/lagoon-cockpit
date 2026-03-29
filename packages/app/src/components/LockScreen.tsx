@@ -130,13 +130,13 @@ const styles = StyleSheet.create({
     marginBottom: 32,
   },
   errorContainer: {
-    backgroundColor: 'rgba(255, 107, 107, 0.12)',
+    backgroundColor: COLORS.dangerBg,
     borderRadius: 12,
     paddingHorizontal: 16,
     paddingVertical: 10,
     marginBottom: 20,
     borderWidth: 1,
-    borderColor: 'rgba(255, 107, 107, 0.25)',
+    borderColor: COLORS.red + '40',
   },
   error: {
     color: COLORS.red,

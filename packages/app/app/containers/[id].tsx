@@ -7,13 +7,7 @@ import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import LogViewer from '../../src/components/LogViewer';
 import ActionSheet from '../../src/components/ActionSheet';
-import { COLORS as BASE_COLORS } from '../../src/theme/tokens';
-
-const COLORS = {
-  ...BASE_COLORS,
-  terminal: '#0A0A0A',
-  terminalText: '#86EFAC',
-};
+import { COLORS } from '../../src/theme/tokens';
 
 function formatBytes(bytes: number): string {
   if (bytes === 0) return '0 B';
@@ -208,7 +202,7 @@ export default function ContainerDetailScreen() {
       <ScrollView
         style={styles.container}
         contentContainerStyle={styles.content}
-        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />}
+        refreshControl={<RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />}
       >
         {/* Loading State */}
         {!detail && !fetchError && (
@@ -814,7 +808,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
   },
   execBtnText: {
-    color: '#000',
+    color: COLORS.bgDeep,
     fontSize: 14,
     fontWeight: '700',
   },

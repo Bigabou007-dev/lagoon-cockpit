@@ -25,7 +25,16 @@ function addClient(res) {
 
   // Send keepalive every 30s to prevent timeout
   const keepalive = setInterval(() => {
-    res.write(":\n\n");
+    try {
+      if (!res.destroyed) res.write(":\n\n");
+      else {
+        clearInterval(keepalive);
+        clients.delete(res);
+      }
+    } catch {
+      clearInterval(keepalive);
+      clients.delete(res);
+    }
   }, 30000);
 
   res.on("close", () => {

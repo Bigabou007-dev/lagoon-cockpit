@@ -7,6 +7,7 @@ import type { ContainerSummary, StackSummary } from '../../src/stores/dashboardS
 import ContainerCard from '../../src/components/ContainerCard';
 import StatusBadge from '../../src/components/StatusBadge';
 import ActionSheet from '../../src/components/ActionSheet';
+import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 export default function StackDetailScreen() {
   const { name } = useLocalSearchParams<{ name: string }>();
@@ -74,19 +75,19 @@ export default function StackDetailScreen() {
         {isAdmin && (
           <View style={styles.actions}>
             <TouchableOpacity
-              style={[styles.actionBtn, { backgroundColor: '#166534' }]}
+              style={[styles.actionBtn, { backgroundColor: COLORS.buttonGreenBg }]}
               onPress={() => setShowAction('start')}
             >
               <Text style={styles.actionText}>Start All</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionBtn, { backgroundColor: '#991B1B' }]}
+              style={[styles.actionBtn, { backgroundColor: COLORS.buttonRedBg }]}
               onPress={() => setShowAction('stop')}
             >
               <Text style={styles.actionText}>Stop All</Text>
             </TouchableOpacity>
             <TouchableOpacity
-              style={[styles.actionBtn, { backgroundColor: '#1E40AF' }]}
+              style={[styles.actionBtn, { backgroundColor: COLORS.buttonPrimary }]}
               onPress={() => setShowAction('restart')}
             >
               <Text style={styles.actionText}>Restart All</Text>
@@ -105,7 +106,7 @@ export default function StackDetailScreen() {
           )}
           keyExtractor={(item: ContainerSummary) => item.id}
           refreshControl={
-            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor="#4A90FF" colors={['#4A90FF']} progressBackgroundColor="#2C2C2E" />
+            <RefreshControl refreshing={refreshing} onRefresh={onRefresh} tintColor={COLORS.blue} colors={[COLORS.blue]} progressBackgroundColor={COLORS.card} />
           }
           contentContainerStyle={styles.list}
         />
@@ -117,7 +118,7 @@ export default function StackDetailScreen() {
         title={`${showAction ? showAction.charAt(0).toUpperCase() + showAction.slice(1) : ''} Stack`}
         message={`Are you sure you want to ${showAction} all containers in "${name}"?`}
         confirmLabel={`${showAction ? showAction.charAt(0).toUpperCase() + showAction.slice(1) : ''} All`}
-        confirmColor={showAction === 'stop' ? '#EF4444' : showAction === 'start' ? '#22C55E' : '#2563EB'}
+        confirmColor={showAction === 'stop' ? COLORS.red : showAction === 'start' ? COLORS.green : COLORS.blue}
         onConfirm={handleAction}
         onCancel={() => setShowAction(null)}
         loading={actionLoading}
@@ -127,13 +128,13 @@ export default function StackDetailScreen() {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, backgroundColor: '#1C1C1E' },
-  header: { padding: 20, paddingBottom: 12 },
+  container: { flex: 1, backgroundColor: COLORS.bg },
+  header: { padding: SPACING.xl, paddingBottom: SPACING.md },
   headerRow: { flexDirection: 'row', justifyContent: 'space-between', alignItems: 'center' },
-  title: { color: '#FFFFFF', fontSize: 22, fontWeight: '700' },
-  subtitle: { color: '#636366', fontSize: 14, marginTop: 4 },
-  actions: { flexDirection: 'row', gap: 10, paddingHorizontal: 20, marginBottom: 16 },
-  actionBtn: { flex: 1, paddingVertical: 12, borderRadius: 8, alignItems: 'center' },
-  actionText: { color: '#fff', fontSize: 14, fontWeight: '600' },
-  list: { paddingHorizontal: 20, paddingBottom: 20 },
+  title: { color: COLORS.textPrimary, fontSize: 22, fontWeight: '700' },
+  subtitle: { color: COLORS.textTertiary, fontSize: 14, marginTop: 4 },
+  actions: { flexDirection: 'row', gap: 10, paddingHorizontal: SPACING.xl, marginBottom: SPACING.lg },
+  actionBtn: { flex: 1, paddingVertical: 12, borderRadius: RADIUS.sm, alignItems: 'center' },
+  actionText: { color: COLORS.buttonPrimaryText, fontSize: 14, fontWeight: '600' },
+  list: { paddingHorizontal: SPACING.xl, paddingBottom: SPACING.xl },
 });

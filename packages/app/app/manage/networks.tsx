@@ -186,7 +186,7 @@ const styles = StyleSheet.create({
   chevron: { color: COLORS.textSecondary, fontSize: 12 },
   cardMeta: { flexDirection: 'row', gap: SPACING.sm },
   metaBadge: { backgroundColor: COLORS.border, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-  metaBadgeActive: { backgroundColor: '#1E3A5F' },
+  metaBadgeActive: { backgroundColor: COLORS.infoBg },
   metaBadgeInactive: {},
   metaBadgeText: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '500' },
   metaBadgeTextActive: { color: COLORS.blue },

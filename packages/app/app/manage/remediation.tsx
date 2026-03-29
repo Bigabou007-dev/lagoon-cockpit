@@ -66,9 +66,9 @@ const ACTION_TYPE_LABELS: Record<string, string> = {
 };
 
 const RESULT_COLORS: Record<string, { bg: string; text: string }> = {
-  success: { bg: '#064E3B', text: '#6EE7B7' },
-  failed: { bg: '#7F1D1D', text: '#FCA5A5' },
-  cooldown_skipped: { bg: '#374151', text: '#9CA3AF' },
+  success: { bg: COLORS.successBg, text: COLORS.successText },
+  failed: { bg: COLORS.dangerBg, text: COLORS.dangerText },
+  cooldown_skipped: { bg: COLORS.mutedBg, text: COLORS.mutedText },
 };
 
 /* ---------- helpers ---------- */
@@ -301,7 +301,7 @@ function RemediationContent() {
                           <Switch
                             value={rule.enabled}
                             onValueChange={() => toggleRule(rule)}
-                            trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                            trackColor={{ false: COLORS.border, true: COLORS.buttonPrimary }}
                             thumbColor={rule.enabled ? COLORS.blue : COLORS.textTertiary}
                           />
                         </View>
@@ -387,7 +387,7 @@ function RemediationContent() {
 
                       {entry.error_message && (
                         <View style={styles.errorBox}>
-                          <Ionicons name="warning-outline" size={14} color="#FCA5A5" />
+                          <Ionicons name="warning-outline" size={14} color={COLORS.dangerText} />
                           <Text style={styles.errorMessage}>{entry.error_message}</Text>
                         </View>
                       )}
@@ -404,7 +404,7 @@ function RemediationContent() {
         {/* -------- FAB -------- */}
         {activeTab === 'rules' && (
           <TouchableOpacity style={styles.fab} onPress={openCreate} activeOpacity={0.8}>
-            <Ionicons name="add" size={28} color="#fff" />
+            <Ionicons name="add" size={28} color={COLORS.buttonPrimaryText} />
           </TouchableOpacity>
         )}
       </View>
@@ -599,14 +599,14 @@ const styles = StyleSheet.create({
     alignItems: 'flex-start',
     gap: 6,
     marginTop: SPACING.sm,
-    backgroundColor: 'rgba(244,63,94,0.08)',
+    backgroundColor: COLORS.red + '14',
     borderRadius: RADIUS.sm,
     padding: SPACING.sm,
   },
   errorMessage: {
     flex: 1,
     fontSize: 12,
-    color: '#FCA5A5',
+    color: COLORS.dangerText,
   },
 
   /* FAB */
@@ -617,7 +617,7 @@ const styles = StyleSheet.create({
     width: 56,
     height: 56,
     borderRadius: 28,
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     alignItems: 'center',
     justifyContent: 'center',
     ...SHADOW.elevated,
@@ -656,7 +656,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   retryBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 24,

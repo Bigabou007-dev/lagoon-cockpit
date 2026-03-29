@@ -224,7 +224,7 @@ export default function IncidentCreateScreen() {
               <Text style={styles.submitBtnText}>Declaring...</Text>
             ) : (
               <>
-                <Ionicons name="megaphone" size={20} color="#fff" />
+                <Ionicons name="megaphone" size={20} color={COLORS.buttonPrimaryText} />
                 <Text style={styles.submitBtnText}>Declare Incident</Text>
               </>
             )}
@@ -320,7 +320,7 @@ const styles = StyleSheet.create({
     opacity: 0.5,
   },
   submitBtnText: {
-    color: '#fff',
+    color: COLORS.buttonPrimaryText,
     fontSize: 17,
     fontWeight: '700',
   },

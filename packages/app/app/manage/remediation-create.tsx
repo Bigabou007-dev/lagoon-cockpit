@@ -422,7 +422,7 @@ function RemediationCreateContent() {
                 <Switch
                   value={enabled}
                   onValueChange={setEnabled}
-                  trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                  trackColor={{ false: COLORS.border, true: COLORS.buttonPrimary }}
                   thumbColor={enabled ? COLORS.blue : COLORS.textTertiary}
                 />
               </View>
@@ -437,10 +437,10 @@ function RemediationCreateContent() {
             activeOpacity={0.8}
           >
             {saving ? (
-              <ActivityIndicator color="#fff" size="small" />
+              <ActivityIndicator color={COLORS.buttonPrimaryText} size="small" />
             ) : (
               <>
-                <Ionicons name="checkmark-circle" size={20} color="#fff" />
+                <Ionicons name="checkmark-circle" size={20} color={COLORS.buttonPrimaryText} />
                 <Text style={styles.saveText}>
                   {isEdit ? 'Update Rule' : 'Save Rule'}
                 </Text>
@@ -627,7 +627,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
     justifyContent: 'center',
     gap: 8,
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.lg,
     paddingVertical: 16,
     marginTop: SPACING.sm,
@@ -638,7 +638,7 @@ const styles = StyleSheet.create({
   },
   saveText: {
     ...FONT.heading,
-    color: '#fff',
+    color: COLORS.buttonPrimaryText,
   },
 
   /* centered states */
@@ -657,7 +657,7 @@ const styles = StyleSheet.create({
     marginBottom: SPACING.lg,
   },
   retryBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.md,
     paddingVertical: 12,
     paddingHorizontal: 24,

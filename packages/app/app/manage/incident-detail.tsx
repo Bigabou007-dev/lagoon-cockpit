@@ -195,10 +195,10 @@ function StatusProgressBar({ currentStatus }: { currentStatus: IncidentStatus })
                 ]}
               >
                 {isCurrent && (
-                  <Ionicons name={STATUS_ICONS[status]} size={10} color="#fff" />
+                  <Ionicons name={STATUS_ICONS[status]} size={10} color={COLORS.buttonPrimaryText} />
                 )}
                 {isCompleted && !isCurrent && (
-                  <Ionicons name="checkmark" size={10} color="#fff" />
+                  <Ionicons name="checkmark" size={10} color={COLORS.buttonPrimaryText} />
                 )}
               </View>
             </View>
@@ -529,7 +529,7 @@ export default function IncidentDetailScreen() {
           {/* Vertical line + dot */}
           <View style={styles.timelineTrack}>
             <View style={[styles.timelineDot, { backgroundColor: color }]}>
-              <Ionicons name={icon} size={12} color="#fff" />
+              <Ionicons name={icon} size={12} color={COLORS.buttonPrimaryText} />
             </View>
             {index < (incident?.timeline?.length ?? 0) - 1 && (
               <View style={styles.timelineLine} />
@@ -996,7 +996,7 @@ const styles = StyleSheet.create({
   /* Modal */
   modalOverlay: {
     flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.6)',
+    backgroundColor: COLORS.overlay,
     justifyContent: 'flex-end',
   },
   modalContent: {
@@ -1076,7 +1076,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   modalConfirmText: {
-    color: '#fff',
+    color: COLORS.buttonPrimaryText,
     fontWeight: '700',
     fontSize: 15,
   },

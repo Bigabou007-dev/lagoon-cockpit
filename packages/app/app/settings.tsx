@@ -201,13 +201,13 @@ export default function SettingsScreen() {
                   <Ionicons
                     name={opt.icon}
                     size={14}
-                    color={isActive ? '#FFFFFF' : colors.textSecondary}
+                    color={isActive ? colors.buttonPrimaryText : colors.textSecondary}
                     style={{ marginRight: 4 }}
                   />
                   <Text
                     style={[
                       styles.segmentText,
-                      { color: isActive ? '#FFFFFF' : colors.textSecondary },
+                      { color: isActive ? colors.buttonPrimaryText : colors.textSecondary },
                     ]}
                   >
                     {opt.label}

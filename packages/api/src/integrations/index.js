@@ -11,6 +11,9 @@ const { initScheduler } = require("./scheduler");
 const PrometheusAdapter = require("./adapters/prometheus");
 const GrafanaAdapter = require("./adapters/grafana");
 const HttpJsonAdapter = require("./adapters/http-json");
+const DatadogAdapter = require("./adapters/datadog");
+const CloudWatchAdapter = require("./adapters/cloudwatch");
+const PagerDutyAdapter = require("./adapters/pagerduty");
 
 /**
  * Initialize the integration system.
@@ -25,11 +28,14 @@ function initIntegrations(db, broadcast) {
   registerAdapter("prometheus", PrometheusAdapter);
   registerAdapter("grafana", GrafanaAdapter);
   registerAdapter("http-json", HttpJsonAdapter);
+  registerAdapter("datadog", DatadogAdapter);
+  registerAdapter("cloudwatch", CloudWatchAdapter);
+  registerAdapter("pagerduty", PagerDutyAdapter);
 
   // Start the poll scheduler
   initScheduler(broadcast);
 
-  console.log("[INTEGRATIONS] System initialized with 3 built-in adapters");
+  console.log("[INTEGRATIONS] System initialized with 6 built-in adapters");
 }
 
 module.exports = { initIntegrations };

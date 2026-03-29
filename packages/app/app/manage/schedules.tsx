@@ -11,6 +11,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
@@ -60,9 +61,9 @@ const CRON_PRESETS: { label: string; value: string }[] = [
 
 /* ---------- helpers ---------- */
 const ACTION_COLORS: Record<string, { bg: string; text: string }> = {
-  start: { bg: '#064E3B', text: '#6EE7B7' },
-  stop: { bg: '#7F1D1D', text: '#FCA5A5' },
-  restart: { bg: '#1E3A5F', text: '#93C5FD' },
+  start: { bg: COLORS.successBg, text: COLORS.successText },
+  stop: { bg: COLORS.dangerBg, text: COLORS.dangerText },
+  restart: { bg: COLORS.infoBg, text: COLORS.infoText },
 };
 
 function cronToHuman(expr: string): string {
@@ -336,7 +337,7 @@ export default function SchedulesScreen() {
         {/* Schedules list */}
         {schedules.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>{'\u{23F0}'}</Text>
+            <Ionicons name="alarm-outline" size={40} color={COLORS.textTertiary} style={{ marginBottom: SPACING.md }} />
             <Text style={styles.emptyText}>No scheduled actions</Text>
             <Text style={styles.emptySubtext}>
               Schedule automatic container start/stop/restart
@@ -369,7 +370,7 @@ export default function SchedulesScreen() {
                   <Switch
                     value={!!schedule.enabled}
                     onValueChange={() => toggleSchedule(schedule)}
-                    trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                    trackColor={{ false: COLORS.border, true: COLORS.buttonPrimary }}
                     thumbColor={schedule.enabled ? COLORS.blue : COLORS.textTertiary}
                   />
                 </View>
@@ -400,7 +401,7 @@ export default function SchedulesScreen() {
                 <View
                   style={[
                     styles.statusDot,
-                    { backgroundColor: entry.success ? '#10B981' : COLORS.red },
+                    { backgroundColor: entry.success ? COLORS.green : COLORS.red },
                   ]}
                 />
               </View>
@@ -477,7 +478,7 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.xs,
   },
   saveBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
@@ -526,12 +527,11 @@ const styles = StyleSheet.create({
   historyName: { color: COLORS.textPrimary, fontSize: 14, fontWeight: '600' },
   statusDot: { width: 8, height: 8, borderRadius: 4 },
   historyMeta: { color: COLORS.textSecondary, fontSize: 12, marginTop: SPACING.xs },
-  historyError: { color: '#FCA5A5', fontSize: 12, marginTop: 2 },
+  historyError: { color: COLORS.dangerText, fontSize: 12, marginTop: 2 },
   historyTime: { color: COLORS.textTertiary, fontSize: 11, marginTop: SPACING.xs },
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 32 },
-  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
   emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
   emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

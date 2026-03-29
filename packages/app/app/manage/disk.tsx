@@ -237,7 +237,7 @@ export default function DiskScreen() {
             disabled={pruneLoading}
           >
             {pruneLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={COLORS.buttonPrimaryText} />
             ) : (
               <>
                 <Text style={styles.pruneBtnText}>System Prune</Text>
@@ -303,6 +303,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },
-  pruneBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  pruneSubText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  pruneBtnText: { color: COLORS.buttonPrimaryText, fontSize: 16, fontWeight: '700' },
+  pruneSubText: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
 });

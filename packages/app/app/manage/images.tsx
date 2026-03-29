@@ -184,7 +184,7 @@ export default function ImagesScreen() {
             disabled={pruneLoading}
           >
             {pruneLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={COLORS.buttonPrimaryText} />
             ) : (
               <Text style={styles.pruneBtnText}>Prune Unused Images</Text>
             )}

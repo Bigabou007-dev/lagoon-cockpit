@@ -199,7 +199,7 @@ const styles = StyleSheet.create({
     backgroundColor: COLORS.purple,
     borderColor: COLORS.purple,
   },
-  checkmark: { color: '#fff', fontSize: 13, fontWeight: '700' },
+  checkmark: { color: COLORS.buttonPrimaryText, fontSize: 13, fontWeight: '700' },
   nameCol: {
     flex: 1,
   },

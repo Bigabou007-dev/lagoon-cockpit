@@ -44,8 +44,9 @@ router.delete("/api/alerts/rules/:id", requireAuth, requireRole("admin"), (req, 
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.deleteRule(id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete alert rule" });
+  } catch (err) {
+    console.error("DELETE /api/alerts/rules/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -55,8 +56,9 @@ router.put("/api/alerts/rules/:id/toggle", requireAuth, requireRole("admin"), (r
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.toggleRule(id, req.body.enabled !== false);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to toggle alert rule" });
+  } catch (err) {
+    console.error("PUT /api/alerts/rules/:id/toggle error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -99,8 +101,9 @@ router.delete("/api/webhooks/:id", requireAuth, requireRole("admin"), (req, res)
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid webhook ID" });
     webhooks.deleteWebhook(id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete webhook" });
+  } catch (err) {
+    console.error("DELETE /api/webhooks/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -141,8 +144,9 @@ router.delete("/api/schedules/:id", requireAuth, requireRole("admin"), (req, res
     scheduler.deleteSchedule(id);
     auditLog(req.user.id, "schedule.delete", req.params.id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete schedule" });
+  } catch (err) {
+    console.error("DELETE /api/schedules/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -154,8 +158,9 @@ router.put("/api/schedules/:id/toggle", requireAuth, requireRole("admin"), (req,
     if (!schedule) return res.status(404).json({ error: "Schedule not found" });
     auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
     res.json(schedule);
-  } catch {
-    res.status(500).json({ error: "Failed to toggle schedule" });
+  } catch (err) {
+    console.error("PUT /api/schedules/:id/toggle error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

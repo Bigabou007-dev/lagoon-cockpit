@@ -363,7 +363,7 @@ function IncidentsListContent() {
         activeOpacity={0.8}
         onPress={() => router.push('/manage/incident-create' as any)}
       >
-        <Ionicons name="add" size={28} color="#fff" />
+        <Ionicons name="add" size={28} color={COLORS.buttonPrimaryText} />
       </TouchableOpacity>
     </View>
   );
