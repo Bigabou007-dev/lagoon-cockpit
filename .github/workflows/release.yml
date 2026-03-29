@@ -8,10 +8,6 @@ permissions:
   contents: write
   packages: write
 
-env:
-  REGISTRY: ghcr.io
-  IMAGE_NAME: ${{ github.repository_owner }}/cockpit
-
 jobs:
   extract-version:
     name: Extract Version
@@ -52,8 +48,8 @@ jobs:
             COCKPIT_VERSION=${{ needs.extract-version.outputs.version }}
             COCKPIT_EDITION=ce
           tags: |
-            ghcr.io/${{ env.IMAGE_NAME }}:latest
-            ghcr.io/${{ env.IMAGE_NAME }}:${{ needs.extract-version.outputs.version }}
+            ghcr.io/lagoon-tech-systems/cockpit:latest
+            ghcr.io/lagoon-tech-systems/cockpit:${{ needs.extract-version.outputs.version }}
           labels: |
             org.opencontainers.image.source=${{ github.server_url }}/${{ github.repository }}
             org.opencontainers.image.version=${{ needs.extract-version.outputs.version }}
@@ -134,7 +130,7 @@ jobs:
             ${{ steps.changelog.outputs.changes }}
 
             ## Distribution
-            - **Docker**: `docker pull ghcr.io/${{ env.IMAGE_NAME }}:${{ needs.extract-version.outputs.version }}`
+            - **Docker**: `docker pull ghcr.io/lagoon-tech-systems/cockpit:${{ needs.extract-version.outputs.version }}`
             - **npm CLI**: `npx lagoon-cockpit-cli@${{ needs.extract-version.outputs.version }}`
             - **Mobile**: EAS builds triggered (check [Expo dashboard](https://expo.dev))
           files: |
