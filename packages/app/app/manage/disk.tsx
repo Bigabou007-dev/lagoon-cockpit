@@ -5,6 +5,7 @@ import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 interface CategoryInfo {
   count: number;
@@ -67,7 +68,7 @@ export default function DiskScreen() {
       setDisk(data);
     } catch (err) {
       console.error('Failed to fetch disk usage:', err);
-      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to fetch disk usage');
+      Alert.alert('Error', sanitizeErrorMessage(err, 'Failed to fetch disk usage'));
     } finally {
       setLoading(false);
     }
@@ -109,7 +110,7 @@ export default function DiskScreen() {
               );
               await fetchDisk();
             } catch (err) {
-              Alert.alert('Prune Failed', err instanceof Error ? err.message : 'System prune failed');
+              Alert.alert('Prune Failed', sanitizeErrorMessage(err, 'System prune failed'));
             } finally {
               setPruneLoading(false);
             }
@@ -237,7 +238,7 @@ export default function DiskScreen() {
             disabled={pruneLoading}
           >
             {pruneLoading ? (
-              <ActivityIndicator size="small" color="#fff" />
+              <ActivityIndicator size="small" color={COLORS.buttonPrimaryText} />
             ) : (
               <>
                 <Text style={styles.pruneBtnText}>System Prune</Text>
@@ -303,6 +304,6 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   pruneBtnDisabled: { opacity: 0.6 },
-  pruneBtnText: { color: '#fff', fontSize: 16, fontWeight: '700' },
-  pruneSubText: { color: 'rgba(255,255,255,0.7)', fontSize: 12, marginTop: 2 },
+  pruneBtnText: { color: COLORS.buttonPrimaryText, fontSize: 16, fontWeight: '700' },
+  pruneSubText: { color: COLORS.textSecondary, fontSize: 12, marginTop: 2 },
 });

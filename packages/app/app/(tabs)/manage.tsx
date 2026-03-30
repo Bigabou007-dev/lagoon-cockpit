@@ -6,6 +6,8 @@ import { useServerStore } from '../../src/stores/serverStore';
 import { useDashboardStore } from '../../src/stores/dashboardStore';
 import { useEdition } from '../../src/edition/useEdition';
 import { UpgradePrompt } from '../../src/edition/UpgradePrompt';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 
 interface MenuItem {
@@ -45,13 +47,14 @@ function renderMenuItem(
   item: MenuItem,
   router: ReturnType<typeof useRouter>,
   hasFeature: (f: string) => boolean,
+  isTablet?: boolean,
 ) {
   const isLocked = item.feature ? !hasFeature(item.feature) : false;
 
   return (
     <TouchableOpacity
       key={item.route}
-      style={[styles.menuItem, isLocked && styles.menuItemLocked]}
+      style={[styles.menuItem, isLocked && styles.menuItemLocked, isTablet && { flex: 1, minWidth: '48%' }]}
       onPress={() => {
         if (isLocked) return; // UpgradePrompt shown inline via lock badge
         router.push(item.route as any);
@@ -74,6 +77,7 @@ function renderMenuItem(
 
 export default function ManageScreen() {
   const router = useRouter();
+  const { isTablet } = useLayout();
   const userRole = useServerStore((s) => s.userRole);
   const isAdmin = userRole === 'admin';
   const platform = useDashboardStore((s) => s.platform);
@@ -93,25 +97,33 @@ export default function ManageScreen() {
   }, [isAdmin, platform]);
 
   return (
+    <ScreenErrorBoundary screenName="Manage">
     <ScrollView style={styles.container} contentContainerStyle={styles.content}>
       <Text style={styles.title}>Manage</Text>
       <Text style={styles.subtitle}>Infrastructure tools and configuration</Text>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Docker Resources</Text>
-        {dockerItems.map((item) => renderMenuItem(item, router, hasFeature))}
+        <View style={isTablet ? styles.gridRow : undefined}>
+          {dockerItems.map((item) => renderMenuItem(item, router, hasFeature, isTablet))}
+        </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Monitoring</Text>
-        {monitoringItems.map((item) => renderMenuItem(item, router, hasFeature))}
+        <View style={isTablet ? styles.gridRow : undefined}>
+          {monitoringItems.map((item) => renderMenuItem(item, router, hasFeature, isTablet))}
+        </View>
       </View>
 
       <View style={styles.section}>
         <Text style={styles.sectionTitle}>Operations</Text>
-        {operationsItems.map((item) => renderMenuItem(item, router, hasFeature))}
+        <View style={isTablet ? styles.gridRow : undefined}>
+          {operationsItems.map((item) => renderMenuItem(item, router, hasFeature, isTablet))}
+        </View>
       </View>
     </ScrollView>
+    </ScreenErrorBoundary>
   );
 }
 
@@ -121,6 +133,7 @@ const styles = StyleSheet.create({
   title: { color: COLORS.textPrimary, ...FONT.hero, fontSize: 28, marginTop: SPACING.sm },
   subtitle: { color: COLORS.textTertiary, ...FONT.body, fontSize: 14, marginBottom: SPACING.xxl },
   section: { marginBottom: SPACING.xxl },
+  gridRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm },
   sectionTitle: { color: COLORS.textSecondary, ...FONT.label, fontSize: 12, marginBottom: SPACING.sm },
   menuItem: {
     flexDirection: 'row', alignItems: 'center', gap: SPACING.md,
@@ -141,7 +154,7 @@ const styles = StyleSheet.create({
   menuLabelLocked: { color: COLORS.textTertiary },
   menuDesc: { color: COLORS.textTertiary, fontSize: 12, marginTop: 2 },
   adminBadge: {
-    color: COLORS.yellow, fontSize: 10, fontWeight: '700', backgroundColor: '#422006',
+    color: COLORS.warningText, fontSize: 10, fontWeight: '700', backgroundColor: COLORS.warningBg,
     paddingHorizontal: 6, paddingVertical: 2, borderRadius: 4, overflow: 'hidden', marginRight: 4,
   },
 });

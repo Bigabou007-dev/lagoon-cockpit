@@ -34,12 +34,17 @@ export const FEATURE_EDITIONS: Record<string, string> = {
   integrations_pro: "pro",
   reports: "pro",
 
+  // Pro features (basic tier)
+  push_basic: "pro",
+
   // Enterprise features
   sso_saml: "enterprise",
   white_label: "enterprise",
   custom_roles: "enterprise",
   ip_allowlist: "enterprise",
+  mtls: "enterprise",
   encryption_at_rest: "enterprise",
+  compliance_logging: "enterprise",
   integrations_unlimited: "enterprise",
 };
 

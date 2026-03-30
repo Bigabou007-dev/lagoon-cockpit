@@ -4,21 +4,27 @@ const router = express.Router();
 const { authenticateWithKey } = require("../auth/keys");
 const { authenticateWithCredentials, createUser, listUsers, deleteUser, updateUserRole } = require("../auth/users");
 const { signAccessToken, generateRefreshToken, validateRefreshToken } = require("../auth/jwt");
-const { requireAuth, requireRole, rateLimitAuth, recordFailedAttempt, clearFailedAttempts } = require("../auth/middleware");
+const {
+  requireAuth,
+  requireRole,
+  rateLimitAuth,
+  recordFailedAttempt,
+  clearFailedAttempts,
+} = require("../auth/middleware");
 const { auditLog } = require("../db/sqlite");
+const { validateBody } = require("../security/request-validator");
+const { requestFingerprint } = require("../security/crypto");
 
 const AUTH_MODE = process.env.AUTH_MODE || "key";
 const SERVER_NAME = process.env.SERVER_NAME || "Cockpit Server";
 
 // ── API key auth (single-admin mode) ─────────────────────
-router.post("/auth/token", rateLimitAuth, (req, res) => {
+router.post("/auth/token", rateLimitAuth, validateBody("authToken"), (req, res) => {
   if (AUTH_MODE !== "key") {
     return res.status(400).json({ error: "Use /auth/login for user-based auth" });
   }
 
   const { apiKey } = req.body;
-  if (!apiKey) return res.status(400).json({ error: "apiKey required" });
-
   const result = authenticateWithKey(apiKey);
   if (!result) {
     recordFailedAttempt(req._authIp);
@@ -26,24 +32,23 @@ router.post("/auth/token", rateLimitAuth, (req, res) => {
   }
 
   clearFailedAttempts(req._authIp);
+  const fingerprint = requestFingerprint(req);
   auditLog(result.userId, "auth.token", null, "API key authentication");
   res.json({
     accessToken: result.accessToken,
-    refreshToken: result.refreshToken,
+    refreshToken: generateRefreshToken(result.userId, result.role, fingerprint),
     role: result.role,
     serverName: SERVER_NAME,
   });
 });
 
 // ── User login (multi-user mode) ─────────────────────────
-router.post("/auth/login", rateLimitAuth, (req, res) => {
+router.post("/auth/login", rateLimitAuth, validateBody("authLogin"), (req, res) => {
   if (AUTH_MODE !== "users") {
     return res.status(400).json({ error: "Use /auth/token for API key auth" });
   }
 
   const { email, password } = req.body;
-  if (!email || !password) return res.status(400).json({ error: "email and password required" });
-
   const result = authenticateWithCredentials(email, password);
   if (!result) {
     recordFailedAttempt(req._authIp);
@@ -51,10 +56,11 @@ router.post("/auth/login", rateLimitAuth, (req, res) => {
   }
 
   clearFailedAttempts(req._authIp);
+  const fingerprint = requestFingerprint(req);
   auditLog(result.userId, "auth.login", null, `User login: ${email}`);
   res.json({
     accessToken: result.accessToken,
-    refreshToken: result.refreshToken,
+    refreshToken: generateRefreshToken(result.userId, result.role, fingerprint),
     role: result.role,
     email: result.email,
     serverName: SERVER_NAME,
@@ -62,11 +68,11 @@ router.post("/auth/login", rateLimitAuth, (req, res) => {
 });
 
 // ── Refresh token ────────────────────────────────────────
-router.post("/auth/refresh", rateLimitAuth, (req, res) => {
+router.post("/auth/refresh", rateLimitAuth, validateBody("authRefresh"), (req, res) => {
   const { refreshToken } = req.body;
-  if (!refreshToken) return res.status(400).json({ error: "refreshToken required" });
+  const fingerprint = requestFingerprint(req);
 
-  const payload = validateRefreshToken(refreshToken);
+  const payload = validateRefreshToken(refreshToken, fingerprint);
   if (!payload) {
     recordFailedAttempt(req._authIp);
     return res.status(401).json({ error: "Invalid or expired refresh token" });
@@ -74,7 +80,7 @@ router.post("/auth/refresh", rateLimitAuth, (req, res) => {
 
   clearFailedAttempts(req._authIp);
   const accessToken = signAccessToken({ sub: payload.userId, role: payload.role });
-  const newRefreshToken = generateRefreshToken(payload.userId, payload.role);
+  const newRefreshToken = generateRefreshToken(payload.userId, payload.role, fingerprint);
 
   res.json({ accessToken, refreshToken: newRefreshToken });
 });
@@ -84,10 +90,9 @@ router.get("/auth/users", requireAuth, requireRole("admin"), (_req, res) => {
   res.json({ users: listUsers() });
 });
 
-router.post("/auth/users", requireAuth, requireRole("admin"), (req, res) => {
+router.post("/auth/users", requireAuth, requireRole("admin"), validateBody("createUser"), (req, res) => {
   try {
     const { email, password, role } = req.body;
-    if (!email || !password) return res.status(400).json({ error: "email and password required" });
     const user = createUser(email, password, role);
     auditLog(req.user.id, "user.create", email, `Role: ${role || "viewer"}`);
     res.status(201).json(user);
@@ -104,8 +109,9 @@ router.delete("/auth/users/:id", requireAuth, requireRole("admin"), (req, res) =
     deleteUser(id);
     auditLog(req.user.id, "user.delete", req.params.id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete user" });
+  } catch (err) {
+    console.error("DELETE /auth/users/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

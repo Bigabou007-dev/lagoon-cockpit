@@ -14,19 +14,7 @@ let db = null;
 /** Initialize JWT module with SQLite database for persistent refresh tokens */
 function initJwt(database) {
   db = database;
-  db.exec(`
-    CREATE TABLE IF NOT EXISTS refresh_tokens (
-      hash TEXT PRIMARY KEY,
-      user_id TEXT NOT NULL,
-      role TEXT NOT NULL,
-      fingerprint TEXT,
-      expires_at INTEGER NOT NULL,
-      created_at INTEGER NOT NULL DEFAULT (unixepoch())
-    );
-    CREATE INDEX IF NOT EXISTS idx_refresh_expires ON refresh_tokens(expires_at);
-  `);
-
-  // Cleanup expired tokens on init
+  // Table created by versioned migrations in db/sqlite.js
   cleanupRefreshTokens();
 }
 
@@ -38,7 +26,7 @@ function signAccessToken(payload) {
 
 /** Verify an access token */
 function verifyAccessToken(token) {
-  return jwt.verify(token, JWT_SECRET);
+  return jwt.verify(token, JWT_SECRET, { algorithms: ["HS256"] });
 }
 
 /**
@@ -54,9 +42,13 @@ function generateRefreshToken(userId, role, fingerprint) {
   const expiresAt = Date.now() + REFRESH_TTL_MS;
 
   if (db) {
-    db.prepare(
-      "INSERT INTO refresh_tokens (hash, user_id, role, fingerprint, expires_at) VALUES (?, ?, ?, ?, ?)"
-    ).run(hash, userId, role, fingerprint || null, expiresAt);
+    db.prepare("INSERT INTO refresh_tokens (hash, user_id, role, fingerprint, expires_at) VALUES (?, ?, ?, ?, ?)").run(
+      hash,
+      userId,
+      role,
+      fingerprint || null,
+      expiresAt,
+    );
   }
 
   return token;
@@ -74,24 +66,30 @@ function validateRefreshToken(token, fingerprint) {
 
   if (!db) return null;
 
-  const entry = db.prepare("SELECT * FROM refresh_tokens WHERE hash = ?").get(hash);
-  if (!entry) return null;
+  // H8: Wrap read + delete in a transaction to prevent race conditions
+  // where the same refresh token could be used concurrently
+  const result = db.transaction(() => {
+    const entry = db.prepare("SELECT * FROM refresh_tokens WHERE hash = ?").get(hash);
+    if (!entry) return null;
 
-  // Always delete the token (one-time use rotation)
-  db.prepare("DELETE FROM refresh_tokens WHERE hash = ?").run(hash);
+    // Always delete the token (one-time use rotation)
+    db.prepare("DELETE FROM refresh_tokens WHERE hash = ?").run(hash);
 
-  // Check expiration
-  if (Date.now() > entry.expires_at) return null;
+    // Check expiration
+    if (Date.now() > entry.expires_at) return null;
 
-  // Check fingerprint binding if configured and present
-  if (entry.fingerprint && fingerprint && entry.fingerprint !== fingerprint) {
-    console.warn(`[AUTH] Refresh token fingerprint mismatch for user ${entry.user_id}`);
-    // Potential token theft — revoke all tokens for this user
-    db.prepare("DELETE FROM refresh_tokens WHERE user_id = ?").run(entry.user_id);
-    return null;
-  }
+    // Check fingerprint binding if configured and present
+    if (entry.fingerprint && fingerprint && entry.fingerprint !== fingerprint) {
+      console.warn(`[AUTH] Refresh token fingerprint mismatch for user ${entry.user_id}`);
+      // Potential token theft — revoke all tokens for this user
+      db.prepare("DELETE FROM refresh_tokens WHERE user_id = ?").run(entry.user_id);
+      return null;
+    }
 
-  return { userId: entry.user_id, role: entry.role };
+    return { userId: entry.user_id, role: entry.role };
+  })();
+
+  return result;
 }
 
 /** Revoke all refresh tokens for a user (e.g., on password change or forced logout) */
@@ -110,7 +108,12 @@ function cleanupRefreshTokens() {
 }
 
 // Cleanup every hour
-setInterval(cleanupRefreshTokens, 60 * 60 * 1000);
+const _cleanupInterval = setInterval(cleanupRefreshTokens, 60 * 60 * 1000);
+
+/** Stop the background cleanup interval (for graceful shutdown / tests) */
+function stopCleanup() {
+  clearInterval(_cleanupInterval);
+}
 
 module.exports = {
   initJwt,
@@ -119,4 +122,5 @@ module.exports = {
   generateRefreshToken,
   validateRefreshToken,
   revokeUserTokens,
+  stopCleanup,
 };

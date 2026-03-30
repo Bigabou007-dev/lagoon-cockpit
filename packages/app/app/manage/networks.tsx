@@ -4,6 +4,7 @@ import { Stack } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -35,7 +36,7 @@ export default function NetworksScreen() {
       setNetworks(data.networks);
     } catch (err) {
       console.error('Failed to fetch networks:', err);
-      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to fetch networks');
+      Alert.alert('Error', sanitizeErrorMessage(err, 'Failed to fetch networks'));
     } finally {
       setLoading(false);
     }
@@ -186,7 +187,7 @@ const styles = StyleSheet.create({
   chevron: { color: COLORS.textSecondary, fontSize: 12 },
   cardMeta: { flexDirection: 'row', gap: SPACING.sm },
   metaBadge: { backgroundColor: COLORS.border, paddingHorizontal: 10, paddingVertical: 4, borderRadius: 6 },
-  metaBadgeActive: { backgroundColor: '#1E3A5F' },
+  metaBadgeActive: { backgroundColor: COLORS.infoBg },
   metaBadgeInactive: {},
   metaBadgeText: { color: COLORS.textSecondary, fontSize: 11, fontWeight: '500' },
   metaBadgeTextActive: { color: COLORS.blue },

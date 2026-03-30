@@ -72,7 +72,7 @@ const schemas = {
   webhook: {
     type: "object",
     properties: {
-      url: { type: "string", maxLength: 2048 },
+      url: { type: "string", format: "uri", maxLength: 2048 },
       events: { type: "array", items: { type: "string", maxLength: 64 }, maxItems: 20 },
       headers: { type: "object", additionalProperties: { type: "string" } },
       enabled: { type: "boolean" },

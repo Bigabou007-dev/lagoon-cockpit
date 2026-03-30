@@ -95,7 +95,7 @@ export default function MaintenanceScreen() {
           <Ionicons
             name={enabled ? 'build' : 'checkmark-circle'}
             size={48}
-            color={enabled ? '#FCD34D' : '#6EE7B7'}
+            color={enabled ? COLORS.warningText : COLORS.successText}
             style={{ marginBottom: SPACING.md }}
           />
           <Text style={[styles.statusLabel, enabled ? styles.labelOn : styles.labelOff]}>
@@ -118,7 +118,7 @@ export default function MaintenanceScreen() {
               value={enabled}
               onValueChange={toggleMaintenance}
               disabled={!isAdmin || toggling || loading}
-              trackColor={{ false: COLORS.border, true: '#B45309' }}
+              trackColor={{ false: COLORS.border, true: COLORS.orange }}
               thumbColor={enabled ? COLORS.yellow : COLORS.textTertiary}
               style={{ transform: [{ scaleX: 1.3 }, { scaleY: 1.3 }] }}
             />
@@ -204,20 +204,20 @@ const styles = StyleSheet.create({
     borderWidth: 1,
   },
   bannerOn: {
-    backgroundColor: '#451A03',
-    borderColor: '#92400E',
+    backgroundColor: COLORS.warningBg,
+    borderColor: COLORS.orange,
   },
   bannerOff: {
-    backgroundColor: '#052E16',
-    borderColor: '#166534',
+    backgroundColor: COLORS.successBg,
+    borderColor: COLORS.green,
   },
   statusLabel: {
     fontSize: 18,
     fontWeight: '800',
     letterSpacing: 2,
   },
-  labelOn: { color: '#FCD34D' },
-  labelOff: { color: '#6EE7B7' },
+  labelOn: { color: COLORS.warningText },
+  labelOff: { color: COLORS.successText },
 
   /* toggle card */
   card: {
@@ -256,11 +256,11 @@ const styles = StyleSheet.create({
 
   /* warning */
   warningCard: {
-    backgroundColor: '#7F1D1D',
+    backgroundColor: COLORS.dangerBg,
     borderRadius: RADIUS.lg,
     padding: 14,
     marginTop: SPACING.sm,
     alignItems: 'center',
   },
-  warningText: { color: '#FCA5A5', fontSize: 13, fontWeight: '500' },
+  warningText: { color: COLORS.dangerText, fontSize: 13, fontWeight: '500' },
 });

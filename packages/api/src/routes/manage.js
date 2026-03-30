@@ -21,7 +21,8 @@ router.post("/api/alerts/rules", requireAuth, requireRole("admin"), (req, res) =
     if (!limit.allowed) {
       return res.status(402).json({
         error: `Alert rule limit reached (${limit.max})`,
-        current: limit.current, max: limit.max,
+        current: limit.current,
+        max: limit.max,
         upgradeUrl: "https://lagoontechsystems.com/upgrade",
       });
     }
@@ -44,8 +45,9 @@ router.delete("/api/alerts/rules/:id", requireAuth, requireRole("admin"), (req, 
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.deleteRule(id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete alert rule" });
+  } catch (err) {
+    console.error("DELETE /api/alerts/rules/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -55,8 +57,9 @@ router.put("/api/alerts/rules/:id/toggle", requireAuth, requireRole("admin"), (r
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid rule ID" });
     alertEngine.toggleRule(id, req.body.enabled !== false);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to toggle alert rule" });
+  } catch (err) {
+    console.error("PUT /api/alerts/rules/:id/toggle error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -78,7 +81,8 @@ router.post("/api/webhooks", requireAuth, requireRole("admin"), (req, res) => {
     if (!limit.allowed) {
       return res.status(402).json({
         error: `Webhook limit reached (${limit.max})`,
-        current: limit.current, max: limit.max,
+        current: limit.current,
+        max: limit.max,
         upgradeUrl: "https://lagoontechsystems.com/upgrade",
       });
     }
@@ -99,8 +103,9 @@ router.delete("/api/webhooks/:id", requireAuth, requireRole("admin"), (req, res)
     if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid webhook ID" });
     webhooks.deleteWebhook(id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete webhook" });
+  } catch (err) {
+    console.error("DELETE /api/webhooks/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
@@ -117,7 +122,8 @@ router.post("/api/schedules", requireAuth, requireRole("admin"), (req, res) => {
     if (!limit.allowed) {
       return res.status(402).json({
         error: `Schedule limit reached (${limit.max})`,
-        current: limit.current, max: limit.max,
+        current: limit.current,
+        max: limit.max,
         upgradeUrl: "https://lagoontechsystems.com/upgrade",
       });
     }
@@ -141,18 +147,24 @@ router.delete("/api/schedules/:id", requireAuth, requireRole("admin"), (req, res
     scheduler.deleteSchedule(id);
     auditLog(req.user.id, "schedule.delete", req.params.id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete schedule" });
+  } catch (err) {
+    console.error("DELETE /api/schedules/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 
 router.put("/api/schedules/:id/toggle", requireAuth, requireRole("admin"), (req, res) => {
-  const id = parseInt(req.params.id, 10);
-  if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
-  const schedule = scheduler.toggleSchedule(id, req.body.enabled !== false);
-  if (!schedule) return res.status(404).json({ error: "Schedule not found" });
-  auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
-  res.json(schedule);
+  try {
+    const id = parseInt(req.params.id, 10);
+    if (!Number.isInteger(id) || id < 1) return res.status(400).json({ error: "Invalid schedule ID" });
+    const schedule = scheduler.toggleSchedule(id, req.body.enabled !== false);
+    if (!schedule) return res.status(404).json({ error: "Schedule not found" });
+    auditLog(req.user.id, "schedule.toggle", req.params.id, req.body.enabled !== false ? "enabled" : "disabled");
+    res.json(schedule);
+  } catch (err) {
+    console.error("PUT /api/schedules/:id/toggle error:", err);
+    res.status(500).json({ error: "Internal server error" });
+  }
 });
 
 router.get("/api/schedules/history", requireAuth, (req, res) => {
@@ -177,10 +189,25 @@ router.get("/api/audit", requireAuth, requireRole("admin"), (req, res) => {
   const db = getDb();
   const limit = Math.min(Math.max(parseInt(req.query.limit || "50", 10), 1), 500);
   const offset = Math.max(parseInt(req.query.offset || "0", 10), 0);
+  const { action, user } = req.query;
+
+  const conditions = [];
+  const params = [];
+  if (action) {
+    conditions.push("action = ?");
+    params.push(action);
+  }
+  if (user) {
+    conditions.push("user_id = ?");
+    params.push(user);
+  }
+
+  const where = conditions.length ? `WHERE ${conditions.join(" AND ")}` : "";
+  const { total } = db.prepare(`SELECT COUNT(*) as total FROM audit_log ${where}`).get(...params);
   const logs = db
-    .prepare("SELECT * FROM audit_log ORDER BY created_at DESC LIMIT ? OFFSET ?")
-    .all(limit, offset);
-  res.json({ logs });
+    .prepare(`SELECT * FROM audit_log ${where} ORDER BY created_at DESC LIMIT ? OFFSET ?`)
+    .all(...params, limit, offset);
+  res.json({ logs, total, limit, offset });
 });
 
 module.exports = router;

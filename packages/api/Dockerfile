@@ -17,7 +17,7 @@ ARG DOCKER_GID=988
 LABEL org.opencontainers.image.title="Lagoon Cockpit API"
 LABEL org.opencontainers.image.description="Mobile-first Docker infrastructure management API"
 LABEL org.opencontainers.image.version="${COCKPIT_VERSION}"
-LABEL org.opencontainers.image.source="https://github.com/lagoon-tech/cockpit"
+LABEL org.opencontainers.image.source="https://github.com/Lagoon-Tech-Systems/lagoon-cockpit"
 LABEL org.opencontainers.image.licenses="AGPL-3.0-only"
 LABEL org.opencontainers.image.vendor="Lagoon Tech Systems"
 
@@ -42,6 +42,6 @@ USER node
 EXPOSE 3000
 
 HEALTHCHECK --interval=30s --timeout=5s --start-period=10s --retries=3 \
-  CMD wget --no-verbose --tries=1 --spider http://localhost:3000/health || exit 1
+  CMD wget -qO- http://localhost:3000/health | grep -q '"status":"ok"' || exit 1
 
 CMD ["node", "src/index.js"]

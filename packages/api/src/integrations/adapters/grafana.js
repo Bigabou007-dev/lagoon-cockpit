@@ -1,4 +1,5 @@
 const { BaseAdapter, createAlert, createEvent } = require("../adapter");
+const { safeFetch } = require("../../security/url-validator");
 
 /**
  * Grafana adapter — pulls alerts, annotations, and dashboard health.
@@ -23,7 +24,7 @@ class GrafanaAdapter extends BaseAdapter {
   async testConnection() {
     const start = Date.now();
     try {
-      const res = await fetch(`${this._baseUrl()}/api/health`, {
+      const res = await safeFetch(`${this._baseUrl()}/api/health`, {
         headers: this._headers(),
         signal: AbortSignal.timeout(10000),
       });
@@ -44,7 +45,7 @@ class GrafanaAdapter extends BaseAdapter {
 
     // Pull active alerts
     try {
-      const res = await fetch(`${this._baseUrl()}/api/v1/provisioning/alert-rules`, {
+      const res = await safeFetch(`${this._baseUrl()}/api/v1/provisioning/alert-rules`, {
         headers: this._headers(),
         signal: AbortSignal.timeout(10000),
       });
@@ -60,8 +61,8 @@ class GrafanaAdapter extends BaseAdapter {
                 rule.title || "Grafana Alert",
                 rule.labels?.severity || "warning",
                 rule.isPaused ? "paused" : "active",
-                `${this._baseUrl()}/alerting/${rule.uid}/edit`
-              )
+                `${this._baseUrl()}/alerting/${rule.uid}/edit`,
+              ),
             );
           }
         }
@@ -73,11 +74,11 @@ class GrafanaAdapter extends BaseAdapter {
     // Pull recent annotations (last poll interval)
     if (this.config.pullAnnotations !== false) {
       try {
-        const from = Date.now() - (this.pollInterval * 1000 * 2); // 2x interval for overlap
-        const res = await fetch(
-          `${this._baseUrl()}/api/annotations?from=${from}&to=${Date.now()}`,
-          { headers: this._headers(), signal: AbortSignal.timeout(10000) }
-        );
+        const from = Date.now() - this.pollInterval * 1000 * 2; // 2x interval for overlap
+        const res = await safeFetch(`${this._baseUrl()}/api/annotations?from=${from}&to=${Date.now()}`, {
+          headers: this._headers(),
+          signal: AbortSignal.timeout(10000),
+        });
 
         if (res.ok) {
           const annotations = await res.json();
@@ -88,8 +89,8 @@ class GrafanaAdapter extends BaseAdapter {
                 "",
                 ann.text || "Annotation",
                 ann.tags?.includes("critical") ? "critical" : "info",
-                JSON.stringify({ dashboardId: ann.dashboardId, panelId: ann.panelId, tags: ann.tags })
-              )
+                JSON.stringify({ dashboardId: ann.dashboardId, panelId: ann.panelId, tags: ann.tags }),
+              ),
             );
           }
         }
@@ -120,7 +121,11 @@ class GrafanaAdapter extends BaseAdapter {
       properties: {
         url: { type: "string", title: "Grafana URL", description: "Base URL of the Grafana instance" },
         apiKey: { type: "string", title: "API Key (legacy)" },
-        serviceAccountToken: { type: "string", title: "Service Account Token", description: "Recommended over API key" },
+        serviceAccountToken: {
+          type: "string",
+          title: "Service Account Token",
+          description: "Recommended over API key",
+        },
         pullAnnotations: { type: "boolean", title: "Pull Annotations", default: true },
       },
       required: ["url"],

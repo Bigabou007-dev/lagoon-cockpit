@@ -1,4 +1,5 @@
 const { BaseAdapter, createMetric, createAlert } = require("../adapter");
+const { safeFetch } = require("../../security/url-validator");
 
 /**
  * Prometheus adapter — pulls metrics from any Prometheus-compatible endpoint.
@@ -25,7 +26,7 @@ class PrometheusAdapter extends BaseAdapter {
     const start = Date.now();
     try {
       const url = `${this.config.url.replace(/\/$/, "")}/-/healthy`;
-      const res = await fetch(url, {
+      const res = await safeFetch(url, {
         headers: this._headers(),
         signal: AbortSignal.timeout(10000),
       });
@@ -45,16 +46,14 @@ class PrometheusAdapter extends BaseAdapter {
     const points = [];
 
     // Pull configured queries
-    const queries = this.config.queries || [
-      { query: "up", name: "target_up", unit: "boolean" },
-    ];
+    const queries = this.config.queries || [{ query: "up", name: "target_up", unit: "boolean" }];
 
     for (const q of queries) {
       try {
-        const res = await fetch(
-          `${baseUrl}/api/v1/query?query=${encodeURIComponent(q.query)}`,
-          { headers: this._headers(), signal: AbortSignal.timeout(10000) }
-        );
+        const res = await safeFetch(`${baseUrl}/api/v1/query?query=${encodeURIComponent(q.query)}`, {
+          headers: this._headers(),
+          signal: AbortSignal.timeout(10000),
+        });
         if (!res.ok) continue;
 
         const body = await res.json();
@@ -63,16 +62,7 @@ class PrometheusAdapter extends BaseAdapter {
         for (const result of body.data.result) {
           const [, value] = result.value || [];
           const labels = result.metric || {};
-          points.push(
-            createMetric(
-              this.name,
-              "",
-              q.name || q.query,
-              parseFloat(value),
-              q.unit || "",
-              labels
-            )
-          );
+          points.push(createMetric(this.name, "", q.name || q.query, parseFloat(value), q.unit || "", labels));
         }
       } catch {
         // Skip failed queries
@@ -82,7 +72,7 @@ class PrometheusAdapter extends BaseAdapter {
     // Pull active alerts
     if (this.config.pullAlerts !== false) {
       try {
-        const res = await fetch(`${baseUrl}/api/v1/alerts`, {
+        const res = await safeFetch(`${baseUrl}/api/v1/alerts`, {
           headers: this._headers(),
           signal: AbortSignal.timeout(10000),
         });
@@ -97,8 +87,8 @@ class PrometheusAdapter extends BaseAdapter {
                 alert.labels?.alertname || "Unknown Alert",
                 alert.labels?.severity || "warning",
                 alert.state || "firing",
-                alert.generatorURL || null
-              )
+                alert.generatorURL || null,
+              ),
             );
           }
         }

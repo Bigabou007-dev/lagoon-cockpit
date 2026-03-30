@@ -1,22 +1,27 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, AppState, type AppStateStatus, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useCallback } from 'react';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAuthStore } from '../src/stores/authStore';
 import LockScreen from '../src/components/LockScreen';
+import ErrorBoundary from '../src/components/ErrorBoundary';
 import { EditionProvider } from '../src/edition/EditionProvider';
+import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 import { COLORS } from '../src/theme/tokens';
+import ConnectionBanner from '../src/components/ConnectionBanner';
 
 SplashScreen.preventAutoHideAsync();
 
 const BACKGROUND_LOCK_MS = 2 * 60 * 1000; // 2 minutes
 
-export default function RootLayout() {
+function AppContent() {
   const isUnlocked = useAuthStore((s) => s.isUnlocked);
   const lock = useAuthStore((s) => s.lock);
   const backgroundedAt = useRef<number | null>(null);
+  const { colors, isDark } = useTheme();
 
   const [fontsLoaded] = useFonts({
     Inter_400Regular,
@@ -51,8 +56,8 @@ export default function RootLayout() {
 
   if (!fontsLoaded) {
     return (
-      <View style={{ flex: 1, backgroundColor: COLORS.bg, justifyContent: 'center', alignItems: 'center' }}>
-        <ActivityIndicator size="large" color={COLORS.blue} />
+      <View style={{ flex: 1, backgroundColor: colors.bg, justifyContent: 'center', alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.blue} />
       </View>
     );
   }
@@ -61,21 +66,34 @@ export default function RootLayout() {
 
   return (
     <EditionProvider>
-      <View style={{ flex: 1, backgroundColor: COLORS.bg }} onLayout={onLayoutReady}>
-        <StatusBar style="light" />
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} onLayout={onLayoutReady}>
+        <StatusBar style={isDark ? 'light' : 'dark'} />
+        <ConnectionBanner />
         <Stack
           screenOptions={{
             headerShown: false,
-            contentStyle: { backgroundColor: COLORS.bg },
+            contentStyle: { backgroundColor: colors.bg },
             animation: 'slide_from_right',
           }}
         >
           <Stack.Screen name="index" />
           <Stack.Screen name="(tabs)" />
-          <Stack.Screen name="settings" options={{ headerShown: true, title: 'Settings', headerStyle: { backgroundColor: COLORS.bg }, headerTintColor: COLORS.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
-          <Stack.Screen name="servers" options={{ headerShown: true, title: 'All Servers', headerStyle: { backgroundColor: COLORS.bg }, headerTintColor: COLORS.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
+          <Stack.Screen name="settings" options={{ headerShown: true, title: 'Settings', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
+          <Stack.Screen name="servers" options={{ headerShown: true, title: 'All Servers', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
         </Stack>
-      </View>
+      </SafeAreaView>
     </EditionProvider>
+  );
+}
+
+export default function RootLayout() {
+  return (
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

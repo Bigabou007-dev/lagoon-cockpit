@@ -39,6 +39,31 @@ export interface ColorPalette {
   glass: string;
   glassBorder: string;
   glassHighlight: string;
+
+  /* Overlay */
+  overlay: string;
+
+  /* Semantic backgrounds (paired bg/text for status badges, buttons) */
+  successBg: string;
+  successText: string;
+  dangerBg: string;
+  dangerText: string;
+  warningBg: string;
+  warningText: string;
+  infoBg: string;
+  infoText: string;
+  mutedBg: string;
+  mutedText: string;
+
+  /* Buttons */
+  buttonPrimary: string;
+  buttonPrimaryText: string;
+  buttonGreenBg: string;
+  buttonRedBg: string;
+
+  /* Terminal */
+  terminal: string;
+  terminalText: string;
 }
 
 export const darkColors: ColorPalette = {
@@ -77,6 +102,31 @@ export const darkColors: ColorPalette = {
   glass: 'rgba(255,255,255,0.06)',
   glassBorder: 'rgba(255,255,255,0.10)',
   glassHighlight: 'rgba(255,255,255,0.04)',
+
+  /* Overlay */
+  overlay: 'rgba(0,0,0,0.7)',
+
+  /* Semantic backgrounds (paired bg/text for status badges, buttons) */
+  successBg: '#064E3B',
+  successText: '#6EE7B7',
+  dangerBg: '#7F1D1D',
+  dangerText: '#FCA5A5',
+  warningBg: '#451A03',
+  warningText: '#FCD34D',
+  infoBg: '#1E3A5F',
+  infoText: '#93C5FD',
+  mutedBg: '#374151',
+  mutedText: '#9CA3AF',
+
+  /* Buttons */
+  buttonPrimary: '#1D4ED8',
+  buttonPrimaryText: '#fff',
+  buttonGreenBg: '#166534',
+  buttonRedBg: '#991B1B',
+
+  /* Terminal */
+  terminal: '#0A0A0A',
+  terminalText: '#86EFAC',
 };
 
 export const lightColors: ColorPalette = {
@@ -115,4 +165,29 @@ export const lightColors: ColorPalette = {
   glass: 'rgba(0,0,0,0.03)',
   glassBorder: 'rgba(0,0,0,0.08)',
   glassHighlight: 'rgba(255,255,255,0.5)',
+
+  /* Overlay */
+  overlay: 'rgba(0,0,0,0.5)',
+
+  /* Semantic backgrounds (paired bg/text for status badges, buttons) */
+  successBg: '#D1FAE5',
+  successText: '#065F46',
+  dangerBg: '#FEE2E2',
+  dangerText: '#991B1B',
+  warningBg: '#FEF3C7',
+  warningText: '#92400E',
+  infoBg: '#DBEAFE',
+  infoText: '#1E40AF',
+  mutedBg: '#F3F4F6',
+  mutedText: '#6B7280',
+
+  /* Buttons */
+  buttonPrimary: '#2563EB',
+  buttonPrimaryText: '#fff',
+  buttonGreenBg: '#16A34A',
+  buttonRedBg: '#DC2626',
+
+  /* Terminal */
+  terminal: '#1E293B',
+  terminalText: '#16A34A',
 };
