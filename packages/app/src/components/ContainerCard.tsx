@@ -1,4 +1,4 @@
-import { View, Text, TouchableOpacity, StyleSheet, Alert } from 'react-native';
+import { View, Text, Pressable, TouchableOpacity, StyleSheet, Alert } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import * as Haptics from 'expo-haptics';
 import type { ContainerSummary } from '../stores/dashboardStore';
@@ -66,15 +66,14 @@ export default function ContainerCard({
   };
 
   return (
-    <TouchableOpacity
-      style={[
+    <Pressable
+      style={({ pressed }) => [
         styles.card,
-        { borderLeftColor: statusColor },
+        { borderLeftColor: statusColor, opacity: pressed ? 0.7 : 1 },
         selected && styles.cardSelected,
       ]}
       onPress={onPress}
       onLongPress={onLongPress}
-      activeOpacity={0.7}
       accessibilityRole="button"
       accessibilityLabel={`Container ${container.name}, ${statusLabel}`}
       accessibilityState={{ selected: selected ?? false }}
@@ -150,7 +149,7 @@ export default function ContainerCard({
           </TouchableOpacity>
         </View>
       )}
-    </TouchableOpacity>
+    </Pressable>
   );
 }
 

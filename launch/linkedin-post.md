@@ -25,7 +25,7 @@ No vendor lock-in. No cloud dependency. Your data stays on your server.
 
 MIT licensed. Contributions welcome.
 
-https://github.com/Bigabou007-dev/lagoon-cockpit
+https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 
 #DevOps #Docker #OpenSource #MobileDevOps #ReactNative #Infrastructure #SelfHosted
 

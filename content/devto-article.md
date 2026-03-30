@@ -163,7 +163,7 @@ Set your API key and JWT secret in `.env`, run `docker compose up -d`, and conne
 
 ## Try it
 
-MIT licensed, open-source: [github.com/Bigabou007-dev/lagoon-cockpit](https://github.com/Bigabou007-dev/lagoon-cockpit)
+MIT licensed, open-source: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
 
 If you manage Docker infrastructure and have ever wished you could check on things from your phone without SSH, give it a shot. PRs welcome.
 

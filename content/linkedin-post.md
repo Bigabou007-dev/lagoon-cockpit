@@ -20,6 +20,6 @@ Since then it went from "monitor Docker containers" to a full cross-platform inf
 
 The goal was simple: manage your servers from your phone without SSH. We went a bit further than that.
 
-https://github.com/Bigabou007-dev/lagoon-cockpit
+https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 
 #OpenSource #DevOps #Docker #ReactNative #InfrastructureMonitoring #SelfHosted

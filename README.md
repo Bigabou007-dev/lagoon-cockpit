@@ -32,15 +32,10 @@ Portainer and Rancher are powerful, but they're desktop web UIs. When your serve
 
 <div align="center">
 
-| Overview Dashboard | Containers | Container Detail | Manage Hub |
+| Overview Dashboard | Containers | Compose Stacks | Manage Hub |
 |:--:|:--:|:--:|:--:|
-| ![Overview](docs/screenshots/overview.png) | ![Containers](docs/screenshots/containers.png) | ![Detail](docs/screenshots/container-detail.png) | ![Manage](docs/screenshots/manage.png) |
-| Real-time gauges, uptime, container & stack health | Search, filter, bulk actions with inline controls | Stats, Logs, Exec, Env, Top — 5 deep-dive tabs | 10+ screens: System Map, Disk, Webhooks, Alerts |
-
-| Monitoring | Disk Usage | Maintenance Mode | Stacks |
-|:--:|:--:|:--:|:--:|
-| ![Monitoring](docs/screenshots/monitoring.png) | ![Disk](docs/screenshots/disk-usage.png) | ![Maintenance](docs/screenshots/maintenance.png) | ![Stacks](docs/screenshots/stacks.png) |
-| Grafana integration with CPU/Memory charts | Storage breakdown + one-tap system prune | Pause alerts during planned work | Compose projects with stack-level actions |
+| ![Overview](docs/screenshots/overview.png) | ![Containers](docs/screenshots/containers.png) | ![Stacks](docs/screenshots/stacks.png) | ![Manage](docs/screenshots/manage.png) |
+| Real-time gauges, uptime, system resources | Search, filter, bulk actions with inline controls | Compose projects with stack-level health | 14+ screens: System Map, Disk, Webhooks, Alerts |
 
 </div>
 

@@ -3,7 +3,7 @@ title: "I Built a Mobile DevOps Dashboard Because Checking Production Shouldn't 
 published: false
 description: "Lagoon Cockpit: an open-source mobile app for managing Docker containers, Compose stacks, and server health from your phone."
 tags: devops, docker, opensource, reactnative
-canonical_url: https://github.com/Bigabou007-dev/lagoon-cockpit
+canonical_url: https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 cover_image:
 ---
 
@@ -135,7 +135,7 @@ This means the API doesn't need to mount your compose files — it discovers sta
 ### Deploy the API (2 minutes)
 
 ```bash
-git clone https://github.com/Bigabou007-dev/lagoon-cockpit.git
+git clone https://github.com/Lagoon-Tech-Systems/lagoon-cockpit.git
 cd lagoon-cockpit/packages/api
 
 # Configure
@@ -168,7 +168,7 @@ Scan the QR code with Expo Go on your phone. Add your server URL + API key, and 
 
 ## Try It
 
-GitHub: [github.com/Bigabou007-dev/lagoon-cockpit](https://github.com/Bigabou007-dev/lagoon-cockpit)
+GitHub: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
 
 MIT licensed. Stars, issues, and PRs welcome.
 
