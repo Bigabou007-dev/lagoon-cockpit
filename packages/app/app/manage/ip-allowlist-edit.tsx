@@ -1,4 +1,4 @@
-import { useState } from 'react';
+import { useState, useEffect, useCallback } from 'react';
 import {
   View,
   Text,
@@ -10,103 +10,100 @@ import {
   KeyboardAvoidingView,
   Platform,
   Switch,
+  ActivityIndicator,
 } from 'react-native';
-import { Stack, useRouter } from 'expo-router';
+import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
-import { sanitizeErrorMessage } from '../../src/lib/errors';
+
+/* ---------- Types ---------- */
+
+interface IpRule {
+  id: string;
+  cidr: string;
+  label: string;
+  description?: string;
+  enabled: boolean;
+  created_at: string;
+  updated_at?: string;
+}
 
 /* ---------- Constants ---------- */
 
 const ENT_API = '/api/ext/cockpit-enterprise';
 
-function isValidCidr(value: string): boolean {
-  if (!value.trim()) return false;
-  const v = value.trim();
-  if (/^(\d{1,3}\.){3}\d{1,3}\/\d{1,2}$/.test(v)) {
-    const [ip, prefix] = v.split('/');
-    const parts = ip.split('.').map(Number);
-    if (parts.some(p => p > 255)) return false;
-    if (Number(prefix) > 32) return false;
-    return true;
-  }
-  if (/^[0-9a-fA-F:]+\/\d{1,3}$/.test(v)) {
-    return Number(v.split('/')[1]) <= 128;
-  }
-  return false;
-}
-
 /* ---------- Screen ---------- */
 
-function IpAllowlistCreateContent() {
+function IpAllowlistEditContent() {
   const router = useRouter();
+  const { id } = useLocalSearchParams<{ id: string }>();
 
-  const [cidr, setCidr] = useState('');
+  const [loading, setLoading] = useState(true);
   const [label, setLabel] = useState('');
   const [description, setDescription] = useState('');
   const [enabled, setEnabled] = useState(true);
+  const [cidr, setCidr] = useState('');
   const [submitting, setSubmitting] = useState(false);
 
-  const canSubmit = cidr.trim().length > 0;
+  const fetchRule = useCallback(async () => {
+    if (!id) return;
+    try {
+      const res = await apiFetch<IpRule>(`${ENT_API}/ip-allowlist/rules/${id}`);
+      setCidr(res.cidr);
+      setLabel(res.label ?? '');
+      setDescription(res.description ?? '');
+      setEnabled(res.enabled);
+    } catch (err: unknown) {
+      const message = sanitizeErrorMessage(err, 'Failed to load rule');
+      Alert.alert('Error', message, [{ text: 'OK', onPress: () => router.back() }]);
+    } finally {
+      setLoading(false);
+    }
+  }, [id, router]);
+
+  useEffect(() => {
+    fetchRule();
+  }, [fetchRule]);
 
   const handleSubmit = async () => {
-    if (!canSubmit) return;
-
-    if (!isValidCidr(cidr)) {
-      Alert.alert('Validation Error', 'Invalid CIDR range. Use IPv4 (e.g. 10.0.0.0/8) or IPv6 notation.');
-      return;
-    }
-
-    if (cidr.trim().endsWith('/0')) {
-      Alert.alert(
-        'Warning',
-        'This rule allows ALL addresses. Are you sure?',
-        [
-          { text: 'Cancel', style: 'cancel' },
-          { text: 'Continue', onPress: () => doSubmit() },
-        ],
-      );
-      return;
-    }
-
-    doSubmit();
-  };
-
-  const doSubmit = async () => {
+    if (!id) return;
     setSubmitting(true);
     try {
-      const body: Record<string, unknown> = {
-        cidr: cidr.trim(),
-        enabled,
-      };
-      if (label.trim()) body.label = label.trim();
-      if (description.trim()) body.description = description.trim();
-
-      await apiFetch(`${ENT_API}/ip-allowlist/rules`, {
-        method: 'POST',
-        body: JSON.stringify(body),
+      await apiFetch(`${ENT_API}/ip-allowlist/rules/${id}`, {
+        method: 'PUT',
+        body: JSON.stringify({
+          label: label.trim() || undefined,
+          description: description.trim() || undefined,
+          enabled,
+        }),
       });
-
       router.back();
     } catch (err: unknown) {
-      const message = sanitizeErrorMessage(err, 'Failed to create rule');
+      const message = sanitizeErrorMessage(err, 'Failed to update rule');
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);
     }
   };
 
+  if (loading) {
+    return (
+      <>
+        <Stack.Screen options={{ title: 'Edit IP Rule', headerBackTitle: 'Back' }} />
+        <View style={[styles.container, { justifyContent: 'center', alignItems: 'center' }]}>
+          <ActivityIndicator size="large" color={COLORS.blue} />
+        </View>
+      </>
+    );
+  }
+
   return (
     <>
-      <Stack.Screen
-        options={{
-          title: 'Add IP Rule',
-          headerBackTitle: 'IP Allowlist',
-        }}
-      />
+      <Stack.Screen options={{ title: 'Edit IP Rule', headerBackTitle: 'Back' }} />
 
       <KeyboardAvoidingView
         style={styles.container}
@@ -118,21 +115,13 @@ function IpAllowlistCreateContent() {
           contentContainerStyle={styles.scrollContent}
           keyboardShouldPersistTaps="handled"
         >
-          {/* CIDR */}
+          {/* CIDR (read-only) */}
           <GlassCard style={styles.section}>
-            <Text style={styles.fieldLabel}>CIDR Range *</Text>
-            <Text style={styles.fieldHint}>IPv4 or IPv6 CIDR notation (e.g. 10.0.0.0/8)</Text>
-            <TextInput
-              style={styles.textInput}
-              placeholder="e.g. 192.168.1.0/24"
-              placeholderTextColor={COLORS.textTertiary}
-              value={cidr}
-              onChangeText={setCidr}
-              maxLength={50}
-              autoFocus
-              autoCapitalize="none"
-              keyboardType="default"
-            />
+            <Text style={styles.fieldLabel}>CIDR Range</Text>
+            <Text style={styles.fieldHint}>CIDR cannot be changed — delete and recreate for a new range</Text>
+            <View style={styles.readOnlyField}>
+              <Text style={styles.readOnlyText}>{cidr}</Text>
+            </View>
           </GlassCard>
 
           {/* Label */}
@@ -170,7 +159,7 @@ function IpAllowlistCreateContent() {
             <View style={styles.switchRow}>
               <View style={{ flex: 1 }}>
                 <Text style={styles.fieldLabel}>Enabled</Text>
-                <Text style={styles.fieldHint}>Rule is active immediately after creation</Text>
+                <Text style={styles.fieldHint}>Toggle this rule on or off</Text>
               </View>
               <Switch
                 value={enabled}
@@ -183,24 +172,17 @@ function IpAllowlistCreateContent() {
 
           {/* Submit Button */}
           <TouchableOpacity
-            style={[
-              styles.submitBtn,
-              !canSubmit && styles.submitBtnDisabled,
-            ]}
+            style={styles.submitBtn}
             onPress={handleSubmit}
-            disabled={!canSubmit || submitting}
+            disabled={submitting}
             activeOpacity={0.8}
           >
             {submitting ? (
-              <Text style={styles.submitBtnText}>Creating...</Text>
+              <Text style={styles.submitBtnText}>Saving...</Text>
             ) : (
               <>
-                <Ionicons
-                  name="add-circle-outline"
-                  size={20}
-                  color={COLORS.buttonPrimaryText}
-                />
-                <Text style={styles.submitBtnText}>Add Rule</Text>
+                <Ionicons name="checkmark-circle-outline" size={20} color={COLORS.buttonPrimaryText} />
+                <Text style={styles.submitBtnText}>Save Changes</Text>
               </>
             )}
           </TouchableOpacity>
@@ -210,10 +192,10 @@ function IpAllowlistCreateContent() {
   );
 }
 
-export default function IpAllowlistCreateScreen() {
+export default function IpAllowlistEditScreen() {
   return (
     <FeatureGate feature="ip_allowlist">
-      <IpAllowlistCreateContent />
+      <IpAllowlistEditContent />
     </FeatureGate>
   );
 }
@@ -259,6 +241,21 @@ const styles = StyleSheet.create({
     paddingTop: SPACING.md,
   },
 
+  /* Read-only field */
+  readOnlyField: {
+    backgroundColor: COLORS.bg,
+    borderRadius: RADIUS.md,
+    paddingHorizontal: SPACING.md,
+    paddingVertical: SPACING.md,
+    borderWidth: 1,
+    borderColor: COLORS.border,
+    opacity: 0.6,
+  },
+  readOnlyText: {
+    color: COLORS.textSecondary,
+    fontSize: 15,
+  },
+
   /* Switch row */
   switchRow: {
     flexDirection: 'row',
@@ -277,9 +274,6 @@ const styles = StyleSheet.create({
     borderRadius: RADIUS.lg,
     marginTop: SPACING.md,
     ...SHADOW.card,
-  },
-  submitBtnDisabled: {
-    opacity: 0.5,
   },
   submitBtnText: {
     color: COLORS.buttonPrimaryText,

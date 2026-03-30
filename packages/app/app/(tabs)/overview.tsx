@@ -13,6 +13,7 @@ import { GlassCard } from '../../src/components/ui/GlassCard';
 import { TactileCard } from '../../src/components/ui/TactileCard';
 import { StatusDot } from '../../src/components/ui/StatusDot';
 import Skeleton from '../../src/components/Skeleton';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ─── Helpers ─── */
 function formatBytes(bytes: number): string {
@@ -221,7 +222,7 @@ export default function OverviewScreen() {
       }
     } catch (err) {
       console.error('[COCKPIT] Failed to fetch overview:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load dashboard');
+      setError(sanitizeErrorMessage(err, 'Failed to load dashboard'));
     }
   }, [setOverview, setContainers, setStacks]);
 

@@ -15,6 +15,7 @@ import Skeleton from '../../src/components/Skeleton';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 const PRO_API = '/api/ext/cockpit-pro';
 
@@ -178,7 +179,7 @@ function IncidentsListContent() {
       const res = await apiFetch<IncidentsResponse>(`${PRO_API}/incidents?${params.toString()}`);
       setIncidents(res.incidents ?? []);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load incidents';
+      const message = sanitizeErrorMessage(err, 'Failed to load incidents');
       setError(message);
     } finally {
       setLoading(false);

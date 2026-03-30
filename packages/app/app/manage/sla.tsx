@@ -14,6 +14,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -132,7 +133,7 @@ function SlaListContent() {
 
       setDefinitions(enriched);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load SLA definitions';
+      const message = sanitizeErrorMessage(err, 'Failed to load SLA definitions');
       setError(message);
     } finally {
       setLoading(false);

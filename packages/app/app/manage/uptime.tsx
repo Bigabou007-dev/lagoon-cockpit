@@ -14,6 +14,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -113,7 +114,7 @@ function UptimeListContent() {
       const res = await apiFetch<MonitorsResponse>(`${PRO_API}/uptime/monitors`);
       setMonitors(res.monitors ?? []);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load monitors';
+      const message = sanitizeErrorMessage(err, 'Failed to load monitors');
       setError(message);
     } finally {
       setLoading(false);

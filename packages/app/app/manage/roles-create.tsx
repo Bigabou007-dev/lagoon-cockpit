@@ -17,6 +17,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -92,7 +93,7 @@ function RolesCreateContent() {
         setSelectedPermissions(new Set(r.permissions ?? []));
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : 'Failed to load role';
+        const message = sanitizeErrorMessage(err, 'Failed to load role');
         Alert.alert('Error', message);
       })
       .finally(() => setLoadingExisting(false));
@@ -137,7 +138,7 @@ function RolesCreateContent() {
 
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} role`;
+      const message = sanitizeErrorMessage(err, `Failed to ${isEditing ? 'update' : 'create'} role`);
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);

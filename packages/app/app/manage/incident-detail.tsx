@@ -22,6 +22,7 @@ const PRO_API = '/api/ext/cockpit-pro';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -280,7 +281,7 @@ function IncidentDetailContent() {
       const res = await apiFetch<IncidentDetail>(`${PRO_API}/incidents/${id}`);
       setIncident(res);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load incident';
+      const message = sanitizeErrorMessage(err, 'Failed to load incident');
       setError(message);
     } finally {
       setLoading(false);
@@ -313,7 +314,7 @@ function IncidentDetailContent() {
       setStatusMessage('');
       await fetchIncident(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to update status';
+      const message = sanitizeErrorMessage(err, 'Failed to update status');
       Alert.alert('Error', message);
     } finally {
       setUpdatingStatus(false);
@@ -331,7 +332,7 @@ function IncidentDetailContent() {
       setNoteText('');
       await fetchIncident(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to add note';
+      const message = sanitizeErrorMessage(err, 'Failed to add note');
       Alert.alert('Error', message);
     } finally {
       setAddingNote(false);
@@ -353,7 +354,7 @@ function IncidentDetailContent() {
               await apiFetch(`${PRO_API}/incidents/${id}`, { method: 'DELETE' });
               router.back();
             } catch (err: unknown) {
-              const message = err instanceof Error ? err.message : 'Failed to delete incident';
+              const message = sanitizeErrorMessage(err, 'Failed to delete incident');
               Alert.alert('Error', message);
               setDeleting(false);
             }

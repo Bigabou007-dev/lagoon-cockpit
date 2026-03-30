@@ -5,19 +5,19 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Animated,
-  Easing,
   ScrollView,
   Alert,
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, Easing } from 'react-native-reanimated';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -57,31 +57,21 @@ function formatDateTime(timestamp: string): string {
 /* ---------- Staggered Animation ---------- */
 
 function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(16)).current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(16);
 
   useEffect(() => {
-    const anim = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]);
-    anim.start();
-  }, [opacity, translateY, delay]);
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 400, easing: Easing.out(Easing.ease) }));
+  }, []);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+    <Animated.View style={animStyle}>
       {children}
     </Animated.View>
   );
@@ -108,7 +98,7 @@ function MtlsDetailContent() {
       const res = await apiFetch<MtlsAgent>(`${ENT_API}/mtls/agents/${id}`);
       setAgent(res);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load agent';
+      const message = sanitizeErrorMessage(err, 'Failed to load agent');
       setError(message);
     } finally {
       setLoading(false);
@@ -132,7 +122,7 @@ function MtlsDetailContent() {
       await apiFetch(`${ENT_API}/mtls/agents/${id}/toggle`, { method: 'PUT' });
       await fetchAgent(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to toggle agent';
+      const message = sanitizeErrorMessage(err, 'Failed to toggle agent');
       Alert.alert('Error', message);
     } finally {
       setToggling(false);
@@ -154,7 +144,7 @@ function MtlsDetailContent() {
               await apiFetch(`${ENT_API}/mtls/agents/${id}`, { method: 'DELETE' });
               router.back();
             } catch (err: unknown) {
-              const message = err instanceof Error ? err.message : 'Failed to remove agent';
+              const message = sanitizeErrorMessage(err, 'Failed to remove agent');
               Alert.alert('Error', message);
               setDeleting(false);
             }

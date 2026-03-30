@@ -16,6 +16,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 const PRO_API = '/api/ext/cockpit-pro';
 
@@ -93,7 +94,7 @@ function IncidentCreateContent() {
       });
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to create incident';
+      const message = sanitizeErrorMessage(err, 'Failed to create incident');
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);

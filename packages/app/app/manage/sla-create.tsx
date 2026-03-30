@@ -17,6 +17,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -91,7 +92,7 @@ function SlaCreateContent() {
         setMonitorId(def.monitor_id ?? '');
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : 'Failed to load SLA definition';
+        const message = sanitizeErrorMessage(err, 'Failed to load SLA definition');
         Alert.alert('Error', message);
       })
       .finally(() => setLoadingExisting(false));
@@ -128,7 +129,7 @@ function SlaCreateContent() {
 
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} SLA`;
+      const message = sanitizeErrorMessage(err, `Failed to ${isEditing ? 'update' : 'create'} SLA`);
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);

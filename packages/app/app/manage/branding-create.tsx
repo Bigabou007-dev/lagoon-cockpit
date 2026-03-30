@@ -17,6 +17,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -86,7 +87,7 @@ function BrandingCreateContent() {
         setFaviconUrl(t.favicon_url ?? '');
       })
       .catch((err: unknown) => {
-        const message = err instanceof Error ? err.message : 'Failed to load theme';
+        const message = sanitizeErrorMessage(err, 'Failed to load theme');
         Alert.alert('Error', message);
       })
       .finally(() => setLoadingExisting(false));
@@ -139,7 +140,7 @@ function BrandingCreateContent() {
 
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : `Failed to ${isEditing ? 'update' : 'create'} theme`;
+      const message = sanitizeErrorMessage(err, `Failed to ${isEditing ? 'update' : 'create'} theme`);
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);

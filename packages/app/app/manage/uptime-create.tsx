@@ -17,6 +17,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -110,7 +111,7 @@ function UptimeCreateContent() {
         }
       }
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load monitor';
+      const message = sanitizeErrorMessage(err, 'Failed to load monitor');
       Alert.alert('Error', message);
       router.back();
     } finally {
@@ -176,7 +177,7 @@ function UptimeCreateContent() {
       }
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to save monitor';
+      const message = sanitizeErrorMessage(err, 'Failed to save monitor');
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);

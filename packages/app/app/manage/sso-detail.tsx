@@ -6,19 +6,19 @@ import {
   TouchableOpacity,
   StyleSheet,
   RefreshControl,
-  Animated,
-  Easing,
   ScrollView,
   Alert,
   ActivityIndicator,
   Platform,
 } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withTiming, withDelay, Easing } from 'react-native-reanimated';
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router';
 import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Types ---------- */
 
@@ -74,31 +74,21 @@ function formatDateTime(timestamp: string): string {
 /* ---------- Staggered Animation ---------- */
 
 function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(16)).current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(16);
 
   useEffect(() => {
-    const anim = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]);
-    anim.start();
-  }, [opacity, translateY, delay]);
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 400, easing: Easing.out(Easing.ease) }));
+  }, []);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+    <Animated.View style={animStyle}>
       {children}
     </Animated.View>
   );
@@ -133,7 +123,7 @@ function SsoDetailContent() {
       setSessions(sessRes.sessions ?? []);
       if (metaRes) setMetadataUrl(metaRes.metadata_url);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to load SSO provider';
+      const message = sanitizeErrorMessage(err, 'Failed to load SSO provider');
       setError(message);
     } finally {
       setLoading(false);
@@ -157,7 +147,7 @@ function SsoDetailContent() {
       await apiFetch(`${ENT_API}/sso/providers/${id}/toggle`, { method: 'PUT' });
       await fetchAll(false);
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to toggle provider';
+      const message = sanitizeErrorMessage(err, 'Failed to toggle provider');
       Alert.alert('Error', message);
     } finally {
       setToggling(false);
@@ -178,7 +168,7 @@ function SsoDetailContent() {
               await apiFetch(`${ENT_API}/sso/sessions/${sessionId}`, { method: 'DELETE' });
               await fetchAll(false);
             } catch (err: unknown) {
-              const message = err instanceof Error ? err.message : 'Failed to revoke session';
+              const message = sanitizeErrorMessage(err, 'Failed to revoke session');
               Alert.alert('Error', message);
             }
           },
@@ -202,7 +192,7 @@ function SsoDetailContent() {
               await apiFetch(`${ENT_API}/sso/providers/${id}`, { method: 'DELETE' });
               router.back();
             } catch (err: unknown) {
-              const message = err instanceof Error ? err.message : 'Failed to delete provider';
+              const message = sanitizeErrorMessage(err, 'Failed to delete provider');
               Alert.alert('Error', message);
               setDeleting(false);
             }

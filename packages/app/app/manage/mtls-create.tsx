@@ -16,6 +16,7 @@ import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
 import { GlassCard } from '../../src/components/ui/GlassCard';
 import { FeatureGate } from '../../src/edition/FeatureGate';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 /* ---------- Constants ---------- */
 
@@ -59,7 +60,7 @@ function MtlsCreateContent() {
 
       router.back();
     } catch (err: unknown) {
-      const message = err instanceof Error ? err.message : 'Failed to register agent';
+      const message = sanitizeErrorMessage(err, 'Failed to register agent');
       Alert.alert('Error', message);
     } finally {
       setSubmitting(false);
