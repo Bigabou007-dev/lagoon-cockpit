@@ -1,13 +1,13 @@
 import { useEffect } from 'react';
-import { type ViewStyle } from 'react-native';
-import Animated, { type AnimatedStyle, useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
+import { type StyleProp, type ViewStyle } from 'react-native';
+import Animated, { useSharedValue, useAnimatedStyle, withRepeat, withSequence, withTiming } from 'react-native-reanimated';
 import { COLORS } from '../theme/tokens';
 
 interface SkeletonProps {
   width: number | string;
   height: number;
   borderRadius?: number;
-  style?: AnimatedStyle<ViewStyle>;
+  style?: StyleProp<ViewStyle>;
 }
 
 export default function Skeleton({ width, height, borderRadius = 8, style }: SkeletonProps) {
@@ -37,7 +37,7 @@ export default function Skeleton({ width, height, borderRadius = 8, style }: Ske
           backgroundColor: COLORS.border,
         },
         animStyle,
-        style,
+        style as Record<string, unknown>,
       ]}
     />
   );
