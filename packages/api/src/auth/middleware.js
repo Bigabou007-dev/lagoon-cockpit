@@ -33,14 +33,17 @@ function clearFailedAttempts(ip) {
 }
 
 // Periodically clean up expired lockouts to prevent memory leak
-setInterval(() => {
-  const now = Date.now();
-  for (const [ip, entry] of failedAttempts) {
-    if (entry.lockedUntil && now >= entry.lockedUntil) {
-      failedAttempts.delete(ip);
+const _lockoutCleanupInterval = setInterval(
+  () => {
+    const now = Date.now();
+    for (const [ip, entry] of failedAttempts) {
+      if (entry.lockedUntil && now >= entry.lockedUntil) {
+        failedAttempts.delete(ip);
+      }
     }
-  }
-}, 60 * 60 * 1000); // Every hour
+  },
+  60 * 60 * 1000,
+); // Every hour
 
 /** Rate limit middleware for auth routes */
 function rateLimitAuth(req, res, next) {
@@ -87,10 +90,16 @@ function requireRole(...roles) {
   };
 }
 
+/** Stop the background lockout cleanup interval (for graceful shutdown / tests) */
+function stopLockoutCleanup() {
+  clearInterval(_lockoutCleanupInterval);
+}
+
 module.exports = {
   rateLimitAuth,
   recordFailedAttempt,
   clearFailedAttempts,
   requireAuth,
   requireRole,
+  stopLockoutCleanup,
 };

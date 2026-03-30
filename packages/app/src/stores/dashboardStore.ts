@@ -71,6 +71,8 @@ interface OverviewData {
   timestamp: string;
 }
 
+type SSEStatus = 'connected' | 'reconnecting' | 'disconnected';
+
 interface DashboardState {
   overview: OverviewData | null;
   platform: 'linux' | 'windows';
@@ -82,6 +84,7 @@ interface DashboardState {
   isLoading: boolean;
   error: string | null;
   lastUpdated: string | null;
+  sseStatus: SSEStatus;
 
   setOverview: (data: OverviewData) => void;
   setPlatform: (platform: 'linux' | 'windows') => void;
@@ -91,9 +94,11 @@ interface DashboardState {
   setProcesses: (data: WindowsProcess[]) => void;
   addAlert: (alert: Alert) => void;
   updateFromSSE: (event: string, data: unknown) => void;
+  setSSEStatus: (status: SSEStatus) => void;
   setLoading: (loading: boolean) => void;
   setError: (error: string | null) => void;
   clearAlerts: () => void;
+  reset: () => void;
 }
 
 export const useDashboardStore = create<DashboardState>((set, get) => ({
@@ -107,6 +112,7 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
   isLoading: false,
   error: null,
   lastUpdated: null,
+  sseStatus: 'disconnected' as SSEStatus,
 
   setOverview: (data) => {
     const platform = data.platform === 'windows' ? 'windows' : 'linux';
@@ -146,7 +152,22 @@ export const useDashboardStore = create<DashboardState>((set, get) => ({
     }
   },
 
+  setSSEStatus: (status) => set({ sseStatus: status }),
   setLoading: (loading) => set({ isLoading: loading }),
   setError: (error) => set({ error }),
   clearAlerts: () => set({ alerts: [] }),
+  reset: () =>
+    set({
+      overview: null,
+      platform: 'linux',
+      containers: [],
+      stacks: [],
+      services: [],
+      processes: [],
+      alerts: [],
+      isLoading: false,
+      error: null,
+      lastUpdated: null,
+      sseStatus: 'disconnected' as SSEStatus,
+    }),
 }));

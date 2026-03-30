@@ -10,6 +10,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
@@ -198,7 +199,7 @@ export default function WebhooksScreen() {
         {/* Webhooks list */}
         {webhooks.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>{'\u{1F517}'}</Text>
+            <Ionicons name="link" size={40} color={COLORS.textTertiary} style={{ marginBottom: SPACING.md }} />
             <Text style={styles.emptyText}>No webhooks configured</Text>
             <Text style={styles.emptySubtext}>
               Webhooks send HTTP POST notifications when events occur
@@ -217,13 +218,13 @@ export default function WebhooksScreen() {
                 <View
                   style={[
                     styles.statusBadge,
-                    { backgroundColor: wh.enabled ? '#064E3B' : '#7F1D1D' },
+                    { backgroundColor: wh.enabled ? COLORS.successBg : COLORS.dangerBg },
                   ]}
                 >
                   <Text
                     style={[
                       styles.statusText,
-                      { color: wh.enabled ? '#6EE7B7' : '#FCA5A5' },
+                      { color: wh.enabled ? COLORS.successText : COLORS.dangerText },
                     ]}
                   >
                     {wh.enabled ? 'Active' : 'Disabled'}
@@ -298,7 +299,7 @@ const styles = StyleSheet.create({
     marginLeft: SPACING.xs,
   },
   saveBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
@@ -338,7 +339,6 @@ const styles = StyleSheet.create({
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 40 },
-  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
   emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
   emptySubtext: { color: COLORS.textTertiary, fontSize: 13, textAlign: 'center' },
 });

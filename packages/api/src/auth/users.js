@@ -17,6 +17,13 @@ function authenticateWithCredentials(email, password) {
 
   if (!bcrypt.compareSync(password, user.password_hash)) return null;
 
+  // Rehash if stored hash uses a weaker cost factor (< 12)
+  const currentCost = parseInt(user.password_hash.split("$")[2], 10);
+  if (!currentCost || currentCost < 12) {
+    const newHash = bcrypt.hashSync(password, 12);
+    db.prepare("UPDATE users SET password_hash = ? WHERE id = ?").run(newHash, user.id);
+  }
+
   const accessToken = signAccessToken({ sub: user.id, role: user.role, email: user.email });
 
   // Update last_login
@@ -35,10 +42,8 @@ function createUser(email, password, role = "viewer") {
   const existing = db.prepare("SELECT id FROM users WHERE email = ?").get(email);
   if (existing) throw new Error("User already exists");
 
-  const hash = bcrypt.hashSync(password, 10);
-  const result = db.prepare(
-    "INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)"
-  ).run(email, hash, role);
+  const hash = bcrypt.hashSync(password, 12);
+  const result = db.prepare("INSERT INTO users (email, password_hash, role) VALUES (?, ?, ?)").run(email, hash, role);
 
   return { id: result.lastInsertRowid, email, role };
 }
@@ -46,9 +51,7 @@ function createUser(email, password, role = "viewer") {
 /** List all users (admin only) */
 function listUsers() {
   if (!db) throw new Error("User database not initialized");
-  return db
-    .prepare("SELECT id, email, role, created_at, last_login FROM users")
-    .all();
+  return db.prepare("SELECT id, email, role, created_at, last_login FROM users").all();
 }
 
 /** Delete a user (admin only) */

@@ -2,9 +2,7 @@ const fs = require("fs");
 const path = require("path");
 
 const DEFAULT_EXTENSIONS_DIR = path.resolve(__dirname, "..", "..", "extensions");
-const EXTENSIONS_DIR = process.env.EXTENSIONS_DIR
-  ? path.resolve(process.env.EXTENSIONS_DIR)
-  : DEFAULT_EXTENSIONS_DIR;
+const EXTENSIONS_DIR = process.env.EXTENSIONS_DIR ? path.resolve(process.env.EXTENSIONS_DIR) : DEFAULT_EXTENSIONS_DIR;
 
 /**
  * Load all extensions from the extensions directory.
@@ -63,8 +61,8 @@ function loadExtensions(app, db, services) {
 
       // Check for package.json or index.js
       const hasPackageJson = fs.existsSync(path.join(realExtPath, "package.json"));
-      const hasIndex = fs.existsSync(path.join(realExtPath, "index.js")) ||
-                       fs.existsSync(path.join(realExtPath, "src", "index.js"));
+      const hasIndex =
+        fs.existsSync(path.join(realExtPath, "index.js")) || fs.existsSync(path.join(realExtPath, "src", "index.js"));
 
       if (!hasPackageJson && !hasIndex) {
         console.warn(`[EXT] ${entry}: no package.json or index.js, skipping`);
@@ -95,8 +93,14 @@ function loadExtensions(app, db, services) {
 
       ext.init(extRouter, scopedServices);
 
-      // Mount extension router under /api/ext/<name>
-      app.use(`/api/ext/${extName}`, extRouter);
+      // Mount public routes WITHOUT auth (if extension exposes them)
+      if (ext.publicRoutes) {
+        app.use(`/api/ext/${extName}/status-pages`, ext.publicRoutes);
+      }
+
+      // Mount extension router under /api/ext/<name> (auth required)
+      const { requireAuth } = require("../auth/middleware");
+      app.use(`/api/ext/${extName}`, requireAuth, extRouter);
 
       const info = { name: extName, version: ext.version || "0.0.0" };
       loaded.push(info);
@@ -133,15 +137,89 @@ function createScopedDb(db, extName) {
 }
 
 function validateExtSql(sql, prefix) {
-  // Allow CREATE TABLE, INSERT, SELECT, UPDATE, DELETE only on ext_ prefixed tables
+  // Normalize: strip CTE wrappers so the inner bodies get validated too.
+  // CTEs use "WITH name AS (SELECT ...)" syntax and can nest dangerous statements
+  // that would bypass table-name checks if only the outer query is inspected.
+  const normalized = stripCteWrappers(sql);
+
+  // Block dangerous DDL/DCL statements that extensions must never execute,
+  // regardless of table prefix. Check the full (normalized) SQL.
+  const dangerousPatterns = [
+    /\bDROP\s+TABLE\b/i,
+    /\bDROP\s+INDEX\b/i,
+    /\bALTER\s+TABLE\b/i,
+    /\bATTACH\s+DATABASE\b/i,
+    /\bDETACH\s+DATABASE\b/i,
+    /\bPRAGMA\b/i,
+    /\bCREATE\s+TRIGGER\b/i,
+    /\bCREATE\s+VIEW\b/i,
+    /\bLOAD_EXTENSION\b/i,
+  ];
+  for (const pattern of dangerousPatterns) {
+    if (pattern.test(normalized)) {
+      throw new Error(`Extension "${prefix.slice(4, -1)}" cannot execute prohibited SQL statement.`);
+    }
+  }
+
+  // Allow CREATE TABLE, INSERT, SELECT, UPDATE, DELETE only on ext_ prefixed tables.
+  // Run against the normalized SQL so CTE bodies are included.
   const tablePattern = /(?:FROM|INTO|UPDATE|TABLE(?:\s+IF\s+NOT\s+EXISTS)?)\s+(\w+)/gi;
   let match;
-  while ((match = tablePattern.exec(sql)) !== null) {
+  while ((match = tablePattern.exec(normalized)) !== null) {
     const tableName = match[1].toLowerCase();
     if (!tableName.startsWith(prefix.toLowerCase()) && tableName !== "sqlite_master") {
       throw new Error(`Extension "${prefix.slice(4, -1)}" cannot access table "${match[1]}". Use "${prefix}" prefix.`);
     }
   }
+}
+
+/**
+ * Strip CTE (WITH ... AS (...)) wrappers so the bodies are exposed for validation.
+ * Returns the SQL with CTE definitions inlined as plain text (parentheses removed)
+ * so table-name patterns inside CTEs are caught by the main regex.
+ */
+function stripCteWrappers(sql) {
+  // Match WITH ... AS (...), ... AS (...) prefix.
+  // We do a simple parenthesis-depth walk to correctly find the CTE bodies
+  // even when they contain nested parentheses.
+  const withMatch = sql.match(/^\s*WITH\s+/i);
+  if (!withMatch) return sql;
+
+  // Walk past the WITH keyword and collect all CTE body text + the final query
+  let pos = withMatch[0].length;
+  let result = "";
+
+  while (pos < sql.length) {
+    // Skip CTE name and optional column list up to "AS"
+    const asMatch = sql.slice(pos).match(/^[\w]+\s*(?:\([^)]*\))?\s*AS\s*/i);
+    if (!asMatch) break;
+    pos += asMatch[0].length;
+
+    // Extract the parenthesized CTE body by counting depth
+    if (sql[pos] !== "(") break;
+    let depth = 1;
+    const bodyStart = pos + 1;
+    pos++;
+    while (pos < sql.length && depth > 0) {
+      if (sql[pos] === "(") depth++;
+      else if (sql[pos] === ")") depth--;
+      pos++;
+    }
+    // bodyStart..pos-1 is the CTE body (without outer parens)
+    result += " " + sql.slice(bodyStart, pos - 1);
+
+    // Skip optional comma between CTEs
+    const commaMatch = sql.slice(pos).match(/^\s*,\s*/);
+    if (commaMatch) {
+      pos += commaMatch[0].length;
+    } else {
+      break;
+    }
+  }
+
+  // Append the main query after the CTEs
+  result += " " + sql.slice(pos);
+  return result;
 }
 
 module.exports = { loadExtensions };

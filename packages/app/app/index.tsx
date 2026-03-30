@@ -11,6 +11,7 @@ import {
   KeyboardAvoidingView,
   Platform,
 } from 'react-native';
+import { SafeAreaView } from 'react-native-safe-area-context';
 import { useRouter } from 'expo-router';
 import { useEffect, useState } from 'react';
 import * as SecureStore from 'expo-secure-store';
@@ -18,6 +19,7 @@ import { LinearGradient } from 'expo-linear-gradient';
 import { Ionicons } from '@expo/vector-icons';
 import { useServerStore, type ServerProfile } from '../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../src/theme/tokens';
+import { sanitizeErrorMessage } from '../src/lib/errors';
 
 export default function ServerSelectScreen() {
   const router = useRouter();
@@ -67,7 +69,7 @@ export default function ServerSelectScreen() {
       router.replace('/(tabs)/overview');
     } catch (err) {
       console.error('[COCKPIT] handleConnect failed:', err);
-      setError(err instanceof Error ? err.message : 'Unknown connection error');
+      setError(sanitizeErrorMessage(err, 'Unknown connection error'));
     } finally {
       setConnecting(false);
       setConnectingId(null);
@@ -117,7 +119,7 @@ export default function ServerSelectScreen() {
       router.replace('/(tabs)/overview');
     } catch (err) {
       console.error('[COCKPIT] handleAdd failed:', err);
-      setError(err instanceof Error ? err.message : 'Unknown error');
+      setError(sanitizeErrorMessage(err, 'Unknown error'));
     } finally {
       setConnecting(false);
     }
@@ -160,6 +162,7 @@ export default function ServerSelectScreen() {
   );
 
   return (
+    <SafeAreaView style={{ flex: 1, backgroundColor: COLORS.bg }} edges={['top']}>
     <KeyboardAvoidingView
       behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       style={{ flex: 1 }}
@@ -320,6 +323,7 @@ export default function ServerSelectScreen() {
       )}
     </ScrollView>
     </KeyboardAvoidingView>
+    </SafeAreaView>
   );
 }
 
@@ -330,7 +334,7 @@ const styles = StyleSheet.create({
   },
   containerContent: {
     padding: SPACING.xxl,
-    paddingTop: 80,
+    paddingTop: SPACING.xxl,
     paddingBottom: 120,
   },
   title: {

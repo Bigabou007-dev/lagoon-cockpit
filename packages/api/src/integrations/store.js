@@ -1,9 +1,29 @@
 /**
  * Integration data store — persists adapter outputs in SQLite.
  * Handles time-series storage with configurable retention.
+ * Config blobs are AES-256-GCM encrypted at rest using JWT_SECRET.
  */
 
+const { encrypt, decrypt } = require("../security/crypto");
+
 let db = null;
+
+function getEncryptionKey() {
+  return process.env.JWT_SECRET || "cockpit-fallback-key";
+}
+
+function encryptConfig(config) {
+  return encrypt(JSON.stringify(config), getEncryptionKey());
+}
+
+function decryptConfig(encrypted) {
+  try {
+    return JSON.parse(decrypt(encrypted, getEncryptionKey()));
+  } catch {
+    // Fallback: config may be stored as plain JSON (pre-encryption migration)
+    return JSON.parse(encrypted);
+  }
+}
 
 const DEFAULT_RETENTION_DAYS = 7;
 
@@ -42,20 +62,24 @@ function initStore(database) {
 // ── Integration CRUD ───────────────────────────────────────
 
 function createIntegration(id, adapter, name, config, pollInterval) {
-  db.prepare(
-    "INSERT INTO integrations (id, adapter, name, config, poll_interval) VALUES (?, ?, ?, ?, ?)"
-  ).run(id, adapter, name, JSON.stringify(config), pollInterval || 30);
+  db.prepare("INSERT INTO integrations (id, adapter, name, config, poll_interval) VALUES (?, ?, ?, ?, ?)").run(
+    id,
+    adapter,
+    name,
+    encryptConfig(config),
+    pollInterval || 30,
+  );
 }
 
 function getIntegration(id) {
   const row = db.prepare("SELECT * FROM integrations WHERE id = ?").get(id);
-  if (row) row.config = JSON.parse(row.config);
+  if (row) row.config = decryptConfig(row.config);
   return row;
 }
 
 function listIntegrations() {
   const rows = db.prepare("SELECT * FROM integrations ORDER BY created_at DESC").all();
-  return rows.map((r) => ({ ...r, config: JSON.parse(r.config) }));
+  return rows.map((r) => ({ ...r, config: decryptConfig(r.config) }));
 }
 
 function updateIntegration(id, fields) {
@@ -66,7 +90,7 @@ function updateIntegration(id, fields) {
   for (const [key, val] of Object.entries(fields)) {
     if (!allowed.includes(key)) continue;
     sets.push(`${key} = ?`);
-    values.push(key === "config" ? JSON.stringify(val) : val);
+    values.push(key === "config" ? encryptConfig(val) : val);
   }
 
   if (sets.length === 0) return;
@@ -79,9 +103,11 @@ function deleteIntegration(id) {
 }
 
 function updateIntegrationStatus(id, status, error) {
-  db.prepare(
-    "UPDATE integrations SET last_pull = datetime('now'), last_status = ?, last_error = ? WHERE id = ?"
-  ).run(status, error || null, id);
+  db.prepare("UPDATE integrations SET last_pull = datetime('now'), last_status = ?, last_error = ? WHERE id = ?").run(
+    status,
+    error || null,
+    id,
+  );
 }
 
 function countIntegrations() {
@@ -91,9 +117,7 @@ function countIntegrations() {
 // ── Integration data ───────────────────────────────────────
 
 function storeDataPoints(integrationId, dataPoints) {
-  const stmt = db.prepare(
-    "INSERT INTO integration_data (integration_id, type, data, timestamp) VALUES (?, ?, ?, ?)"
-  );
+  const stmt = db.prepare("INSERT INTO integration_data (integration_id, type, data, timestamp) VALUES (?, ?, ?, ?)");
 
   const insertMany = db.transaction((points) => {
     for (const point of points) {
@@ -131,10 +155,13 @@ function queryData(integrationId, opts = {}) {
     sql += " LIMIT 500";
   }
 
-  return db.prepare(sql).all(...params).map((r) => ({
-    ...r,
-    data: JSON.parse(r.data),
-  }));
+  return db
+    .prepare(sql)
+    .all(...params)
+    .map((r) => ({
+      ...r,
+      data: JSON.parse(r.data),
+    }));
 }
 
 /** Clean up data older than retention period */

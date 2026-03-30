@@ -1,6 +1,8 @@
 import { View, Text, ScrollView, RefreshControl, StyleSheet } from 'react-native';
 import { useState, useCallback, useEffect } from 'react';
 import { apiFetch } from '../../src/lib/api';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
 
 interface Endpoint {
@@ -29,6 +31,7 @@ function getDaysColor(days: number): string {
 }
 
 export default function StatusScreen() {
+  const { isTablet } = useLayout();
   const [endpoints, setEndpoints] = useState<Endpoint[]>([]);
   const [certs, setCerts] = useState<SSLCert[]>([]);
   const [refreshing, setRefreshing] = useState(false);
@@ -57,6 +60,7 @@ export default function StatusScreen() {
   }, [fetchAll]);
 
   return (
+    <ScreenErrorBoundary screenName="Status">
     <ScrollView
       style={styles.container}
       contentContainerStyle={styles.content}
@@ -67,8 +71,9 @@ export default function StatusScreen() {
       {endpoints.length === 0 ? (
         <Text style={styles.empty}>No endpoints configured</Text>
       ) : (
-        endpoints.map((ep, i) => (
-          <View key={i} style={styles.card}>
+        <View style={isTablet ? styles.gridRow : undefined}>
+        {endpoints.map((ep, i) => (
+          <View key={i} style={[styles.card, isTablet && { flex: 1, minWidth: '48%' }]}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardName}>{ep.name}</Text>
               <View style={[styles.statusDot, { backgroundColor: ep.healthy ? COLORS.green : COLORS.red }]} />
@@ -82,7 +87,8 @@ export default function StatusScreen() {
             </View>
             {ep.error && <Text style={styles.cardError}>{ep.error}</Text>}
           </View>
-        ))
+        ))}
+        </View>
       )}
 
       {/* SSL Certificates */}
@@ -90,8 +96,9 @@ export default function StatusScreen() {
       {certs.length === 0 ? (
         <Text style={styles.empty}>No SSL domains configured</Text>
       ) : (
-        certs.map((cert, i) => (
-          <View key={i} style={styles.card}>
+        <View style={isTablet ? styles.gridRow : undefined}>
+        {certs.map((cert, i) => (
+          <View key={i} style={[styles.card, isTablet && { flex: 1, minWidth: '48%' }]}>
             <View style={styles.cardHeader}>
               <Text style={styles.cardName}>{cert.domain}</Text>
               <Text style={[styles.days, { color: getDaysColor(cert.daysRemaining) }]}>
@@ -106,9 +113,11 @@ export default function StatusScreen() {
             )}
             {cert.error && <Text style={styles.cardError}>{cert.error}</Text>}
           </View>
-        ))
+        ))}
+        </View>
       )}
     </ScrollView>
+    </ScreenErrorBoundary>
   );
 }
 
@@ -123,6 +132,7 @@ const styles = StyleSheet.create({
     letterSpacing: 1,
     marginBottom: SPACING.md,
   },
+  gridRow: { flexDirection: 'row', flexWrap: 'wrap', gap: SPACING.sm } as any,
   empty: { color: COLORS.textTertiary, fontSize: 14, fontStyle: 'italic', marginBottom: SPACING.lg },
   card: {
     backgroundColor: COLORS.card,

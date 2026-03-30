@@ -8,6 +8,14 @@ services:
     container_name: cockpit_api
     restart: unless-stopped
     env_file: .env
+    cap_drop:
+      - ALL
+    cap_add:
+      - SYS_PTRACE
+    read_only: true
+    tmpfs:
+      - /tmp:size=64M
+      - /var/run:size=8M
     volumes:
       - /var/run/docker.sock:/var/run/docker.sock
       - /proc:/host/proc:ro
@@ -22,7 +30,7 @@ services:
           cpus: "0.10"
           memory: 64M
     healthcheck:
-      test: ["CMD", "wget", "--spider", "-q", "http://localhost:3000/health"]
+      test: ["CMD-SHELL", "wget -qO- http://localhost:3000/health | grep -q '\"status\":\"ok\"'"]
       interval: 30s
       timeout: 5s
       retries: 3

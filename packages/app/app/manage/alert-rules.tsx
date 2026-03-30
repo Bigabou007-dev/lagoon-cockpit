@@ -12,6 +12,7 @@ import {
   ScrollView,
 } from 'react-native';
 import { Stack } from 'expo-router';
+import { Ionicons } from '@expo/vector-icons';
 import { apiFetch } from '../../src/lib/api';
 import { useServerStore } from '../../src/stores/serverStore';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
@@ -234,7 +235,7 @@ export default function AlertRulesScreen() {
         {/* Rules list */}
         {rules.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Text style={styles.emptyIcon}>{'\u{1F4CB}'}</Text>
+            <Ionicons name="clipboard-outline" size={40} color={COLORS.textTertiary} style={{ marginBottom: SPACING.md }} />
             <Text style={styles.emptyText}>No alert rules configured</Text>
             <Text style={styles.emptySubtext}>Tap "+ Add Rule" to create one</Text>
           </View>
@@ -254,7 +255,7 @@ export default function AlertRulesScreen() {
                 <Switch
                   value={rule.enabled}
                   onValueChange={() => toggleRule(rule)}
-                  trackColor={{ false: COLORS.border, true: '#1D4ED8' }}
+                  trackColor={{ false: COLORS.border, true: COLORS.buttonPrimary }}
                   thumbColor={rule.enabled ? COLORS.blue : COLORS.textTertiary}
                 />
               </View>
@@ -346,7 +347,7 @@ const styles = StyleSheet.create({
   pickerLabel: { color: COLORS.textSecondary, fontSize: 13 },
   pickerValue: { color: COLORS.blue, fontSize: 14, fontWeight: '600' },
   saveBtn: {
-    backgroundColor: '#1D4ED8',
+    backgroundColor: COLORS.buttonPrimary,
     borderRadius: RADIUS.lg,
     paddingVertical: 14,
     alignItems: 'center',
@@ -386,7 +387,6 @@ const styles = StyleSheet.create({
 
   /* empty */
   emptyContainer: { alignItems: 'center', marginVertical: 32 },
-  emptyIcon: { fontSize: 40, marginBottom: SPACING.md },
   emptyText: { color: COLORS.textPrimary, fontSize: 16, fontWeight: '600', marginBottom: SPACING.xs },
   emptySubtext: { color: COLORS.textTertiary, fontSize: 13 },
 });

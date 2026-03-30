@@ -4,7 +4,13 @@ const router = express.Router();
 const { authenticateWithKey } = require("../auth/keys");
 const { authenticateWithCredentials, createUser, listUsers, deleteUser, updateUserRole } = require("../auth/users");
 const { signAccessToken, generateRefreshToken, validateRefreshToken } = require("../auth/jwt");
-const { requireAuth, requireRole, rateLimitAuth, recordFailedAttempt, clearFailedAttempts } = require("../auth/middleware");
+const {
+  requireAuth,
+  requireRole,
+  rateLimitAuth,
+  recordFailedAttempt,
+  clearFailedAttempts,
+} = require("../auth/middleware");
 const { auditLog } = require("../db/sqlite");
 const { validateBody } = require("../security/request-validator");
 const { requestFingerprint } = require("../security/crypto");
@@ -84,10 +90,9 @@ router.get("/auth/users", requireAuth, requireRole("admin"), (_req, res) => {
   res.json({ users: listUsers() });
 });
 
-router.post("/auth/users", requireAuth, requireRole("admin"), (req, res) => {
+router.post("/auth/users", requireAuth, requireRole("admin"), validateBody("createUser"), (req, res) => {
   try {
     const { email, password, role } = req.body;
-    if (!email || !password) return res.status(400).json({ error: "email and password required" });
     const user = createUser(email, password, role);
     auditLog(req.user.id, "user.create", email, `Role: ${role || "viewer"}`);
     res.status(201).json(user);
@@ -104,8 +109,9 @@ router.delete("/auth/users/:id", requireAuth, requireRole("admin"), (req, res) =
     deleteUser(id);
     auditLog(req.user.id, "user.delete", req.params.id);
     res.json({ ok: true });
-  } catch {
-    res.status(500).json({ error: "Failed to delete user" });
+  } catch (err) {
+    console.error("DELETE /auth/users/:id error:", err);
+    res.status(500).json({ error: "Internal server error" });
   }
 });
 

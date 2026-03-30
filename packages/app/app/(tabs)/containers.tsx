@@ -1,4 +1,4 @@
-import { View, TextInput, FlatList, RefreshControl, StyleSheet, Alert, ScrollView, Animated, Easing, ActivityIndicator } from 'react-native';
+import { View, TextInput, FlatList, RefreshControl, StyleSheet, Alert, ScrollView, ActivityIndicator } from 'react-native';
 import { useState, useCallback, useEffect, useRef } from 'react';
 import { useRouter } from 'expo-router';
 import { useDashboardStore, type ContainerSummary, type WindowsService } from '../../src/stores/dashboardStore';
@@ -8,7 +8,11 @@ import Skeleton from '../../src/components/Skeleton';
 import { Text, TouchableOpacity } from 'react-native';
 import { Ionicons } from '@expo/vector-icons';
 import { COLORS, RADIUS, SPACING, FONT, SHADOW } from '../../src/theme/tokens';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import * as Haptics from 'expo-haptics';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
+import { FadeIn } from '../../src/components/ui/FadeIn';
 
 type Filter = 'all' | 'running' | 'stopped' | 'unhealthy';
 type WinFilter = 'all' | 'running' | 'stopped';
@@ -53,8 +57,6 @@ function WindowsServicesView() {
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
   const [actionLoading, setActionLoading] = useState<string | null>(null);
-  const fadeAnims = useRef<Animated.Value[]>([]).current;
-
   const fetchServices = useCallback(async () => {
     try {
       setError(null);
@@ -63,7 +65,7 @@ function WindowsServicesView() {
       setIsLoaded(true);
     } catch (err) {
       console.error('Failed to fetch services:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load services');
+      setError(sanitizeErrorMessage(err, 'Failed to load services'));
     }
   }, []);
 
@@ -102,7 +104,7 @@ function WindowsServicesView() {
               await apiFetch(`/api/services/${name}/${action}`, { method: 'POST' });
               await fetchServices();
             } catch (err) {
-              Alert.alert('Failed', err instanceof Error ? err.message : 'Action failed');
+              Alert.alert('Failed', sanitizeErrorMessage(err, 'Action failed'));
             } finally {
               setActionLoading(null);
             }
@@ -141,6 +143,8 @@ function WindowsServicesView() {
           placeholderTextColor={COLORS.textTertiary}
           value={search}
           onChangeText={setSearch}
+          accessibilityLabel="Search services"
+          accessibilityRole="search"
         />
       </View>
 
@@ -157,6 +161,9 @@ function WindowsServicesView() {
                 isActive && { backgroundColor: pillColor + '26', borderColor: pillColor },
               ]}
               onPress={() => setFilter(f.key)}
+              accessibilityRole="button"
+              accessibilityLabel={`Filter: ${f.label}, ${f.count}`}
+              accessibilityState={{ selected: isActive }}
             >
               <Text style={[
                 styles.filterText,
@@ -220,23 +227,10 @@ function WindowsServicesView() {
         <FlatList
           data={filtered}
           renderItem={({ item, index }) => {
-            while (fadeAnims.length <= index) {
-              fadeAnims.push(new Animated.Value(0));
-            }
-            const fadeAnim = fadeAnims[index];
-            if ((fadeAnim as any).__getValue() === 0) {
-              Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 400,
-                delay: index * 60,
-                easing: Easing.out(Easing.ease),
-                useNativeDriver: true,
-              }).start();
-            }
             const statusColor = getServiceStatusColor(item.status);
             const isActioning = actionLoading === item.name;
             return (
-              <Animated.View style={{ opacity: fadeAnim }}>
+              <FadeIn index={index}>
                 <View style={[styles.serviceCard, { borderLeftColor: statusColor }]}>
                   {/* Header row */}
                   <View style={styles.serviceHeader}>
@@ -282,6 +276,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.green + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'start')}
                           disabled={item.status === 'Running'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Start ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Running' }}
                         >
                           <Ionicons name="play" size={14} color={item.status === 'Running' ? COLORS.textTertiary : COLORS.green} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Running' ? COLORS.textTertiary : COLORS.green }]}>Start</Text>
@@ -290,6 +287,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.red + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'stop')}
                           disabled={item.status === 'Stopped'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Stop ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Stopped' }}
                         >
                           <Ionicons name="stop" size={14} color={item.status === 'Stopped' ? COLORS.textTertiary : COLORS.red} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Stopped' ? COLORS.textTertiary : COLORS.red }]}>Stop</Text>
@@ -298,6 +298,9 @@ function WindowsServicesView() {
                           style={[styles.actionBtn, { backgroundColor: COLORS.blue + '1A' }]}
                           onPress={() => handleServiceAction(item.name, 'restart')}
                           disabled={item.status === 'Stopped'}
+                          accessibilityRole="button"
+                          accessibilityLabel={`Restart ${item.displayName}`}
+                          accessibilityState={{ disabled: item.status === 'Stopped' }}
                         >
                           <Ionicons name="refresh-circle" size={14} color={item.status === 'Stopped' ? COLORS.textTertiary : COLORS.blue} />
                           <Text style={[styles.actionBtnText, { color: item.status === 'Stopped' ? COLORS.textTertiary : COLORS.blue }]}>Restart</Text>
@@ -306,7 +309,7 @@ function WindowsServicesView() {
                     )}
                   </View>
                 </View>
-              </Animated.View>
+              </FadeIn>
             );
           }}
           keyExtractor={(item) => item.name}
@@ -328,13 +331,11 @@ function WindowsServicesView() {
 export default function ContainersScreen() {
   const platform = useDashboardStore((s) => s.platform);
 
-  // ── Windows: render services view ──
-  if (platform === 'windows') {
-    return <WindowsServicesView />;
-  }
-
-  // ── Linux: original containers view (unchanged) ──
-  return <LinuxContainersView />;
+  return (
+    <ScreenErrorBoundary screenName="Containers">
+      {platform === 'windows' ? <WindowsServicesView /> : <LinuxContainersView />}
+    </ScreenErrorBoundary>
+  );
 }
 
 /* ──────────────────────────────────────────────
@@ -343,6 +344,7 @@ export default function ContainersScreen() {
 
 function LinuxContainersView() {
   const router = useRouter();
+  const layout = useLayout();
   const { containers, setContainers } = useDashboardStore();
   const [refreshing, setRefreshing] = useState(false);
   const [search, setSearch] = useState('');
@@ -352,8 +354,6 @@ function LinuxContainersView() {
   const [bulkLoading, setBulkLoading] = useState(false);
   const [isLoaded, setIsLoaded] = useState(false);
   const [error, setError] = useState<string | null>(null);
-  const fadeAnims = useRef<Animated.Value[]>([]).current;
-
   const fetchContainers = useCallback(async () => {
     try {
       setError(null);
@@ -362,7 +362,7 @@ function LinuxContainersView() {
       setIsLoaded(true);
     } catch (err) {
       console.error('Failed to fetch containers:', err);
-      setError(err instanceof Error ? err.message : 'Failed to load containers');
+      setError(sanitizeErrorMessage(err, 'Failed to load containers'));
     }
   }, [setContainers]);
 
@@ -410,7 +410,7 @@ function LinuxContainersView() {
               setBulkMode(false);
               await fetchContainers();
             } catch (err) {
-              Alert.alert('Failed', err instanceof Error ? err.message : 'Bulk action failed');
+              Alert.alert('Failed', sanitizeErrorMessage(err, 'Bulk action failed'));
             } finally {
               setBulkLoading(false);
             }
@@ -425,7 +425,7 @@ function LinuxContainersView() {
       await apiFetch(`/api/containers/${id}/${action}`, { method: 'POST' });
       await fetchContainers();
     } catch (err) {
-      Alert.alert('Failed', err instanceof Error ? err.message : 'Action failed');
+      Alert.alert('Failed', sanitizeErrorMessage(err, 'Action failed'));
     }
   };
 
@@ -461,6 +461,8 @@ function LinuxContainersView() {
           placeholderTextColor={COLORS.textTertiary}
           value={search}
           onChangeText={setSearch}
+          accessibilityLabel="Search containers"
+          accessibilityRole="search"
         />
       </View>
 
@@ -477,6 +479,9 @@ function LinuxContainersView() {
                 isActive && { backgroundColor: pillColor + '26', borderColor: pillColor },
               ]}
               onPress={() => setFilter(f.key)}
+              accessibilityRole="button"
+              accessibilityLabel={`Filter: ${f.label}, ${f.count}`}
+              accessibilityState={{ selected: isActive }}
             >
               <Text style={[
                 styles.filterText,
@@ -506,6 +511,9 @@ function LinuxContainersView() {
             bulkMode && { backgroundColor: COLORS.purple + '26', borderColor: COLORS.purple },
           ]}
           onPress={() => { setBulkMode(!bulkMode); setSelectedIds(new Set()); }}
+          accessibilityRole="button"
+          accessibilityLabel={bulkMode ? `Bulk select mode, ${selectedIds.size} selected` : 'Toggle bulk select'}
+          accessibilityState={{ selected: bulkMode }}
         >
           <Text style={[
             styles.filterText,
@@ -554,25 +562,13 @@ function LinuxContainersView() {
       {/* Container list */}
       {(isLoaded || containers.length > 0) && (
         <FlatList
+          key={`list-${layout.listColumns}`}
           data={filtered}
+          numColumns={layout.listColumns}
+          columnWrapperStyle={layout.listColumns > 1 ? { gap: SPACING.sm } : undefined}
           renderItem={({ item, index }) => {
-            // Ensure we have an animated value for this index
-            while (fadeAnims.length <= index) {
-              fadeAnims.push(new Animated.Value(0));
-            }
-            const fadeAnim = fadeAnims[index];
-            // Trigger staggered fade-in on first load
-            if ((fadeAnim as any).__getValue() === 0) {
-              Animated.timing(fadeAnim, {
-                toValue: 1,
-                duration: 400,
-                delay: index * 60,
-                easing: Easing.out(Easing.ease),
-                useNativeDriver: true,
-              }).start();
-            }
             return (
-              <Animated.View style={{ opacity: fadeAnim }}>
+              <FadeIn index={index} style={layout.listColumns > 1 ? { flex: 1 } : undefined}>
                 <ContainerCard
                   container={item}
                   onPress={() => bulkMode ? toggleSelect(item.id) : router.push(`/containers/${item.id}`)}
@@ -581,7 +577,7 @@ function LinuxContainersView() {
                   showQuickActions={!bulkMode}
                   onQuickAction={handleQuickAction}
                 />
-              </Animated.View>
+              </FadeIn>
             );
           }}
           keyExtractor={(item) => item.id}
@@ -603,6 +599,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.green + '26' }]}
                 onPress={() => handleBulkAction('start')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Start ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="play" size={14} color={COLORS.green} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.green }]}>Start</Text>
@@ -611,6 +609,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.red + '26' }]}
                 onPress={() => handleBulkAction('stop')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Stop ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="stop" size={14} color={COLORS.red} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.red }]}>Stop</Text>
@@ -619,6 +619,8 @@ function LinuxContainersView() {
                 style={[styles.bulkBtn, { backgroundColor: COLORS.blue + '26' }]}
                 onPress={() => handleBulkAction('restart')}
                 disabled={bulkLoading}
+                accessibilityRole="button"
+                accessibilityLabel={`Restart ${selectedIds.size} selected containers`}
               >
                 <Ionicons name="refresh-circle" size={14} color={COLORS.blue} />
                 <Text style={[styles.bulkBtnText, { color: COLORS.blue }]}>Restart</Text>

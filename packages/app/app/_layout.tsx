@@ -1,14 +1,17 @@
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, AppState, type AppStateStatus, ActivityIndicator } from 'react-native';
+import { SafeAreaProvider, SafeAreaView } from 'react-native-safe-area-context';
 import { useEffect, useRef, useCallback } from 'react';
 import { useFonts, Inter_400Regular, Inter_500Medium, Inter_600SemiBold, Inter_700Bold, Inter_800ExtraBold } from '@expo-google-fonts/inter';
 import * as SplashScreen from 'expo-splash-screen';
 import { useAuthStore } from '../src/stores/authStore';
 import LockScreen from '../src/components/LockScreen';
+import ErrorBoundary from '../src/components/ErrorBoundary';
 import { EditionProvider } from '../src/edition/EditionProvider';
 import { ThemeProvider, useTheme } from '../src/theme/ThemeProvider';
 import { COLORS } from '../src/theme/tokens';
+import ConnectionBanner from '../src/components/ConnectionBanner';
 
 SplashScreen.preventAutoHideAsync();
 
@@ -63,8 +66,9 @@ function AppContent() {
 
   return (
     <EditionProvider>
-      <View style={{ flex: 1, backgroundColor: colors.bg }} onLayout={onLayoutReady}>
+      <SafeAreaView style={{ flex: 1, backgroundColor: colors.bg }} onLayout={onLayoutReady}>
         <StatusBar style={isDark ? 'light' : 'dark'} />
+        <ConnectionBanner />
         <Stack
           screenOptions={{
             headerShown: false,
@@ -77,15 +81,19 @@ function AppContent() {
           <Stack.Screen name="settings" options={{ headerShown: true, title: 'Settings', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
           <Stack.Screen name="servers" options={{ headerShown: true, title: 'All Servers', headerStyle: { backgroundColor: colors.bg }, headerTintColor: colors.textPrimary, headerTitleStyle: { fontFamily: 'Inter_700Bold' } }} />
         </Stack>
-      </View>
+      </SafeAreaView>
     </EditionProvider>
   );
 }
 
 export default function RootLayout() {
   return (
-    <ThemeProvider>
-      <AppContent />
-    </ThemeProvider>
+    <ErrorBoundary>
+      <SafeAreaProvider>
+        <ThemeProvider>
+          <AppContent />
+        </ThemeProvider>
+      </SafeAreaProvider>
+    </ErrorBoundary>
   );
 }

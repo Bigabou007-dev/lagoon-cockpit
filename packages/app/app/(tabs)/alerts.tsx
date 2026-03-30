@@ -1,8 +1,11 @@
-import { View, Text, FlatList, TouchableOpacity, StyleSheet, Animated, Easing } from 'react-native';
-import { useRef, useEffect } from 'react';
+import { View, Text, FlatList, TouchableOpacity, StyleSheet } from 'react-native';
+import { useEffect } from 'react';
+import Animated, { useSharedValue, useAnimatedStyle, withDelay, withTiming, Easing } from 'react-native-reanimated';
 import { Ionicons } from '@expo/vector-icons';
 import { useDashboardStore, type Alert } from '../../src/stores/dashboardStore';
 import Skeleton from '../../src/components/Skeleton';
+import { useLayout } from '../../src/hooks/useLayout';
+import ScreenErrorBoundary from '../../src/components/ScreenErrorBoundary';
 import { COLORS, RADIUS, SPACING, SHADOW } from '../../src/theme/tokens';
 
 function getAlertIconProps(alert: Alert): { name: keyof typeof Ionicons.glyphMap; color: string } {
@@ -34,31 +37,21 @@ function SkeletonAlerts() {
 
 /* Animated wrapper for staggered entry */
 function FadeSlideIn({ delay, children }: { delay: number; children: React.ReactNode }) {
-  const opacity = useRef(new Animated.Value(0)).current;
-  const translateY = useRef(new Animated.Value(16)).current;
+  const opacity = useSharedValue(0);
+  const translateY = useSharedValue(16);
 
   useEffect(() => {
-    const anim = Animated.parallel([
-      Animated.timing(opacity, {
-        toValue: 1,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-      Animated.timing(translateY, {
-        toValue: 0,
-        duration: 400,
-        delay,
-        easing: Easing.out(Easing.ease),
-        useNativeDriver: true,
-      }),
-    ]);
-    anim.start();
-  }, [opacity, translateY, delay]);
+    opacity.value = withDelay(delay, withTiming(1, { duration: 400, easing: Easing.out(Easing.ease) }));
+    translateY.value = withDelay(delay, withTiming(0, { duration: 400, easing: Easing.out(Easing.ease) }));
+  }, []);
+
+  const animStyle = useAnimatedStyle(() => ({
+    opacity: opacity.value,
+    transform: [{ translateY: translateY.value }],
+  }));
 
   return (
-    <Animated.View style={{ opacity, transform: [{ translateY }] }}>
+    <Animated.View style={animStyle}>
       {children}
     </Animated.View>
   );
@@ -66,11 +59,13 @@ function FadeSlideIn({ delay, children }: { delay: number; children: React.React
 
 export default function AlertsScreen() {
   const { alerts, clearAlerts, isLoading } = useDashboardStore();
+  const { listColumns } = useLayout();
   const isLoaded = !isLoading;
 
   const renderAlert = ({ item, index }: { item: Alert; index: number }) => {
     const iconProps = getAlertIconProps(item);
     return (
+      <View style={listColumns > 1 ? { flex: 1 } : undefined}>
       <FadeSlideIn delay={index * 60}>
         <View style={styles.alertItem}>
           <Ionicons name={iconProps.name} size={18} color={iconProps.color} style={{ marginTop: 2 }} />
@@ -89,13 +84,20 @@ export default function AlertsScreen() {
           </View>
         </View>
       </FadeSlideIn>
+      </View>
     );
   };
 
   return (
+    <ScreenErrorBoundary screenName="Alerts">
     <View style={styles.container}>
       {alerts.length > 0 && (
-        <TouchableOpacity style={styles.clearBtn} onPress={clearAlerts}>
+        <TouchableOpacity
+          style={styles.clearBtn}
+          onPress={clearAlerts}
+          accessibilityRole="button"
+          accessibilityLabel={`Clear all ${alerts.length} alerts`}
+        >
           <Text style={styles.clearText}>Clear All</Text>
         </TouchableOpacity>
       )}
@@ -108,6 +110,9 @@ export default function AlertsScreen() {
           data={alerts}
           renderItem={renderAlert}
           keyExtractor={(_, i) => String(i)}
+          numColumns={listColumns}
+          key={`alerts-${listColumns}`}
+          {...(listColumns > 1 && { columnWrapperStyle: { gap: SPACING.sm } })}
           contentContainerStyle={styles.list}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
@@ -119,6 +124,7 @@ export default function AlertsScreen() {
         />
       )}
     </View>
+    </ScreenErrorBoundary>
   );
 }
 

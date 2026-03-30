@@ -14,6 +14,7 @@ import { useState, useCallback, useEffect, useRef, useMemo } from 'react';
 import { Stack, useRouter } from 'expo-router';
 import { apiFetch } from '../../src/lib/api';
 import { COLORS, RADIUS, SPACING } from '../../src/theme/tokens';
+import { sanitizeErrorMessage } from '../../src/lib/errors';
 
 if (Platform.OS === 'android' && UIManager.setLayoutAnimationEnabledExperimental) {
   UIManager.setLayoutAnimationEnabledExperimental(true);
@@ -69,25 +70,25 @@ const COLS_PER_GROUP = 3;
 const SCREEN_W = Dimensions.get('window').width;
 
 const STACK_COLORS = [
-  'rgba(59,130,246,0.12)',   // blue
-  'rgba(139,92,246,0.12)',   // violet
-  'rgba(236,72,153,0.12)',   // pink
-  'rgba(20,184,166,0.12)',   // teal
-  'rgba(245,158,11,0.12)',   // amber
-  'rgba(99,102,241,0.12)',   // indigo
-  'rgba(16,185,129,0.12)',   // emerald
-  'rgba(244,63,94,0.12)',    // rose
+  COLORS.blue + '1F',     // blue
+  COLORS.purple + '1F',   // violet
+  COLORS.pink + '1F',     // pink
+  COLORS.teal + '1F',     // teal
+  COLORS.yellow + '1F',   // amber
+  COLORS.indigo + '1F',   // indigo
+  COLORS.green + '1F',    // emerald
+  COLORS.rose + '1F',     // rose
 ];
 
 const STACK_BORDER_COLORS = [
-  'rgba(59,130,246,0.35)',
-  'rgba(139,92,246,0.35)',
-  'rgba(236,72,153,0.35)',
-  'rgba(20,184,166,0.35)',
-  'rgba(245,158,11,0.35)',
-  'rgba(99,102,241,0.35)',
-  'rgba(16,185,129,0.35)',
-  'rgba(244,63,94,0.35)',
+  COLORS.blue + '59',
+  COLORS.purple + '59',
+  COLORS.pink + '59',
+  COLORS.teal + '59',
+  COLORS.yellow + '59',
+  COLORS.indigo + '59',
+  COLORS.green + '59',
+  COLORS.rose + '59',
 ];
 
 const STACK_LABEL_COLORS = [
@@ -110,9 +111,9 @@ function getNodeColor(state: string, health?: string): string {
 }
 
 function getGlowColor(state: string, health?: string): string {
-  if (health === 'unhealthy') return 'rgba(234,179,8,0.4)';
-  if (state === 'running') return 'rgba(34,197,94,0.25)';
-  return 'rgba(239,68,68,0.35)';
+  if (health === 'unhealthy') return COLORS.yellow + '66';
+  if (state === 'running') return COLORS.green + '40';
+  return COLORS.red + '59';
 }
 
 function getNodeSize(health?: string): number {
@@ -159,7 +160,7 @@ export default function SystemMapScreen() {
       setLastRefresh(new Date());
     } catch (err) {
       console.error('[SystemMap] fetch error:', err);
-      Alert.alert('Error', err instanceof Error ? err.message : 'Failed to load system data');
+      Alert.alert('Error', sanitizeErrorMessage(err, 'Failed to load system data'));
     } finally {
       setLoading(false);
     }
@@ -436,7 +437,7 @@ export default function SystemMapScreen() {
                       top: line.y1,
                       width: length,
                       height: 1.5,
-                      backgroundColor: 'rgba(96,165,250,0.15)',
+                      backgroundColor: COLORS.blue + '26',
                       transform: [{ rotate: `${angle}deg` }],
                       transformOrigin: 'left center',
                       zIndex: 1,
@@ -584,11 +585,11 @@ export default function SystemMapScreen() {
           </View>
           <View style={styles.legendRow}>
             <View style={styles.legendItem}>
-              <View style={[styles.legendLine, { backgroundColor: 'rgba(96,165,250,0.4)' }]} />
+              <View style={[styles.legendLine, { backgroundColor: COLORS.blue + '66' }]} />
               <Text style={styles.legendText}>Shared Network</Text>
             </View>
             <View style={styles.legendItem}>
-              <View style={[styles.legendSwatch, { backgroundColor: 'rgba(59,130,246,0.2)', borderColor: 'rgba(59,130,246,0.4)' }]} />
+              <View style={[styles.legendSwatch, { backgroundColor: COLORS.blue + '33', borderColor: COLORS.blue + '66' }]} />
               <Text style={styles.legendText}>Stack Group</Text>
             </View>
           </View>
@@ -674,7 +675,7 @@ const styles = StyleSheet.create({
     fontWeight: '500',
   },
   refreshLabel: {
-    color: '#4B5563',
+    color: COLORS.textTertiary,
     fontSize: 10,
     textAlign: 'center',
     marginTop: 2,
@@ -724,7 +725,7 @@ const styles = StyleSheet.create({
     fontWeight: '800',
   },
   nodeLabel: {
-    color: '#D1D5DB',
+    color: COLORS.textSecondary,
     fontSize: 10,
     fontWeight: '600',
     marginTop: 6,
@@ -740,12 +741,12 @@ const styles = StyleSheet.create({
     maxWidth: NODE_W + 20,
   },
   netBadge: {
-    backgroundColor: 'rgba(96,165,250,0.12)',
+    backgroundColor: COLORS.blue + '1F',
     borderRadius: 4,
     paddingHorizontal: 5,
     paddingVertical: 1.5,
     borderWidth: 0.5,
-    borderColor: 'rgba(96,165,250,0.25)',
+    borderColor: COLORS.blue + '40',
   },
   netBadgeText: {
     color: COLORS.blue,
