@@ -22,7 +22,7 @@ function enhancedAudit(auditLogFn) {
     const originalEnd = res.end;
     res.end = function (...args) {
       const userId = req.user?.id || req.user?.email || "anonymous";
-      const ip = req.ip || req.connection.remoteAddress || "unknown";
+      const ip = req.ip || req.socket.remoteAddress || "unknown";
       const ua = (req.headers["user-agent"] || "unknown").slice(0, 256);
       const fingerprint = requestFingerprint(req);
       const requestId = res.getHeader("X-Request-ID") || "none";

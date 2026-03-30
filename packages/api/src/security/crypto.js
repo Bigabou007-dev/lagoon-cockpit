@@ -67,7 +67,7 @@ function decrypt(encrypted, secret) {
 
 /** Generate a request fingerprint from IP + User-Agent */
 function requestFingerprint(req) {
-  const ip = req.ip || req.connection.remoteAddress || "unknown";
+  const ip = req.ip || req.socket.remoteAddress || "unknown";
   const ua = req.headers["user-agent"] || "unknown";
   return sha256(`${ip}:${ua}`).slice(0, 16);
 }

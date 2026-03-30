@@ -35,6 +35,21 @@ const MENU_ITEMS: MenuItem[] = [
   { label: 'Push Notifications', description: 'Manage mobile push alert preferences', icon: 'phone-portrait', iconColor: COLORS.teal, route: '/manage/notifications', section: 'monitoring' },
   { label: 'Webhooks', description: 'Fire events to Slack/Discord/n8n', icon: 'link', iconColor: COLORS.indigo, route: '/manage/webhooks', adminOnly: true, section: 'monitoring' },
   { label: 'Integrations', description: 'Connect external monitoring sources', icon: 'git-network', iconColor: COLORS.indigo, route: '/manage/integrations', adminOnly: true, section: 'monitoring', feature: 'integrations_basic' },
+  /* Pro */
+  { label: 'Incidents', description: 'Declare and manage incidents', icon: 'warning', iconColor: '#ef4444', route: '/manage/incidents', section: 'monitoring', feature: 'incidents' },
+  { label: 'Auto-Remediation', description: 'Self-healing rules and history', icon: 'flash', iconColor: '#f97316', route: '/manage/remediation', section: 'monitoring', feature: 'remediation' },
+  { label: 'Status Pages', description: 'Public status pages for services', icon: 'globe-outline', iconColor: '#22c55e', route: '/manage/status-pages', section: 'monitoring', feature: 'status_pages' },
+  { label: 'Uptime Monitors', description: 'HTTP, TCP & DNS probe monitoring', icon: 'pulse', iconColor: '#14b8a6', route: '/manage/uptime', section: 'monitoring', feature: 'uptime_monitoring' },
+  { label: 'ChatOps', description: 'Telegram & Slack alert channels', icon: 'chatbubbles', iconColor: '#6366f1', route: '/manage/chatops', section: 'monitoring', feature: 'chatops' },
+  { label: 'SLA Tracking', description: 'Error budgets and compliance', icon: 'shield-checkmark', iconColor: '#a855f7', route: '/manage/sla', section: 'monitoring', feature: 'sla' },
+  /* Enterprise */
+  { label: 'SSO / SAML', description: 'Single sign-on providers', icon: 'key', iconColor: '#ef4444', route: '/manage/sso', section: 'monitoring', feature: 'sso_saml' },
+  { label: 'Branding', description: 'White-label theme settings', icon: 'color-palette', iconColor: '#ec4899', route: '/manage/branding', section: 'monitoring', feature: 'white_label' },
+  { label: 'Custom Roles', description: 'Role-based access control', icon: 'people', iconColor: '#f97316', route: '/manage/roles', section: 'monitoring', feature: 'custom_roles' },
+  { label: 'IP Allowlist', description: 'Network access rules', icon: 'shield', iconColor: '#22c55e', route: '/manage/ip-allowlist', section: 'monitoring', feature: 'ip_allowlist' },
+  { label: 'mTLS', description: 'Mutual TLS certificates', icon: 'lock-closed', iconColor: '#14b8a6', route: '/manage/mtls', section: 'monitoring', feature: 'mtls' },
+  { label: 'Encryption', description: 'Data encryption at rest', icon: 'key', iconColor: '#6366f1', route: '/manage/encryption', section: 'monitoring', feature: 'encryption_at_rest' },
+  { label: 'Compliance Logs', description: 'Audit trail and compliance', icon: 'document-text', iconColor: '#a855f7', route: '/manage/compliance', section: 'monitoring', feature: 'compliance_logging' },
   /* Operations */
   { label: 'Event Log', description: 'Windows Event Log viewer', icon: 'document-text', iconColor: COLORS.orange, route: '/manage/eventlog', section: 'operations', windowsOnly: true },
   { label: 'Activity Log', description: 'Who did what and when', icon: 'list', iconColor: COLORS.textSecondary, route: '/manage/activity', section: 'operations' },

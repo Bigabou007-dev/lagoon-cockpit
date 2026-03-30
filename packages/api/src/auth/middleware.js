@@ -47,7 +47,7 @@ const _lockoutCleanupInterval = setInterval(
 
 /** Rate limit middleware for auth routes */
 function rateLimitAuth(req, res, next) {
-  const ip = req.ip || req.connection.remoteAddress;
+  const ip = req.ip || req.socket.remoteAddress;
   if (isRateLimited(ip)) {
     return res.status(429).json({
       error: "Too many failed attempts. Try again in 15 minutes.",

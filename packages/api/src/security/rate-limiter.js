@@ -99,7 +99,7 @@ const DEFAULTS = {
 function createRateLimiter(opts = {}) {
   const windowMs = opts.windowMs || DEFAULTS.windowMs;
   const max = opts.max || DEFAULTS.max;
-  const keyFn = opts.keyFn || ((req) => req.ip || req.connection.remoteAddress);
+  const keyFn = opts.keyFn || ((req) => req.ip || req.socket.remoteAddress);
   const message = opts.message || "Too many requests. Please try again later.";
 
   return async (req, res, next) => {
@@ -145,7 +145,7 @@ const strictLimiter = createRateLimiter({
 const userLimiter = createRateLimiter({
   windowMs: 60 * 1000,
   max: parseInt(process.env.RATE_LIMIT_USER_MAX || "200", 10),
-  keyFn: (req) => (req.user && req.user.id ? `user:${req.user.id}` : req.ip || req.connection.remoteAddress),
+  keyFn: (req) => (req.user && req.user.id ? `user:${req.user.id}` : req.ip || req.socket.remoteAddress),
 });
 
 module.exports = { createRateLimiter, globalLimiter, strictLimiter, userLimiter, setStore, RedisStore, MemoryStore };

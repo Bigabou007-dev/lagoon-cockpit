@@ -24,6 +24,8 @@
     },
     "production-private": {
       "extends": "production",
+      "distribution": "internal",
+      "android": { "buildType": "apk" },
       "env": { "COCKPIT_EDITION": "private" }
     }
   },
