@@ -23,7 +23,7 @@ The API is a single Docker container (~22MB RAM) that talks directly to the Dock
 
 No vendor lock-in. No cloud dependency. Your data stays on your server.
 
-MIT licensed. Contributions welcome.
+AGPL-3.0 licensed. Contributions welcome.
 
 https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 
