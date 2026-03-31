@@ -14,16 +14,16 @@ There had to be a better way.
 
 ## The problem
 
-I run multiple services on a VPS -- websites, APIs, AppFlowy Cloud, n8n workflows, a reverse proxy. That's 16 containers across 5 Docker Compose stacks. Monitoring tools like Portainer and Rancher exist, but they're desktop-first web UIs. On mobile, they're painful.
+I run multiple services on a VPS — websites, APIs, workflow automations, a reverse proxy. That's 16 containers across 5 Docker Compose stacks. Monitoring tools like Portainer and Rancher exist, but they're desktop-first web UIs. On mobile, they're painful.
 
 What I wanted:
 - **Native mobile app** with biometric lock
 - **At-a-glance dashboard** showing CPU, RAM, disk, container health
-- **Container management** -- start, stop, restart from a tap
-- **Compose stack management** -- bring up/down entire services
-- **SSL monitoring** -- know before certificates expire
-- **Push notifications** -- not just Telegram, but native mobile alerts
-- **Multi-server** -- manage staging, production, and dev from one app
+- **Container management** — start, stop, restart from a tap
+- **Compose stack management** — bring up/down entire services
+- **SSL monitoring** — know before certificates expire
+- **Push notifications** — not just Telegram, but native mobile alerts
+- **Multi-server** — manage staging, production, and dev from one app
 
 ## The architecture
 
@@ -31,7 +31,7 @@ What I wanted:
 
 ### 1. A lightweight API agent (per server)
 
-A single Express.js container that talks to the Docker Engine API via the unix socket. No shell commands, no Docker CLI -- just raw HTTP against `/var/run/docker.sock`.
+A single Express.js container that talks to the Docker Engine API via the unix socket. No shell commands, no Docker CLI — just raw HTTP against `/var/run/docker.sock`.
 
 ```js
 function dockerAPI(method, path, body = null) {
@@ -51,7 +51,7 @@ function dockerAPI(method, path, body = null) {
 
 This is significantly faster and more reliable than spawning `docker ps` and parsing text output. You get structured JSON with all container metadata, stats, and logs.
 
-**Stack discovery** uses Docker labels -- no compose files needed:
+**Stack discovery** uses Docker labels — no compose files needed:
 
 ```js
 const containers = await dockerAPI('GET', '/containers/json?all=true');
@@ -68,7 +68,7 @@ Every container created by `docker compose` gets a `com.docker.compose.project` 
 
 Five tabs: Overview, Containers, Stacks, Status, Alerts.
 
-The app connects to any number of Cockpit API instances -- add your production VPS, staging server, and dev box. Switch between them with a tap.
+The app connects to any number of Cockpit API instances — add your production VPS, staging server, and dev box. Switch between them with a tap.
 
 **Real-time updates** via Server-Sent Events (SSE). The API broadcasts system metrics and container state every 15 seconds. SSE is simpler than WebSocket, works over standard HTTP, and auto-reconnects on mobile network changes.
 
@@ -85,9 +85,9 @@ This is the part that kept me up at night. You're exposing Docker socket control
 **Dual auth modes:**
 - **API key mode**: Single admin, one key. Simple for solo operators.
 - **Multi-user mode**: SQLite-backed user accounts with three roles:
-  - `viewer` -- read-only dashboards
-  - `operator` -- can start/stop/restart containers
-  - `admin` -- full control including stack operations and user management
+  - `viewer` — read-only dashboards
+  - `operator` — can start/stop/restart containers
+  - `admin` — full control including stack operations and user management
 
 **JWT with refresh tokens**: 15-minute access tokens, 7-day refresh tokens with rotation. Rate limiting: 5 failed attempts = 15-minute lockout.
 
@@ -163,7 +163,7 @@ Set your API key and JWT secret in `.env`, run `docker compose up -d`, and conne
 
 ## Try it
 
-MIT licensed, open-source: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
+AGPL-3.0 licensed, open-source: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
 
 If you manage Docker infrastructure and have ever wished you could check on things from your phone without SSH, give it a shot. PRs welcome.
 
