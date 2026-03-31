@@ -1,33 +1,37 @@
 ---
-title: "I built a mobile DevOps dashboard because managing Docker from my phone shouldn't require SSH"
+title: "Your AI Agents Run 24/7. Your Laptop Doesn't. I Built a Mobile Docker Dashboard."
 published: false
-description: "Lagoon Cockpit is an open-source mobile-first dashboard for managing Docker infrastructure. Here's how I built it and why."
+description: "Lagoon Cockpit: an open-source mobile-native app for managing Docker containers, Compose stacks, and server health from your phone — built for the age of always-on automation."
 tags: docker, devops, reactnative, opensource
 cover_image: ""
 ---
 
-# I built a mobile DevOps dashboard because managing Docker from my phone shouldn't require SSH
+# Your AI Agents Run 24/7. Your Laptop Doesn't. I Built a Mobile Docker Dashboard.
 
-You're at dinner. Your monitoring bot sends a Telegram alert: a container is down. You pull out your phone, open a terminal emulator, fat-finger your SSH key passphrase three times, finally get in, type `docker ps`, squint at truncated output on a 6-inch screen, and run `docker restart nginx`.
+It's 2026. Your infrastructure doesn't sleep.
 
-There had to be a better way.
+You've got n8n pipelines processing data around the clock. AI agents running inference jobs. Deployment managers watching your CI/CD. Scheduled backups, monitoring bots, reverse proxies serving traffic globally. These services run 24/7 because that's the whole point — automation that works while you don't.
+
+But when something breaks — a container crashes, an agent pipeline stalls, a resource spike cascades — you need to respond *now*. Not after you drive home. Not after you open your laptop. Now.
+
+And you're not at your desk. You're commuting. At dinner. In a meeting. Traveling. Sleeping.
 
 ## The problem
 
-I run multiple services on a VPS — websites, APIs, workflow automations, a reverse proxy. That's 16 containers across 5 Docker Compose stacks. Monitoring tools like Portainer and Rancher exist, but they're desktop-first web UIs. On mobile, they're painful.
+Your options when something goes down:
+1. SSH from your phone (fat-finger your passphrase three times, squint at truncated output)
+2. Open Portainer on mobile Safari (pinch-zoom through a desktop UI on a 6-inch screen)
+3. Wait until you get to your laptop (while your automation is down and your clients are affected)
 
-What I wanted:
-- **Native mobile app** with biometric lock
-- **At-a-glance dashboard** showing CPU, RAM, disk, container health
-- **Container management** — start, stop, restart from a tap
-- **Compose stack management** — bring up/down entire services
-- **SSL monitoring** — know before certificates expire
-- **Push notifications** — not just Telegram, but native mobile alerts
-- **Multi-server** — manage staging, production, and dev from one app
+**None of these are acceptable when your infrastructure runs autonomously.**
+
+Portainer, Rancher, and similar tools are excellent — but they were built for a world where you sit at a monitor. That's not how infrastructure works anymore.
+
+So I built **Lagoon Cockpit**.
 
 ## The architecture
 
-**Lagoon Cockpit** is two things:
+**Lagoon Cockpit** is three things:
 
 ### 1. A lightweight API agent (per server)
 
@@ -72,101 +76,59 @@ The app connects to any number of Cockpit API instances — add your production 
 
 **Real-time updates** via Server-Sent Events (SSE). The API broadcasts system metrics and container state every 15 seconds. SSE is simpler than WebSocket, works over standard HTTP, and auto-reconnects on mobile network changes.
 
+### 3. A CLI companion
+
+25+ commands for terminal workflows: `npx lagoon-cockpit-cli ps`, `cockpit logs`, `cockpit exec` — everything the mobile app does, from your terminal.
+
+## What you can do from your phone
+
+- **Real-time dashboard** — CPU, RAM, disk, container count, stack health, alerts
+- **Container lifecycle** — start/stop/restart, logs with regex search, exec with command whitelist
+- **Compose stacks** — bring entire pipelines up/down with one tap
+- **Visual system map** — see your Docker topology, tap any node to manage
+- **SSL & endpoint monitoring** — cert expiry, response times, health checks
+- **Custom alert rules** — CPU > 90% for 5 min → push notification
+- **Scheduled cron actions** — restart that leaky container every Sunday at 3 AM
+- **Webhook integrations** — Slack, Discord, n8n for automated incident response
+- **Prometheus export** — 37 metrics at `/metrics` for Grafana dashboards
+
 ## The security model
 
-This is the part that kept me up at night. You're exposing Docker socket control over a network. The security audit (17 findings, all fixed before launch) shaped these decisions:
+This is the part that kept me up at night. You're exposing Docker socket control over a network. Two independent security audits (35 findings, all fixed) shaped these decisions:
 
 **No public ports.** The API container joins your reverse proxy network but exposes zero ports to the internet. Access it via Tailscale, WireGuard, or an IP-restricted reverse proxy.
 
-**Container ID validation.** Without this, a path traversal via crafted container IDs (`../../images/json`) could hit arbitrary Docker Engine API endpoints. Every ID is validated against `^[a-zA-Z0-9][a-zA-Z0-9_.-]{0,127}$`.
+**Container ID validation.** Without this, a path traversal via crafted container IDs could hit arbitrary Docker Engine API endpoints. Every ID is validated against a strict regex.
 
-**Self-protection.** The API detects its own container ID at startup and refuses to stop or restart itself. You can't accidentally brick your management plane.
+**Self-protection.** The API detects its own container ID at startup and refuses to stop or restart itself.
 
 **Dual auth modes:**
 - **API key mode**: Single admin, one key. Simple for solo operators.
-- **Multi-user mode**: SQLite-backed user accounts with three roles:
-  - `viewer` — read-only dashboards
-  - `operator` — can start/stop/restart containers
-  - `admin` — full control including stack operations and user management
+- **Multi-user mode**: SQLite-backed user accounts with three roles (viewer/operator/admin).
 
-**JWT with refresh tokens**: 15-minute access tokens, 7-day refresh tokens with rotation. Rate limiting: 5 failed attempts = 15-minute lockout.
+**JWT with refresh token rotation**: 15-minute access tokens, 7-day refresh tokens. Rate limiting: 5 failed attempts = 15-minute lockout.
 
-## Live demo output
-
-Here's what the API returns for a real production server:
-
-### System Overview
-```json
-{
-  "system": {
-    "cpuPercent": 5.9,
-    "cpuCount": 8,
-    "memory": { "percent": 34.49 },
-    "disk": { "percent": 13.95 },
-    "load": { "load1": 0.71 }
-  },
-  "containers": { "total": 16, "running": 16, "stopped": 0 },
-  "stacks": { "total": 5, "allHealthy": true }
-}
-```
-
-### SSL Certificates
-```json
-{
-  "certificates": [
-    { "domain": "example.com", "daysRemaining": 74, "issuer": "Let's Encrypt" },
-    { "domain": "api.example.com", "daysRemaining": 81, "issuer": "Let's Encrypt" }
-  ]
-}
-```
-
-### Endpoint Probes
-```json
-{
-  "endpoints": [
-    { "name": "Website", "status": 200, "healthy": true, "responseTime": 102 },
-    { "name": "API", "status": 200, "healthy": true, "responseTime": 108 }
-  ]
-}
-```
+**Exec whitelist**: Only pre-approved commands, argv execution, shell metacharacter blocking.
 
 ## Deployment
 
-Drop a single container on your server:
+One command:
 
-```yaml
-services:
-  cockpit-api:
-    build: .
-    container_name: lagoon_cockpit_api
-    restart: unless-stopped
-    env_file: .env
-    volumes:
-      - /var/run/docker.sock:/var/run/docker.sock
-      - /proc:/host/proc:ro
-      - cockpit_data:/app/data
-    networks:
-      - your_proxy_network
-    deploy:
-      resources:
-        limits: { cpus: "0.25", memory: 256M }
+```bash
+docker run -d \
+  -e API_KEY=your-key \
+  -v /var/run/docker.sock:/var/run/docker.sock \
+  ghcr.io/lagoon-tech-systems/cockpit:latest
 ```
 
-Set your API key and JWT secret in `.env`, run `docker compose up -d`, and connect from the mobile app.
-
-## What's next
-
-- **EAS builds** for direct APK/IPA distribution
-- **Docker image logs streaming** with real-time tail
-- **Container resource history** with sparkline graphs
-- **Webhook integrations** beyond Expo push notifications
+~22MB RAM. 0% CPU at idle. Connect from the mobile app or CLI and you're managing your infrastructure from your pocket.
 
 ## Try it
 
 AGPL-3.0 licensed, open-source: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
 
-If you manage Docker infrastructure and have ever wished you could check on things from your phone without SSH, give it a shot. PRs welcome.
+Your agents run 24/7. Now you can manage them from anywhere.
 
 ---
 
-*Built by [Lagoon Tech Systems](https://lagoontechsystems.com) in Abidjan, Cote d'Ivoire.*
+*Built by [Lagoon Tech Systems](https://lagoontechsystems.com) in Abidjan, Côte d'Ivoire.*
