@@ -1,3 +1,4 @@
+import '../src/pwa-register';
 import { Stack } from 'expo-router';
 import { StatusBar } from 'expo-status-bar';
 import { View, AppState, type AppStateStatus, ActivityIndicator } from 'react-native';

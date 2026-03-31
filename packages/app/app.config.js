@@ -4,7 +4,7 @@ module.exports = {
   expo: {
     name: EDITION === "ce" ? "Lagoon Cockpit CE" : "Lagoon Cockpit",
     slug: "lagoon-cockpit",
-    version: "1.0.0",
+    version: "2.0.0",
     orientation: "portrait",
     scheme: "lagoon-cockpit",
     userInterfaceStyle: "dark",
@@ -33,6 +33,11 @@ module.exports = {
     },
     web: {
       favicon: "./assets/favicon.png",
+      name: "Lagoon Cockpit",
+      shortName: "Cockpit",
+      themeColor: "#0D0D0D",
+      backgroundColor: "#0D0D0D",
+      description: "Self-hosted Docker management from your phone",
     },
     plugins: [
       "expo-router",
