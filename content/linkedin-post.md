@@ -1,25 +1,36 @@
-# LinkedIn Post — Lagoon Cockpit v3 Update
+# LinkedIn Post — Lagoon Cockpit
 
 ---
 
-One week ago I open-sourced Lagoon Cockpit -- a mobile DevOps dashboard.
+We're in the age of autonomous agents and always-on automation. People are running n8n pipelines, AI workflows, deployment managers, and production services that work 24/7.
 
-Since then it went from "monitor Docker containers" to a full cross-platform infrastructure command center. Here's what shipped in v3:
+When something goes down—a container crashes, an agent pipeline breaks, resources spike—the cost is immediate. Your automation stops. Your clients are affected. And you're NOT sitting at your desk.
 
-**Windows Server support.** Same app, second server profile. Monitor Windows Services, processes, and system resources -- all from your phone next to your Docker containers.
+The existing tools (Portainer, Rancher) were built for a world where you sit at a monitor. That's not 2026.
 
-**23 API endpoints on Linux. 15 on Windows.** Container exec with a security-hardened command whitelist. Regex log search. Bulk operations. Nuke & rebuild. Scheduled cron actions. Custom alert rules. Webhook integrations.
+Just open-sourced Lagoon Cockpit—a native mobile app for managing your entire Docker infrastructure from your phone, anywhere.
 
-**A visual system map** that shows your entire Docker topology -- stacks grouped, networks connected, health color-coded. Tap any node to manage it.
+What you can do from your phone:
+- Real-time CPU, RAM, disk gauges with auto-refresh
+- Start/stop/restart containers and full Compose stacks
+- Container logs, exec, regex search
+- Visual system map of your Docker topology
+- SSL cert monitoring + endpoint health checks
+- Custom alert rules + webhook integrations (Slack, Discord, n8n)
+- Scheduled container actions (cron)
+- Push notifications when things go wrong
+- Multi-server—manage multiple VPS from one app
+- Role-based access for teams (admin/operator/viewer)
 
-**A CLI companion** with 20 commands. `cockpit ps`, `cockpit logs`, `cockpit exec` -- everything the mobile app does, from your terminal.
+The API is a single Docker container (~22MB RAM). Deploys in one command:
+docker run ghcr.io/lagoon-tech-systems/cockpit:latest
 
-**35 security findings fixed** across 2 full audits before going public. Shell injection prevention, SSRF protection, rate limiting, role-based access control.
+Or use the CLI: npx lagoon-cockpit-cli overview
 
-10,000+ lines across 4 packages. AGPL-3.0 licensed. Running in production right now.
+No vendor lock-in. No cloud dependency. Your data stays on your server. Passed 2 independent security audits. Running in production right now.
 
-The goal was simple: manage your servers from your phone without SSH. We went a bit further than that.
+AGPL-3.0 licensed. Contributions welcome.
 
 https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 
-#OpenSource #DevOps #Docker #ReactNative #InfrastructureMonitoring #SelfHosted
+#DevOps #Docker #OpenSource #MobileDevOps #ReactNative #Infrastructure #SelfHosted
