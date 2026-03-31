@@ -170,7 +170,7 @@ Scan the QR code with Expo Go on your phone. Add your server URL + API key, and 
 
 GitHub: [github.com/Lagoon-Tech-Systems/lagoon-cockpit](https://github.com/Lagoon-Tech-Systems/lagoon-cockpit)
 
-MIT licensed. Stars, issues, and PRs welcome.
+AGPL-3.0 licensed. Stars, issues, and PRs welcome.
 
 ---
 
