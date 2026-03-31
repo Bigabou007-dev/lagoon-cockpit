@@ -4,24 +4,34 @@
 
 **Post:**
 
-Just open-sourced Lagoon Cockpit — a mobile DevOps dashboard for managing Docker infrastructure from your phone.
+We're in the age of autonomous agents and always-on automation. People are running n8n pipelines, AI workflows, deployment managers, and production services that work 24/7.
 
-The problem: Every time I needed to check on production while away from my desk, it meant SSH-ing from my phone or waiting for a Telegram alert. Portainer and Rancher are great, but they're desktop-first web UIs that don't work well on mobile.
+When something goes down—a container crashes, an agent pipeline breaks, resources spike—the cost is immediate. Your automation stops. Your clients are affected. And you're NOT sitting at your desk.
 
-So I built what I wanted: a native mobile app that connects to a lightweight API agent running on each server.
+You might be commuting. At lunch. In a meeting. With your family. Traveling.
 
-What it does:
-- Real-time overview of CPU, RAM, disk, and container health
-- Start/stop/restart individual containers or entire Docker Compose stacks
-- View container logs from your phone
-- SSL certificate and endpoint monitoring
+The existing tools (Portainer, Rancher) were built for a world where you sit at a monitor. That's not 2026.
+
+Just open-sourced Lagoon Cockpit—a native mobile app for managing your entire Docker infrastructure from your phone, anywhere.
+
+What you can do from your phone:
+- Real-time CPU, RAM, disk gauges with auto-refresh
+- Start/stop/restart containers and full Compose stacks
+- Container logs, exec, regex search
+- Visual system map of your Docker topology
+- SSL cert monitoring + endpoint health checks
+- Custom alert rules + webhook integrations (Slack, Discord, n8n)
+- Scheduled container actions (cron)
 - Push notifications when things go wrong
-- Multi-server support — manage multiple VPS from one app
+- Multi-server—manage multiple VPS from one app
 - Role-based access for teams (admin/operator/viewer)
 
-The API is a single Docker container (~22MB RAM) that talks directly to the Docker Engine socket. The mobile app is built with Expo/React Native with biometric lock.
+The API is a single Docker container (~22MB RAM). Deploys in one command:
+docker run ghcr.io/lagoon-tech-systems/cockpit:latest
 
-No vendor lock-in. No cloud dependency. Your data stays on your server.
+Or use the CLI: npx lagoon-cockpit-cli overview
+
+No vendor lock-in. No cloud dependency. Your data stays on your server. Passed 2 independent security audits. Running in production right now.
 
 AGPL-3.0 licensed. Contributions welcome.
 
@@ -32,6 +42,7 @@ https://github.com/Lagoon-Tech-Systems/lagoon-cockpit
 ---
 
 **Notes for posting:**
-- Post from Lagoon Tech Systems company page or personal profile
-- Add the repo screenshot or demo GIF as the post image
-- Tag relevant communities: #DevOps #Docker #OpenSource
+- Post from personal profile (3–5x more reach than company page)
+- Add the demo GIF or social card as the post media
+- Post Tuesday–Thursday, 8–10 AM WAT
+- Respond to every comment within the first 2 hours
