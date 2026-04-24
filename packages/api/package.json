@@ -9,7 +9,7 @@
     "test": "jest --forceExit --detectOpenHandles"
   },
   "dependencies": {
-    "ajv": "^8.18.0",
+    "ajv": "^8.20.0",
     "ajv-formats": "^3.0.1",
     "bcryptjs": "^3.0.3",
     "better-sqlite3": "^12.8.0",
